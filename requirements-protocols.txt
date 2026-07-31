@@ -1,0 +1,33 @@
+# Protocol-specific scientific dependencies.
+#
+# Referenced by README.md and by the `protocols` extra in pyproject.toml. These
+# are the heavier packages needed only by individual validation (VP_*) and
+# falsification (FP_*) protocols, kept separate so the core CLI and GUIs can be
+# installed without them.
+#
+# Install:  python3 -m pip install -r requirements-protocols.txt
+#      or:  python3 -m pip install '.[protocols]'
+
+# --- Deep learning (VP_01, VP_06, FP_06, FP_11) ---------------------------
+torch>=2.2.0
+torchvision>=0.17.0
+
+# --- Bayesian inference and MCMC (VP_02, VP_11, FP_10) --------------------
+pymc>=5.0.0,<6.0.0
+arviz>=0.17.0,<1.0.0
+
+# --- Neurophysiology / EEG (VP_09, VP_18, FP_09) --------------------------
+mne>=1.7.0,<1.8.0
+
+# --- Sensitivity analysis and nonlinear dynamics (FP_08, FP_11) -----------
+SALib>=1.5.0,<2.0.0
+nolds>=0.6.0,<1.7.0
+numba>=0.59.0
+
+# --- Symbolic mathematics (VP_07a, FP_07) ---------------------------------
+sympy>=1.12,<2.0.0
+
+# --- Survival analysis and model interpretability (VP_12, FP_13) ----------
+lifelines>=0.28.0,<0.29.0
+shap>=0.44.0
+captum>=0.8.0,<0.9.0

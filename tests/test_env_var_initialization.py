@@ -33,10 +33,26 @@ def reset_key_manager_singleton():
 
 
 @pytest.fixture
-def clean_env():
-    """Fixture to clean environment variables."""
+def clean_env(tmp_path, monkeypatch):
+    """Clean environment variables and isolate key material.
+
+    These tests deliberately unset the key environment variables to exercise
+    the file-backed path. Without an isolated keys directory that path resolves
+    to the repository's real ``.keys/``, so the suite would depend on — and
+    mutate — the developer's own key material.
+    """
+    import utils.secure_key_manager as skm
+
     original_env = os.environ.copy()
+    original_manager = skm._secure_key_manager
+
+    # Key files are resolved relative to the working directory.
+    monkeypatch.chdir(tmp_path)
+    skm._secure_key_manager = None
+
     yield
+
+    skm._secure_key_manager = original_manager
     os.environ.clear()
     os.environ.update(original_env)
 

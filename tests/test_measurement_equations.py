@@ -18,27 +18,60 @@ def test_compute_HEP_basic():
 
 
 def test_compute_HEP_high_precision():
-    """Test HEP with high interoceptive precision."""
-    hep_low = MeasurementEquations.compute_HEP(Pi_i_eff=0.5, M_ca=0.0, beta=1.0)
-    hep_high = MeasurementEquations.compute_HEP(Pi_i_eff=2.0, M_ca=0.0, beta=1.0)
-    # Higher precision should give larger HEP
-    assert hep_high >= hep_low
+    """Higher interoceptive precision gives larger HEP in expectation.
+
+    Compared over a seeded ensemble rather than two single draws — see the
+    note below _mean_hep. Comparing single draws passed in isolation and failed
+    under the full suite's RNG state.
+    """
+    assert _mean_hep(0, Pi_i_eff=2.0, M_ca=0.0, beta=1.0) > _mean_hep(0, Pi_i_eff=0.5, M_ca=0.0, beta=1.0)
+
+
+# compute_HEP adds unseeded measurement noise (sigma = 0.5 uV, comparable to the
+# signal itself) and clamps the result at HEP_MINIMUM = 0.1. Comparing two single
+# draws is therefore flaky by construction: noise routinely inverts the ordering
+# and the clamp can floor either arm. These tests assert the monotonic
+# relationship the model actually claims, over a seeded ensemble.
+
+HEP_ENSEMBLE_DRAWS = 400
+
+
+def _mean_hep(seed, **kwargs):
+    import numpy as np
+
+    rng_state = np.random.get_state()
+    np.random.seed(seed)
+    try:
+        return float(np.mean([MeasurementEquations.compute_HEP(**kwargs) for _ in range(HEP_ENSEMBLE_DRAWS)]))
+    finally:
+        np.random.set_state(rng_state)
 
 
 def test_compute_HEP_somatic_marker():
-    """Test HEP with somatic marker modulation."""
-    hep_low = MeasurementEquations.compute_HEP(Pi_i_eff=1.0, M_ca=-1.0, beta=1.0)
-    hep_high = MeasurementEquations.compute_HEP(Pi_i_eff=1.0, M_ca=1.0, beta=1.0)
-    # Higher somatic marker should give larger HEP
-    assert hep_high >= hep_low
+    """Higher somatic marker gives larger HEP in expectation."""
+    hep_low = _mean_hep(0, Pi_i_eff=1.0, M_ca=-1.0, beta=1.0)
+    hep_high = _mean_hep(0, Pi_i_eff=1.0, M_ca=1.0, beta=1.0)
+    assert hep_high > hep_low, f"HEP should rise with somatic marker: {hep_low} -> {hep_high}"
 
 
 def test_compute_HEP_beta_modulation():
-    """Test HEP with beta gain modulation."""
-    hep_low = MeasurementEquations.compute_HEP(Pi_i_eff=1.0, M_ca=0.0, beta=0.5)
-    hep_high = MeasurementEquations.compute_HEP(Pi_i_eff=1.0, M_ca=0.0, beta=2.0)
-    # Higher beta should give larger HEP
-    assert hep_high >= hep_low
+    """Higher beta gain gives larger HEP in expectation."""
+    hep_low = _mean_hep(0, Pi_i_eff=1.0, M_ca=0.0, beta=0.5)
+    hep_high = _mean_hep(0, Pi_i_eff=1.0, M_ca=0.0, beta=2.0)
+    assert hep_high > hep_low, f"HEP should rise with beta gain: {hep_low} -> {hep_high}"
+
+
+def test_compute_HEP_precision_modulation():
+    """Higher interoceptive precision gives larger HEP in expectation."""
+    hep_low = _mean_hep(0, Pi_i_eff=0.5, M_ca=0.0, beta=1.0)
+    hep_high = _mean_hep(0, Pi_i_eff=2.0, M_ca=0.0, beta=1.0)
+    assert hep_high > hep_low
+
+
+def test_compute_HEP_never_below_floor():
+    """The clamp must hold even for strongly suppressing parameters."""
+    for _ in range(200):
+        assert MeasurementEquations.compute_HEP(Pi_i_eff=0.01, M_ca=-2.0, beta=0.1) >= 0.1
 
 
 def test_compute_P3b_latency_basic():

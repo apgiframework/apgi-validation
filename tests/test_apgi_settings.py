@@ -33,20 +33,29 @@ def test_master_key_required_without_ephemeral(monkeypatch, tmp_path):
         SecureKeyManager(keys_dir=str(tmp_path / ".keys"))
 
 
-def test_get_jwt_secret_falls_back_to_pickle(monkeypatch, tmp_path):
+def test_get_jwt_secret_uses_dedicated_key(monkeypatch, tmp_path):
+    """JWT signing material must be independent of the pickle secret.
+
+    This previously asserted the opposite — that get_jwt_secret() returned the
+    pickle key — encoding a real flaw as the expected behaviour. Sharing one
+    key across two trust domains means a pickle-key rotation silently
+    invalidates every issued token, and one compromised key grants authority
+    over both.
+    """
     from utils.secure_key_manager import get_jwt_secret, get_secure_key_manager
 
     monkeypatch.setenv("APGI_ALLOW_EPHEMERAL_MASTER_KEY", "1")
     monkeypatch.delenv("APGI_JWT_SECRET", raising=False)
+    monkeypatch.delenv("PICKLE_SECRET_KEY", raising=False)
 
-    # Use the same global instance for both calls
     mgr = get_secure_key_manager()
     mgr._keys_dir = str(tmp_path / ".keys")  # Override the keys directory
     pickle_key = mgr.get_pickle_secret_key()
     jwt_secret = get_jwt_secret()
 
-    # Compare the full keys, not just substrings
-    assert jwt_secret == pickle_key
+    assert jwt_secret != pickle_key, "JWT secret must not reuse the pickle key"
+    assert len(jwt_secret) == 64
+    assert jwt_secret == mgr.get_jwt_secret_key()
 
 
 def test_env_hex_keys_short_circuit(monkeypatch):

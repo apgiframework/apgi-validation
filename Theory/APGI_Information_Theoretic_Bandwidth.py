@@ -213,9 +213,18 @@ def _mutual_info_bits(
 
     Uses sklearn.metrics.mutual_info_score when available (returns nats,
     converted via /ln2), otherwise falls back to a vectorised numpy formula.
+
+    The sklearn path is also abandoned if it raises TypeError: some
+    scipy/sklearn combinations build the contingency table as a sparse matrix
+    whose ``.sum()`` rejects the ``initial`` keyword sklearn passes, e.g.
+    "matrix.sum() got an unexpected keyword argument 'initial'". The NumPy
+    fallback below is exact, so degrading to it costs accuracy nothing.
     """
     if HAS_SKLEARN:
-        return float(_skl_mi(labels_a, labels_b) / np.log(2.0))
+        try:
+            return float(_skl_mi(labels_a, labels_b) / np.log(2.0))
+        except TypeError:
+            pass  # dependency skew; use the exact NumPy path below
     # Vectorised fallback
     a, b = np.asarray(labels_a, dtype=int), np.asarray(labels_b, dtype=int)
     Ka, Kb = a.max() + 1, b.max() + 1
@@ -372,7 +381,29 @@ class BandwidthDerivation:
 
         Returns:
             BandwidthResult with I(S;B), bandwidth, and APGI formula outputs.
+
+        Raises:
+            ValueError: If any parameter is outside its physically meaningful
+                range. Precisions are inverse variances and sigmoid steepness a
+                gain, so all must be positive; a negative value previously
+                produced a plausible-looking bandwidth from meaningless inputs.
         """
+        for name, value in (
+            ("Pi_e", Pi_e),
+            ("Pi_i", Pi_i),
+            ("alpha", alpha),
+            ("stimulus_rate_Hz", stimulus_rate_Hz),
+        ):
+            if not np.isfinite(value):
+                raise ValueError(f"{name} must be finite, got {value!r}")
+            if value <= 0.0:
+                raise ValueError(f"{name} must be positive, got {value!r}")
+
+        if not np.isfinite(theta_baseline):
+            raise ValueError(f"theta_baseline must be finite, got {theta_baseline!r}")
+        if sigma_theta < 0.0 or not np.isfinite(sigma_theta):
+            raise ValueError(f"sigma_theta must be finite and non-negative, got {sigma_theta!r}")
+
         # Stimulus grid: K levels uniformly spaced over [−3σ, +3σ]
         stimulus_levels = np.linspace(-3.0, 3.0, self.N_stimulus_bins)
         K = self.N_stimulus_bins
@@ -709,6 +740,24 @@ class ClinicalProfile:
     sigma_theta: float  # Trial-to-trial threshold variance (ADHD proxy)
     description: str  # Clinical mechanism
 
+    def validate_parameters(self) -> bool:
+        """Check that this profile is physically meaningful.
+
+        Mirrors the guard in :meth:`BandwidthDerivation.compute`, so a profile
+        can be screened before it is used to drive a simulation.
+
+        Returns:
+            True if every parameter lies in its admissible range.
+        """
+        positive = (self.Pi_e, self.Pi_i, self.alpha)
+        if any(not np.isfinite(v) or v <= 0.0 for v in positive):
+            return False
+        if not np.isfinite(self.theta_baseline):
+            return False
+        if not np.isfinite(self.sigma_theta) or self.sigma_theta < 0.0:
+            return False
+        return True
+
 
 # Canonical profiles (physiologically calibrated to literature)
 CLINICAL_PROFILES: Dict[str, ClinicalProfile] = {
@@ -809,12 +858,30 @@ class ClinicalBandwidthMapper:
         Compute I(S;B) and bandwidth for all clinical profiles.
 
         Args:
-            profiles: Override the default CLINICAL_PROFILES dict.
+            profiles: Override the default CLINICAL_PROFILES dict. Must include
+                an "HC" (healthy control) entry, which is used as the reference
+                against which every disorder profile is contrasted.
 
         Returns:
             ClinicalBandwidthResult with per-disorder bandwidth statistics.
+
+        Raises:
+            KeyError: If ``profiles`` omits the required "HC" baseline. Raised
+                explicitly here rather than as a bare lookup failure deep in the
+                heatmap computation.
+            ValueError: If any supplied profile is not physically meaningful.
         """
         profiles = profiles or CLINICAL_PROFILES
+
+        if "HC" not in profiles:
+            raise KeyError(
+                "compute_all requires an 'HC' (healthy control) profile as the comparison "
+                f"baseline; got profiles: {sorted(profiles)}"
+            )
+
+        invalid = [name for name, prof in profiles.items() if not prof.validate_parameters()]
+        if invalid:
+            raise ValueError(f"Clinical profiles have non-physical parameters: {invalid}")
 
         bandwidth_bps: Dict[str, float] = {}
         I_bits_d: Dict[str, float] = {}

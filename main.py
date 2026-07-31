@@ -519,8 +519,15 @@ def cli(ctx, config_file, log_level, verbose, quiet, token):
         console.print(f"Using config: {config_file} (version: {get_config_value('version')})")
 
     if log_level:
-        # set_parameter("logging", "level", log_level.upper())
-        apgi_logger.logger.info(f"Log level overridden to: {log_level.upper()}")
+        from utils.logging_config import set_log_level
+
+        try:
+            applied = set_log_level(log_level)
+        except ValueError as exc:
+            console.print(f"[red]❌ Error: {exc}[/red]")
+            ctx.exit(2)
+        set_config_value("log_level", applied)
+        apgi_logger.logger.info(f"Log level overridden to: {applied}")
 
     # 4. Security Gateway Initialization
     from utils.security_gateway import Role, SecurityGateway
@@ -1029,6 +1036,24 @@ def _sanitize_error_message(error_msg: str) -> str:
         "[JWT_REDACTED]",
         error_msg,
     )
+
+    # Bearer / Basic authorization headers. Must run before the name=value rule
+    # below, which would otherwise match the "Authorization:" prefix and leave
+    # the actual credential in place — redaction that looks applied but is not.
+    error_msg = re.sub(r"(?i)\b(bearer|basic)\s+\S+", r"\1 [REDACTED]", error_msg)
+
+    # Credential assignments such as password=hunter2 or "api_key": "sk-live-1".
+    # The length-based rules below only catch long opaque blobs, so short but
+    # entirely real secrets in name=value form were passing through verbatim —
+    # straight into the logs, contrary to this function's documented contract.
+    error_msg = re.sub(
+        r"(?i)(pass(?:word|wd|phrase)?|secret|token|api[_-]?key|access[_-]?key"
+        r"|auth(?:orization)?|credential|private[_-]?key|session[_-]?id)"
+        r"[\"']?\s*[:=]\s*[\"']?([^\s,;\"'&}]+)[\"']?",
+        r"\1=[REDACTED]",
+        error_msg,
+    )
+
     # Hex-encoded keys (32+ chars, typically 64 for 256-bit keys) - before API key pattern
     error_msg = re.sub(r"\b[a-fA-F0-9]{32,}\b", "[HEX_REDACTED]", error_msg)
     # API keys, tokens, or secrets (typically 40+ chars with mixed case/numbers)

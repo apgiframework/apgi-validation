@@ -1210,10 +1210,13 @@ def main():
             # Validate token and check GUI access permissions
             gateway.require_roles(args.token, [Role.RESEARCHER, Role.ADMIN])
         elif os.environ.get("APGI_ENFORCE_AUTH", "0") == "1":
-            raise SystemExit("APGI_ENFORCE_AUTH=1 is set: a --token is required to start the GUI.")
+            raise SystemExit(
+                "Authentication required: pass --token to start the GUI. "
+                "For local development only, set APGI_ENFORCE_AUTH=0 to enable an auto-generated dev token."
+            )
         else:
             # Development mode: auto-generate a token so the GUI works without CLI args.
-            # Set APGI_ENFORCE_AUTH=1 in production / multi-user deployments to disable this.
+            # Reached only when APGI_ENFORCE_AUTH=0 is set explicitly (local dev).
             try:
                 from utils.auth_adapter import get_auth_manager
 

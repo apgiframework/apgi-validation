@@ -37,26 +37,58 @@ python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-Install the required Python packages:
+Install the required Python packages. `requirements.txt` includes
+`requirements-protocols.txt`, so this single command installs everything:
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-For protocol-specific dependencies:
+To install only the core CLI and GUIs, without the heavier protocol stack
+(torch, PyMC, MNE):
 
 ```bash
-python3 -m pip install -r requirements-protocols.txt
+python3 -m pip install .
+```
+
+Or as an editable install with the protocol extras and dev tooling:
+
+```bash
+python3 -m pip install -e '.[protocols,dev]'
 ```
 
 ### Required Environment Variables
 
-Set the minimum required security keys:
+Copy the template and generate a master key:
 
 ```bash
-export PICKLE_SECRET_KEY=$(python3 -c "import os; print(os.urandom(32).hex())")
-export APGI_BACKUP_HMAC_KEY=$(python3 -c "import os; print(os.urandom(32).hex())")
+cp .env.example .env
 ```
+
+```bash
+python3 -c "from cryptography.fernet import Fernet; print('APGI_MASTER_KEY=' + Fernet.generate_key().decode())" >> .env
+```
+
+`APGI_MASTER_KEY` is the only key you must supply. It encrypts the pickle,
+backup-HMAC and JWT keys, each of which is minted automatically into `.keys/`
+on first run. Keep it safe: if it is lost, existing key files cannot be
+decrypted, and the framework will refuse to start rather than silently
+replacing them. Recover by restoring the key, or by rotating:
+
+```bash
+python3 -m utils.key_rotation_manager --rotate
+```
+
+For development and CI you can skip the master key entirely by allowing an
+ephemeral one — never do this in production:
+
+```bash
+export APGI_ALLOW_EPHEMERAL_MASTER_KEY=1
+```
+
+Authentication is enforced by default. GUIs require `--token`; for local
+single-user work, set `APGI_ENFORCE_AUTH=0` to get an auto-generated
+24-hour development token.
 
 ### Quick Start
 

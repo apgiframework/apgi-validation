@@ -1,5 +1,7 @@
 """Tests for Spectral Analysis module - comprehensive coverage."""
 
+import pytest
+
 try:
     import numpy as np
 
@@ -49,7 +51,12 @@ class TestComputeSpectralSlopeSpecparam:
         power = 1 / freqs
 
         result = compute_spectral_slope_specparam(freqs, power)
-        assert "aperiodic_exponent" in result
+
+        # The result key is "exponent", not "aperiodic_exponent".
+        assert "exponent" in result
+        assert result["fit_success"] is True, f"Fit failed: {result.get('error_message')}"
+        # A pure 1/f spectrum has an aperiodic exponent of 1.
+        assert result["exponent"] == pytest.approx(1.0, abs=0.05)
 
     def test_spectral_slope_with_peaks(self):
         """Test spectral slope with periodic peaks."""

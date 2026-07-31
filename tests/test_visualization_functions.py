@@ -39,7 +39,7 @@ class TestLoadVisualizationData:
 
         result = _load_visualization_data(str(test_file))
 
-        self.assertIsNotNone(result)
+        assert result is not None
 
     @patch("main.pd.read_csv")
     def test_load_visualization_data_file_not_found(self, mock_read_csv, tmp_path):
@@ -49,7 +49,7 @@ class TestLoadVisualizationData:
 
         result = _load_visualization_data(str(test_file))
 
-        self.assertIsNone(result)
+        assert result is None
 
     @patch("main.pd.read_csv")
     def test_load_visualization_data_parser_error(self, mock_read_csv, tmp_path):
@@ -59,7 +59,7 @@ class TestLoadVisualizationData:
 
         result = _load_visualization_data(str(test_file))
 
-        self.assertIsNone(result)
+        assert result is None
 
 
 class TestParseVisualizationParameters:
@@ -73,39 +73,39 @@ class TestParseVisualizationParameters:
         """Test parsing with invalid figsize."""
         result = _parse_visualization_parameters("invalid", "30", "1.5", "50", "12", "1", "1")
 
-        self.assertEqual(result[0], 12)  # Default width
-        self.assertEqual(result[1], 8)  # Default height
+        assert result[0] == 12  # Default width
+        assert result[1] == 8  # Default height
 
     def test_parse_visualization_parameters_invalid_bins(self):
         """Test parsing with invalid bins."""
         result = _parse_visualization_parameters("12,8", "200", "1.5", "50", "12", "1", "1")
 
-        self.assertEqual(result[2], 30)  # Default bins
+        assert result[2] == 30  # Default bins
 
     def test_parse_visualization_parameters_invalid_linewidth(self):
         """Test parsing with invalid linewidth."""
         result = _parse_visualization_parameters("12,8", "30", "10", "50", "12", "1", "1")
 
-        self.assertEqual(result[3], 1.5)  # Default linewidth
+        assert result[3] == 1.5  # Default linewidth
 
     def test_parse_visualization_parameters_invalid_markersize(self):
         """Test parsing with invalid markersize."""
         result = _parse_visualization_parameters("12,8", "30", "1.5", "500", "12", "1", "1")
 
-        self.assertEqual(result[4], 50.0)  # Default markersize
+        assert result[4] == 50.0  # Default markersize
 
     def test_parse_visualization_parameters_invalid_font_size(self):
         """Test parsing with invalid font size."""
         result = _parse_visualization_parameters("12,8", "30", "1.5", "50", "30", "1", "1")
 
-        self.assertEqual(result[5], 12)  # Default font size
+        assert result[5] == 12  # Default font size
 
     def test_parse_visualization_parameters_invalid_subplots(self):
         """Test parsing with invalid subplot dimensions."""
         result = _parse_visualization_parameters("12,8", "30", "1.5", "50", "12", "5", "5")
 
-        self.assertEqual(result[6], 1)  # Default rows
-        self.assertEqual(result[7], 1)  # Default cols
+        assert result[6] == 1  # Default rows
+        assert result[7] == 1  # Default cols
 
 
 class TestSetupPlottingStyle:
@@ -151,8 +151,8 @@ class TestCreateFigureAndAxes:
 
         fig, axes = _create_figure_and_axes(12, 8, 1, 1, "auto", mock_plt)
 
-        self.assertEqual(fig, mock_fig)
-        self.assertEqual(list(axes), mock_ax_flat)
+        assert fig == mock_fig
+        assert list(axes) == mock_ax_flat
 
     def test_create_figure_and_axes_multiple(self):
         """Test creating multiple subplots."""
@@ -165,8 +165,8 @@ class TestCreateFigureAndAxes:
 
         fig, axes = _create_figure_and_axes(12, 8, 2, 2, "auto", mock_plt)
 
-        self.assertEqual(fig, mock_fig)
-        self.assertEqual(len(axes), 4)
+        assert fig == mock_fig
+        assert len(axes) == 4
 
 
 class TestCreateTimeSeriesPlot:
@@ -179,7 +179,7 @@ class TestCreateTimeSeriesPlot:
 
         _create_time_series_plot(data, axes, 0.5, 1.5, "o", 50, "Time", "Value", "Test Plot", True, True)
 
-        self.assertTrue(axes[0].plot.called)
+        assert axes[0].plot.called
 
     def test_create_time_series_plot_no_numeric(self):
         """Test creating time series plot with no numeric data."""
@@ -202,8 +202,8 @@ class TestCreateScatterPlot:
 
         result = _create_scatter_plot(data, axes, 0.5, 50, "o", 1.5, "X", "Y", "Test Plot", True, True)
 
-        self.assertTrue(result)
-        self.assertTrue(axes[0].scatter.called)
+        assert result
+        assert axes[0].scatter.called
 
     @patch("main.console")
     def test_create_scatter_plot_insufficient_columns(self, mock_console):
@@ -213,7 +213,7 @@ class TestCreateScatterPlot:
 
         result = _create_scatter_plot(data, axes, 0.5, 50, "o", 1.5, "X", "Y", "Test Plot", True, True)
 
-        self.assertFalse(result)
+        assert not (result)
 
 
 class TestCreateHeatmapPlot:
@@ -227,8 +227,8 @@ class TestCreateHeatmapPlot:
 
         result = _create_heatmap_plot(data, "viridis", 0.8, mock_sns, mock_plt)
 
-        self.assertTrue(result)
-        self.assertTrue(mock_sns.heatmap.called)
+        assert result
+        assert mock_sns.heatmap.called
 
     def test_create_heatmap_plot_no_numeric(self):
         """Test creating heatmap plot with no numeric data."""
@@ -238,7 +238,7 @@ class TestCreateHeatmapPlot:
 
         result = _create_heatmap_plot(data, "viridis", 0.8, mock_sns, mock_plt)
 
-        self.assertFalse(result)
+        assert not (result)
 
 
 class TestCreateDistributionPlot:
@@ -251,7 +251,7 @@ class TestCreateDistributionPlot:
 
         result = _create_distribution_plot(data, 30, 0.8, True, mock_plt)
 
-        self.assertTrue(result)
+        assert result
 
     def test_create_distribution_plot_no_numeric(self):
         """Test creating distribution plot with no numeric data."""
@@ -260,7 +260,7 @@ class TestCreateDistributionPlot:
 
         result = _create_distribution_plot(data, 30, 0.8, True, mock_plt)
 
-        self.assertFalse(result)
+        assert not (result)
 
 
 class TestCreatePlotByType:
@@ -296,7 +296,7 @@ class TestCreatePlotByType:
             mock_plt,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_time_series.assert_called_once()
 
     @patch("main._create_scatter_plot")
@@ -329,7 +329,7 @@ class TestCreatePlotByType:
             mock_plt,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_scatter.assert_called_once()
 
     @patch("main._create_heatmap_plot")
@@ -362,7 +362,7 @@ class TestCreatePlotByType:
             mock_plt,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_heatmap.assert_called_once()
 
     @patch("main._create_distribution_plot")
@@ -395,7 +395,7 @@ class TestCreatePlotByType:
             mock_plt,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_distribution.assert_called_once()
 
     def test_create_plot_by_type_invalid(self):
@@ -426,4 +426,4 @@ class TestCreatePlotByType:
             mock_plt,
         )
 
-        self.assertFalse(result)
+        assert not (result)

@@ -95,7 +95,7 @@ class InputSanitizer:
                     min_val=spec.get("min"),
                     max_val=spec.get("max"),
                 )
-            elif p_type == str:
+            elif p_type is str:
                 sanitized[name] = cls.sanitize_string(val, pattern=spec.get("pattern", r"^[a-zA-Z0-9_\-\.]+$"))
             else:
                 sanitized[name] = val  # Passthrough for complex types (should be handled by Pydantic usually)

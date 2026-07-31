@@ -158,14 +158,19 @@ class TestConfigLoader:
 class TestThresholdRegistry:
     """Test the threshold_registry utility module."""
 
+    # Thresholds are named by the prediction they gate (pred_<id>_<measure>).
+    # The previous tests used four invented names — cumulative_reward_advantage_
+    # threshold, cohens_d_threshold, significance_level, threshold_reduction_min —
+    # none of which exists on FalsificationThresholds.
+
     def test_falsification_thresholds_defaults(self):
         """Test FalsificationThresholds default values."""
         thresholds = FalsificationThresholds()
 
-        assert thresholds.cumulative_reward_advantage_threshold == 18.0
-        assert thresholds.cohens_d_threshold == 0.60
-        assert thresholds.significance_level == 0.01
-        assert thresholds.threshold_reduction_min == 20.0
+        assert thresholds.pred_1b_diastole_advantage_pct == 5.0
+        assert thresholds.pred_2a_reward_ratio == 1.15
+        assert thresholds.pred_0a_r_confirm == 0.35
+        assert thresholds.pred_0b_bf10 == 100.0
 
     def test_threshold_registry_initialization(self):
         """Test ThresholdRegistry initialization."""
@@ -173,22 +178,30 @@ class TestThresholdRegistry:
         assert isinstance(registry.thresholds, FalsificationThresholds)
 
         # Test getting individual thresholds
-        advantage_threshold = registry.get_threshold("cumulative_reward_advantage_threshold")
-        assert advantage_threshold == 18.0
-
-        cohens_d = registry.get_threshold("cohens_d_threshold")
-        assert cohens_d == 0.60
+        assert registry.get_threshold("pred_1b_diastole_advantage_pct") == 5.0
+        assert registry.get_threshold("pred_0b_bf10") == 100.0
 
     def test_threshold_registry_validation(self):
         """Test threshold validation."""
         registry = ThresholdRegistry()
 
         # Valid threshold update
-        assert registry.update_threshold("cumulative_reward_advantage_threshold", 20.0)
+        assert registry.update_threshold("pred_1b_diastole_advantage_pct", 20.0)
 
-        # Invalid threshold (negative)
-        with pytest.raises(ValueError):
-            registry.update_threshold("cohens_d_threshold", -1.0)
+        # Unknown thresholds must be rejected rather than silently created.
+        with pytest.raises((ValueError, KeyError, AttributeError)):
+            registry.update_threshold("no_such_threshold", 1.0)
+
+        registry.reset_to_defaults()
+
+    def test_reset_to_defaults_restores_value(self):
+        registry = ThresholdRegistry()
+        original = registry.get_threshold("pred_0b_bf10")
+
+        registry.update_threshold("pred_0b_bf10", 1.0)
+        registry.reset_to_defaults()
+
+        assert registry.get_threshold("pred_0b_bf10") == original
 
     def test_get_all_thresholds(self):
         """Test getting all thresholds as dictionary."""
@@ -196,9 +209,10 @@ class TestThresholdRegistry:
         all_thresholds = registry.get_all_thresholds()
 
         assert isinstance(all_thresholds, dict)
-        assert "cumulative_reward_advantage_threshold" in all_thresholds
-        assert "cohens_d_threshold" in all_thresholds
-        assert "significance_level" in all_thresholds
+        assert "pred_1b_diastole_advantage_pct" in all_thresholds
+        assert "pred_2a_reward_ratio" in all_thresholds
+        assert "pred_0b_bf10" in all_thresholds
+        assert all(isinstance(v, (int, float)) for v in all_thresholds.values())
 
 
 class TestConstants:

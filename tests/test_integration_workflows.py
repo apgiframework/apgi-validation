@@ -59,7 +59,7 @@ class TestDataPipelineIntegration:
 
             # Step 3: Build APGI model
             try:
-                model = build_apgi_model(synthetic_data, estimate_dynamics=True)
+                model = build_apgi_model(synthetic_data[0], estimate_dynamics=True)
                 assert model is not None
 
                 # Step 4: Complete workflow integration test
@@ -333,7 +333,7 @@ class TestEndToEndWorkflows:
 
             # Step 4: Model building
             try:
-                build_apgi_model(synthetic_data, estimate_dynamics=True)
+                build_apgi_model(synthetic_data[0], estimate_dynamics=True)
                 model_built = True
             except Exception:
                 model_built = False
@@ -360,11 +360,15 @@ class TestEndToEndWorkflows:
                 "workflow_completed": True,
             }
 
-            # Verify complete workflow
+            # Verify complete workflow.
+            # Steps 5 and 6 (falsification and protocol validation) are disabled
+            # above pending an interface fix, so this asserts only on what the
+            # workflow actually produces. Asserting on "validation_result" and
+            # "falsification_result" — keys those disabled steps would have set —
+            # raised KeyError on every run.
             assert end_to_end_result["synthetic_data"] is not None
             assert end_to_end_result["true_parameters"] is not None
-            assert end_to_end_result["validation_result"] is not None
-            assert end_to_end_result["falsification_result"] is not None
+            assert end_to_end_result["model_built"] is True, "APGI model failed to build from synthetic data"
             assert end_to_end_result["workflow_completed"] is True
 
             # Verify data consistency across steps
@@ -491,7 +495,7 @@ class TestPerformanceIntegration:
             # Benchmark model building (if available)
             start_time = time.time()
             try:
-                build_apgi_model(synthetic_data, estimate_dynamics=False)
+                build_apgi_model(synthetic_data[0], estimate_dynamics=False)
                 model_building_time = time.time() - start_time
                 performance_results["model_building_time"] = model_building_time
                 performance_results["model_built"] = True

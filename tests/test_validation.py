@@ -1097,10 +1097,10 @@ def test_generate_master_report_decision_logic(passed_count, total_count, expect
     report = validator.generate_master_report()
 
     # Verify decision logic
-    assert report.overall_decision == expected_decision  # nosec B101
-    assert report.total_protocols == total_count  # nosec B101
-    assert report.passed_protocols == passed_count  # nosec B101
-    assert report.success_rate == (passed_count / total_count if total_count > 0 else 0)  # nosec B101
+    assert report["overall_decision"] == expected_decision  # nosec B101
+    assert report["total_protocols"] == total_count  # nosec B101
+    assert report["passed_protocols"] == passed_count  # nosec B101
+    assert report["success_rate"] == (passed_count / total_count if total_count > 0 else 0)  # nosec B101
 
 
 def test_generate_master_report_edge_cases():
@@ -1112,10 +1112,10 @@ def test_generate_master_report_edge_cases():
     # Test with no protocols run
     validator.protocol_results = {}
     report = validator.generate_master_report()
-    assert report.overall_decision == "No protocols run"  # nosec B101
-    assert report.total_protocols == 0  # nosec B101
-    assert report.passed_protocols == 0  # nosec B101
-    assert report.success_rate == 0  # nosec B101
+    assert report["overall_decision"] == "No protocols run"  # nosec B101
+    assert report["total_protocols"] == 0  # nosec B101
+    assert report["passed_protocols"] == 0  # nosec B101
+    assert report["success_rate"] == 0  # nosec B101
 
     # Test with empty protocol_results
     validator.protocol_results = {
@@ -1127,6 +1127,6 @@ def test_generate_master_report_edge_cases():
         )
     }
     report = validator.generate_master_report()
-    assert report.overall_decision == "FAIL: Insufficient validation support"  # nosec B101
-    assert report.total_protocols == 1  # nosec B101
-    assert report.passed_protocols == 0  # Default to False when "passed" key missing  # nosec B101
+    assert report["overall_decision"] == "FAIL: Insufficient validation support"  # nosec B101
+    assert report["total_protocols"] == 1  # nosec B101
+    assert report["passed_protocols"] == 0  # Default to False when "passed" key missing  # nosec B101

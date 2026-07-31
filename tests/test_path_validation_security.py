@@ -169,13 +169,24 @@ class TestPathValidationSecurity:
             validate_file_path(restricted_file, PROJECT_ROOT)
 
     def test_file_size_validation(self, temp_dir):
-        """Test file size validation."""
-        # Create oversized file
+        """Test that an oversized file outside the project root is rejected.
+
+        The file is created *sparse* via truncate: it reports >1GB but occupies
+        no disk blocks. Previously this materialised ``b"x" * (1024**3 + 1)`` —
+        a real gigabyte in RAM and on disk — which made the test fail with
+        ``OSError: No space left on device`` on any machine short of a spare
+        gigabyte, unrelated to the behaviour under test.
+
+        Note the assertion is about path containment, not size: the temp dir
+        lies outside PROJECT_ROOT, so validation rejects it as traversal.
+        """
         oversized_file = temp_dir / "oversized.txt"
         with open(oversized_file, "wb") as f:
-            f.write(b"x" * (1024 * 1024 * 1024 + 1))  # > 1GB
+            f.truncate(1024 * 1024 * 1024 + 1)  # > 1GB, sparse
 
-        # Should reject oversized files
+        assert oversized_file.stat().st_size > 1024 * 1024 * 1024
+
+        # Should reject files outside the project root
         with pytest.raises(ValueError, match="Path traversal detected"):
             validate_file_path(oversized_file, PROJECT_ROOT)
 

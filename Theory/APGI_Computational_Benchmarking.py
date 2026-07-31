@@ -467,12 +467,40 @@ class ComputationalBenchmarker:
         }
 
     def run_benchmark_suite(self, benchmark_paradigms: List[Dict[str, Any]]) -> Dict[str, List[BenchmarkResult]]:
-        """Run complete benchmark suite across all paradigms"""
+        """Run complete benchmark suite across all paradigms.
+
+        Args:
+            benchmark_paradigms: Each entry needs a ``name`` and a 1-D ``inputs``
+                time series; ``target_outputs`` is optional.
+
+        Returns:
+            Mapping of framework name to its per-paradigm BenchmarkResults.
+
+        Raises:
+            KeyError: If a paradigm is missing ``name`` or ``inputs``.
+            ValueError: If ``inputs`` is not a non-empty 1-D series. Every
+                framework indexes ``inputs[t]`` as a scalar, so a 2-D array
+                previously failed deep inside the simulation with
+                "setting an array element with a sequence".
+        """
         results: Dict[str, List[BenchmarkResult]] = {name: [] for name in self.frameworks.keys()}
 
         for paradigm in benchmark_paradigms:
+            for required in ("name", "inputs"):
+                if required not in paradigm:
+                    raise KeyError(f"Benchmark paradigm is missing required key '{required}': {paradigm}")
+
             paradigm_name = paradigm["name"]
-            inputs = paradigm["inputs"]
+            inputs = np.asarray(paradigm["inputs"], dtype=float)
+            if inputs.ndim != 1:
+                raise ValueError(
+                    f"Paradigm '{paradigm_name}' inputs must be a 1-D time series, "
+                    f"got shape {inputs.shape}. Benchmark frameworks simulate a single "
+                    f"scalar observation per timestep."
+                )
+            if inputs.size == 0:
+                raise ValueError(f"Paradigm '{paradigm_name}' inputs must not be empty")
+
             target_outputs = paradigm.get("target_outputs", None)
 
             logger.info(f"Running paradigm: {paradigm_name}")

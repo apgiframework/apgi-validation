@@ -57,6 +57,10 @@ import numpy as np
 
 PROJECT_ROOT = Path(__file__).parent
 
+# Metabolic sensitivity used by the interactive parameter explorer.
+# Canonical value from config/config_template.yaml (valid range -0.5 to 0.5).
+GAMMA_M_DEFAULT = -0.3
+
 
 def safe_import_module(module_name: str, file_path: Path) -> Optional[Any]:
     """Safely import a module with detailed error reporting."""
@@ -166,7 +170,6 @@ protocol_files = [
     ("APGI-P05: Causal TMS & Neuromodulation", "VP_07_TMSCausalInterventions.py"),
     ("APGI-P06: Ignition Dynamics (iEEG)", "VP_20_EmpiricalIEEG.py"),
     ("APGI-P07: DOC Biomarker (Disorders of Consciousness)", "VP_13_EpistemicArchitecture.py"),
-    
     # Non-canonical validation protocols (secondary and tertiary)
     ("VP-02: Behavioral Bayesian Model Comparison", "VP_02_BehavioralBayesianComparison.py"),
     ("VP-04: Phase Transition & Epistemic L2", "VP_04_PhaseTransitionEpistemicLevel2.py"),
@@ -174,29 +177,22 @@ protocol_files = [
     ("VP-06: Liquid Network Inductive Bias", "VP_06_LiquidNetworkInductiveBias.py"),
     ("VP-07a: Mathematical Consistency (Variant)", "VP_07a_MathematicalConsistency.py"),
     ("VP-08: Psychophysical Threshold Estimation", "VP_08_PsychophysicalThresholdEstimation.py"),
-    
     # APGI-P01 related validations (convergent neural signatures)
     ("APGI-P01 (Extended): Neural Signatures Priority 1", "VP_09_NeuralSignaturesEmpiricalPriority1.py"),
-    
     # APGI-P02 related validations (causal manipulations)
     ("APGI-P02 (Extended): Causal Manipulations Priority 2", "VP_10_CausalManipulationsPriority2.py"),
-    
     # Additional non-canonical validations
     ("VP-11: MCMC Cultural Neuroscience Priority 3", "VP_11_MCMCCulturalNeurosciencePriority3.py"),
     ("VP-17: Allen Visual Coding Fatigue", "VP_17_AllenVisualCodingFatigue.py"),
     ("VP-18: EEG Microstate GFP/P3b Analysis", "VP_18_EEGMicrostateGFPP3b.py"),
     ("VP-19: Information Erasure MVPA", "VP_19_InformationErasureMVPA.py"),
     ("VP-21: Free Energy & Prediction Error", "VP_21_FreeEnergyPredictionError.py"),
-    
     # APGI-P03 related validations (fMRI vmPFC variants)
     ("APGI-P03 (Variant): fMRI Anticipation vmPFC", "VP_15_FMRIAnticipationVmPFC.py"),
-    
     # APGI-P04 related validations (metabolic and cross-species)
     ("APGI-P04 (Extended): Clinical Cross-Species Convergence", "VP_12_ClinicalCrossSpeciesConvergence.py"),
-    
     # APGI-P05 related validations (enhanced fMRI)
     ("APGI-P05 (Extended): Enhanced fMRI Anticipation", "VP_22_FMRIAnticipationExperience.py"),
-    
     # Aggregator (not a standalone protocol)
     ("⚙️ VP Aggregator (Meta): Combines all VP results", "VP_ALL_Aggregator.py"),
 ]
@@ -2289,7 +2285,10 @@ class APGIValidationGUI:
             if str(project_root) not in sys.path:
                 sys.path.insert(0, str(project_root))
 
-            # Import APGI equations for simulation
+            # Import APGI equations for simulation. The threshold update is
+            # delegated to apgi_core.update_threshold so the GUI can never drift
+            # from the canonical model (see APGI-Equations.md §Threshold).
+            from apgi_core import compute_information_value, update_threshold
             from apgi_core.equations import CoreIgnitionSystem
 
             ignition_system = CoreIgnitionSystem()
@@ -2300,10 +2299,12 @@ class APGIValidationGUI:
 
             # Initialize variables
             S = 0.0
-            theta = params["theta_0"]
+            theta_0 = params["theta_0"]
+            theta = theta_0
             tau_S = params["tau_S"]
             tau_theta = params["tau_theta"]
             alpha = params["alpha"]
+            gamma_M = params.get("gamma_M", GAMMA_M_DEFAULT)
 
             # Track variables over time
             S_history = []
@@ -2318,9 +2319,19 @@ class APGIValidationGUI:
                 dS_dt = (stimulus_strength - S) / tau_S
                 S += dS_dt * dt
 
-                # Update threshold adaptation
-                dtheta_dt = (params["theta_0"] - theta) / tau_theta
-                theta += dtheta_dt * dt
+                # Update threshold: homeostatic restoration toward theta_0
+                # competes with signal-driven metabolic depression, so tau_theta
+                # controls the recovery rate of an actually-displaced threshold.
+                V_info = compute_information_value(S, S)
+                theta = update_threshold(
+                    theta=theta,
+                    theta0=theta_0,
+                    S=S,
+                    V_info=V_info,
+                    dt=dt,
+                    tau_theta=tau_theta,
+                    gamma_M=gamma_M,
+                )
 
                 # Calculate ignition probability
                 ignition_prob = ignition_system.ignition_probability(S, theta, alpha)
@@ -3431,10 +3442,13 @@ def main() -> None:
                 # Validate token and check GUI access permissions
                 gateway.require_roles(args.token, [Role.RESEARCHER, Role.ADMIN])
             elif os.environ.get("APGI_ENFORCE_AUTH", "0") == "1":
-                raise SystemExit("APGI_ENFORCE_AUTH=1 is set: a --token is required to start the GUI.")
+                raise SystemExit(
+                    "Authentication required: pass --token to start the GUI. "
+                    "For local development only, set APGI_ENFORCE_AUTH=0 to enable an auto-generated dev token."
+                )
             else:
                 # Development mode: auto-generate a token so the GUI works without CLI args.
-                # Set APGI_ENFORCE_AUTH=1 in production / multi-user deployments to disable this.
+                # Reached only when APGI_ENFORCE_AUTH=0 is set explicitly (local dev).
                 try:
                     from utils.auth_adapter import get_auth_manager
 

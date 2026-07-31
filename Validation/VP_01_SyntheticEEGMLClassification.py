@@ -4158,8 +4158,9 @@ def compare_models_with_statistics(results_task_1a):
                 "contingency_table": contingency_table.tolist(),
                 "auc_diff": auc_diff,
                 "auc_perm_p_value": auc_perm_p,
-                "mcnemar_perm_p_value": mcnemar_perm_p,
-                "mcnemar_significant": mcnemar_significant,
+                # mcnemar_perm_p_value and mcnemar_significant are set above;
+                # repeating them here was dead — the later entries silently
+                # overwrote the earlier ones with identical values.
                 "auc_significant": auc_significant,
             }
 

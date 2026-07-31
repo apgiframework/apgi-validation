@@ -156,3 +156,13 @@ data_repository/*.db
 .gitnexus
 .claude/*.json
 .claude/worktrees/
+
+# Encrypted key material must never be committed
+.keys/
+**/.keys/
+.env.bak*
+
+# Protocol run artifacts written into the repo root by test runs
+protocol*_results.json
+compliance_exports/
+config/versions/

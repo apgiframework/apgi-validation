@@ -89,7 +89,10 @@ class TestStatisticalEdgeCases:
 
         t, p, significant = safe_ttest_1samp(x, popmean=5, min_n=3)
 
-        assert abs(t) < 1e-10  # t-statistic should be ~0
+        # Zero-variance data makes the t-statistic 0/0 — undefined, not zero.
+        # NaN is the mathematically correct answer; the previous assertion
+        # (abs(t) < 1e-10) demanded a finite value the statistic cannot have.
+        assert np.isnan(t), f"t should be undefined for zero-variance data, got {t}"
         assert np.isnan(p) or p == 1.0  # p-value should be NaN or 1 (no difference)
         assert significant is False
 
@@ -191,9 +194,14 @@ class TestStatisticalEdgeCases:
         with pytest.raises(ValueError, match="Inf values"):
             validate_sample_array([1, 2, np.inf], min_n=2, name="test")
 
-        # Test with wrong type
-        with pytest.raises(ValueError, match="must be an array or list"):
+        # A one-element list fails the N>=2 check before any dtype inspection,
+        # so that is the error actually raised.
+        with pytest.raises(ValueError, match="N≥2"):
             validate_sample_array(["not_an_array"], min_n=2, name="test")
+
+        # Non-numeric contents in an otherwise long-enough array.
+        with pytest.raises((ValueError, TypeError)):
+            validate_sample_array(["a", "b", "c"], min_n=2, name="test")
 
     def test_validate_paired_arrays_mismatched_lengths(self):
         """Test paired array validation with mismatched lengths."""

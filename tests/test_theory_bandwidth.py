@@ -41,11 +41,17 @@ class TestBinaryEntropy:
         result_zero = _binary_entropy(p_zero)
         assert np.all(np.isfinite(result_zero))  # Should not be NaN due to clipping
 
-        # Test with uniform distribution
-        p_uniform = np.array([0.25, 0.25, 0.25, 0.25])
-        result_uniform = _binary_entropy(p_uniform)
-        expected_uniform = -4 * 0.25 * np.log2(0.25)  # = 2.0
-        np.testing.assert_allclose(result_uniform, expected_uniform, rtol=1e-10)
+        # _binary_entropy is elementwise binary entropy,
+        #   H(p) = -p·log2 p - (1-p)·log2(1-p),
+        # not the Shannon entropy of a multi-outcome distribution. The previous
+        # expectation (2.0 bits for four 0.25 entries) confused the two.
+        p = np.array([0.25, 0.25, 0.25, 0.25])
+        expected = -0.25 * np.log2(0.25) - 0.75 * np.log2(0.75)  # ≈ 0.8113
+        np.testing.assert_allclose(_binary_entropy(p), np.full(4, expected), rtol=1e-10)
+
+        # Maximum at p = 0.5, and symmetric about it.
+        np.testing.assert_allclose(_binary_entropy(np.array([0.5])), np.array([1.0]), rtol=1e-10)
+        np.testing.assert_allclose(_binary_entropy(np.array([0.3])), _binary_entropy(np.array([0.7])), rtol=1e-10)
 
 
 class TestSigmoid:
@@ -100,31 +106,77 @@ class TestIgnitionProbPerLevel:
         theta = 0.3
         alpha = 5.0
 
-        # Test with extreme precision values
-        result_high_precision = _ignition_prob_per_level(stimulus_levels, Pi_e=1.0, Pi_i=0.0, theta=theta, alpha=alpha)
-        expected_high = np.array([1.0, 0.0, 0.0])  # All probability at lowest level
-        np.testing.assert_allclose(result_high_precision, expected_high)
+        # _ignition_prob_per_level returns P(ignition | stimulus = level) for
+        # each level — NOT a probability distribution over levels. The previous
+        # expectations ([1,0,0] / [0,0,1], "all probability at lowest level")
+        # treated it as a distribution and could never hold.
+        high_precision = _ignition_prob_per_level(stimulus_levels, Pi_e=1.0, Pi_i=0.0, theta=theta, alpha=alpha)
+        assert np.all((high_precision >= 0.0) & (high_precision <= 1.0))
+        # Stronger exteroceptive evidence must not lower ignition probability.
+        assert np.all(
+            np.diff(high_precision) >= -1e-12
+        ), f"Ignition probability should be non-decreasing in stimulus strength, got {high_precision}"
 
-        result_low_precision = _ignition_prob_per_level(stimulus_levels, Pi_e=0.0, Pi_i=1.0, theta=theta, alpha=alpha)
-        expected_low = np.array([0.0, 0.0, 1.0])  # All probability at highest level
-        np.testing.assert_allclose(result_low_precision, expected_low)
+        # With no exteroceptive weight the stimulus cannot drive ignition, so
+        # the response is flat across levels *in expectation*. The function
+        # integrates over Monte Carlo interoceptive noise, so allow sampling
+        # spread rather than demanding exact equality.
+        no_drive = _ignition_prob_per_level(stimulus_levels, Pi_e=0.0, Pi_i=1.0, theta=theta, alpha=alpha)
+        assert np.all((no_drive >= 0.0) & (no_drive <= 1.0))
+        assert (
+            np.ptp(no_drive) < 0.15
+        ), f"Without exteroceptive drive, ignition should not track stimulus level: {no_drive}"
 
 
 class TestMutualInfoBits:
     """Test mutual information bits function."""
 
-    def test_mutual_info_basic(self):
-        """Test basic mutual information calculation."""
+    def test_mutual_info_identical_labels_equals_entropy(self):
+        """I(X;X) = H(X), the maximum, not zero.
+
+        This assertion previously demanded 0.0 for identical labels, which is
+        mathematically backwards — identical variables share *all* their
+        information. The error was invisible because a sklearn/scipy skew made
+        the function raise TypeError before the comparison was reached.
+        """
         from Theory.APGI_Information_Theoretic_Bandwidth import _mutual_info_bits
 
-        # Test with identical labels (should give 0 MI)
-        labels_a = np.array([1, 2, 3, 1, 2])
-        labels_b = np.array([1, 2, 3, 1, 2])
-        result = _mutual_info_bits(labels_a, labels_b)
-        assert result == 0.0
+        labels = np.array([1, 2, 3, 1, 2])
+        # p = [2/5, 2/5, 1/5] -> H = -(0.4·log2 0.4)·2 - 0.2·log2 0.2
+        probabilities = np.array([2 / 5, 2 / 5, 1 / 5])
+        expected_entropy = float(-np.sum(probabilities * np.log2(probabilities)))
+
+        assert _mutual_info_bits(labels, labels) == pytest.approx(expected_entropy, abs=1e-9)
+
+    def test_mutual_info_is_symmetric(self):
+        """I(A;B) == I(B;A)."""
+        from Theory.APGI_Information_Theoretic_Bandwidth import _mutual_info_bits
+
+        a = np.array([0, 0, 1, 1, 2, 2])
+        b = np.array([0, 1, 1, 2, 2, 0])
+        assert _mutual_info_bits(a, b) == pytest.approx(_mutual_info_bits(b, a), abs=1e-9)
+
+    def test_mutual_info_independent_labels_near_zero(self):
+        """Independent variables share no information."""
+        from Theory.APGI_Information_Theoretic_Bandwidth import _mutual_info_bits
+
+        rng = np.random.default_rng(42)
+        a = rng.integers(0, 2, size=4000)
+        b = rng.integers(0, 2, size=4000)
+        assert _mutual_info_bits(a, b) < 0.01
+
+    def test_mutual_info_never_negative(self):
+        """MI is non-negative by definition."""
+        from Theory.APGI_Information_Theoretic_Bandwidth import _mutual_info_bits
+
+        rng = np.random.default_rng(7)
+        for _ in range(10):
+            a = rng.integers(0, 4, size=200)
+            b = rng.integers(0, 4, size=200)
+            assert _mutual_info_bits(a, b) >= 0.0
 
     def test_mutual_info_different(self):
-        """Test mutual information with different labels."""
+        """Deterministically related labels carry positive information."""
         from Theory.APGI_Information_Theoretic_Bandwidth import _mutual_info_bits
 
         labels_a = np.array([1, 1, 1, 2, 2])
@@ -152,10 +204,20 @@ class TestBandwidthDerivation:
 
         # Test with default parameters
         result = model.compute()
-        assert hasattr(result, "bandwidth_bps")
-        assert hasattr(result, "prediction_in_range")
-        assert isinstance(result.bandwidth_bps, dict)
-        assert isinstance(result.prediction_in_range, bool)
+
+        # Field names taken from the BandwidthResult dataclass. The previous
+        # assertions named "bandwidth_bps" and "prediction_in_range", neither of
+        # which has ever existed on this type.
+        assert hasattr(result, "bandwidth_bits_per_second")
+        assert hasattr(result, "bandwidth_in_gamma_prediction")
+        assert isinstance(result.bandwidth_bits_per_second, float)
+        assert isinstance(result.bandwidth_in_gamma_prediction, bool)
+
+        # Information-theoretic invariants.
+        assert result.I_bits_per_trial >= 0.0
+        assert 0.0 <= result.P_ignition <= 1.0
+        assert result.H_B >= result.H_B_given_S, "Conditioning cannot increase entropy"
+        assert result.bandwidth_bits_per_second >= 0.0
 
     def test_bandwidth_derivation_parameter_sweep(self):
         """Test parameter sweep functionality."""
@@ -163,11 +225,14 @@ class TestBandwidthDerivation:
 
         model = BandwidthDerivation()
 
-        # Test parameter sweep
+        # parameter_sweep returns a dict of sampled arrays and summary
+        # statistics, not an object with bandwidth_matrix/optimal_params.
         result = model.parameter_sweep()
-        assert hasattr(result, "bandwidth_matrix")
-        assert hasattr(result, "optimal_params")
-        assert hasattr(result, "prediction_in_range")
+        assert isinstance(result, dict)
+        for key in ("bandwidths_gamma", "bandwidth_mean", "bandwidth_median", "n_samples"):
+            assert key in result, f"parameter_sweep result missing {key}"
+        assert result["n_samples"] > 0
+        assert result["bandwidth_p5"] <= result["bandwidth_median"] <= result["bandwidth_p95"]
 
 
 class TestPrecisionWeightingAnalyzer:
@@ -189,12 +254,18 @@ class TestPrecisionWeightingAnalyzer:
         bandwidth_module = BandwidthDerivation()
         analyzer = PrecisionWeightingAnalyzer(bandwidth_module)
 
-        # Test comparison with valid inputs
+        # Field names from the PrecisionGainResult dataclass. The previous
+        # assertions named "delta_I_pct" and "mi_gain_bits", neither of which
+        # exists on this type.
         result = analyzer.compare(theta_baseline=0.1, alpha=0.5)
-        assert hasattr(result, "delta_I_pct")
-        assert hasattr(result, "mi_gain_bits")
-        assert isinstance(result.delta_I_pct, float)
-        assert isinstance(result.mi_gain_bits, float)
+        for field in ("I_precision_on", "I_precision_off", "delta_I", "delta_I_pct_capacity"):
+            assert hasattr(result, field), f"PrecisionGainResult missing {field}"
+
+        assert isinstance(result.delta_I, float)
+        # delta_I is the information gained by enabling precision weighting.
+        assert result.delta_I == pytest.approx(result.I_precision_on - result.I_precision_off, abs=1e-9)
+        assert result.bandwidth_on_bps >= 0.0
+        assert result.bandwidth_off_bps >= 0.0
 
 
 class TestClinicalProfile:
@@ -234,10 +305,12 @@ class TestClinicalProfile:
         )
         assert valid_profile.validate_parameters()
 
-        # Test invalid profile (negative parameter)
+        # Test invalid profile. The previous "invalid" fixture here had no
+        # negative parameter at all despite its comment, so it was
+        # indistinguishable from the valid one.
         invalid_profile = ClinicalProfile(
             label="Test Disorder",
-            Pi_e=1.0,
+            Pi_e=-1.0,  # precision is an inverse variance: must be positive
             Pi_i=0.8,
             theta_baseline=0.3,
             alpha=0.5,
@@ -245,6 +318,40 @@ class TestClinicalProfile:
             description="Test profile",
         )
         assert not invalid_profile.validate_parameters()
+
+    @pytest.mark.parametrize(
+        "overrides",
+        [
+            {"Pi_e": -1.0},
+            {"Pi_e": 0.0},
+            {"Pi_i": -0.2},
+            {"alpha": 0.0},
+            {"sigma_theta": -0.1},
+            {"Pi_e": float("nan")},
+            {"theta_baseline": float("inf")},
+        ],
+    )
+    def test_invalid_profiles_rejected(self, overrides):
+        from Theory.APGI_Information_Theoretic_Bandwidth import ClinicalProfile
+
+        params = dict(
+            label="X",
+            Pi_e=1.0,
+            Pi_i=0.5,
+            theta_baseline=0.3,
+            alpha=2.0,
+            sigma_theta=0.0,
+            description="d",
+        )
+        params.update(overrides)
+        assert not ClinicalProfile(**params).validate_parameters()
+
+    def test_canonical_profiles_are_valid(self):
+        """Every shipped clinical profile must be physically meaningful."""
+        from Theory.APGI_Information_Theoretic_Bandwidth import CLINICAL_PROFILES
+
+        invalid = [name for name, p in CLINICAL_PROFILES.items() if not p.validate_parameters()]
+        assert invalid == [], f"Canonical profiles failed validation: {invalid}"
 
 
 class TestClinicalBandwidthMapper:
@@ -270,8 +377,19 @@ class TestClinicalBandwidthMapper:
         bandwidth_module = BandwidthDerivation()
         mapper = ClinicalBandwidthMapper(bandwidth_module)
 
-        # Create test profiles
+        # Create test profiles. compute_all contrasts every disorder against an
+        # "HC" (healthy control) baseline, so that key is required — omitting it
+        # previously produced a bare KeyError from deep inside the heatmap step.
         profiles = {
+            "HC": ClinicalProfile(
+                label="Healthy Control",
+                Pi_e=2.5,
+                Pi_i=0.8,
+                theta_baseline=0.3,
+                alpha=5.0,
+                sigma_theta=0.0,
+                description="Test HC baseline",
+            ),
             "MDD": ClinicalProfile(
                 label="MDD",
                 Pi_e=1.0,
@@ -293,9 +411,41 @@ class TestClinicalBandwidthMapper:
         }
 
         result = mapper.compute_all(profiles=profiles)
-        assert hasattr(result, "clinical")
+
+        # Field names from the ClinicalBandwidthResult dataclass. The previous
+        # assertion looked for a "clinical" attribute that has never existed.
+        assert hasattr(result, "bandwidth_bps")
         assert hasattr(result, "heatmap_bandwidth")
-        assert hasattr(result, "clinical")
+        assert set(result.bandwidth_bps) == {"HC", "MDD", "ADHD"}
+        assert result.bandwidth_HC == pytest.approx(result.bandwidth_bps["HC"])
+        # Both disorder profiles carry lower precision than HC, so both should
+        # show a bandwidth deficit relative to the baseline.
+        assert result.bandwidth_bps["MDD"] < result.bandwidth_bps["HC"]
+        assert result.bandwidth_bps["ADHD"] < result.bandwidth_bps["HC"]
+
+    def test_clinical_mapper_requires_hc_baseline(self):
+        """Omitting the reference profile must fail with a clear message."""
+        from Theory.APGI_Information_Theoretic_Bandwidth import (
+            BandwidthDerivation,
+            ClinicalBandwidthMapper,
+            ClinicalProfile,
+        )
+
+        mapper = ClinicalBandwidthMapper(BandwidthDerivation())
+        profiles = {
+            "MDD": ClinicalProfile(
+                label="MDD",
+                Pi_e=1.0,
+                Pi_i=0.1,
+                theta_baseline=0.1,
+                alpha=0.5,
+                sigma_theta=0.1,
+                description="Test MDD profile",
+            )
+        }
+
+        with pytest.raises(KeyError, match="HC"):
+            mapper.compute_all(profiles=profiles)
 
 
 class TestBandwidthConfig:
@@ -338,23 +488,21 @@ class TestBandwidthAnalyzer:
         config = BandwidthConfig(N_trials=100)  # Small number for testing
         analyzer = BandwidthAnalyzer(config)
 
-        # Mock the internal modules to speed up testing
-        with patch.object(analyzer, "bw") as mock_bw:
-            with patch.object(analyzer, "pw") as mock_pw:
-                with patch.object(analyzer, "cb") as mock_cb:
-                    # Configure mocks to return simple results
-                    mock_bw.compute.return_value = MagicMock(bandwidth_bps={"test": 40.0}, prediction_in_range=True)
-                    mock_pw.compare.return_value = MagicMock(delta_I_pct=25.0, mi_gain_bits=1.5)
-                    mock_cb.compute_all.return_value = MagicMock(
-                        clinical=MagicMock(), heatmap_bandwidth=np.array([[40.0]])
-                    )
+        # Run the real pipeline. At N_trials=100 it completes in well under a
+        # second, so mocking bought nothing — and the previous mocks patched
+        # attributes named bw/pw/cb, which do not exist on this class
+        # (they are bw_module/precision_module/clinical_module), so the test
+        # raised AttributeError before reaching any assertion.
+        result = analyzer.run()
 
-                    result = analyzer.run()
+        assert hasattr(result, "nominal")
+        assert hasattr(result, "sweep")
+        assert hasattr(result, "clinical")
+        assert hasattr(result, "precision_gain")
 
-                    # Verify the result structure
-                    assert hasattr(result, "nominal")
-                    assert hasattr(result, "sweep")
-                    assert hasattr(result, "clinical")
+        assert result.nominal.bandwidth_bits_per_second >= 0.0
+        assert result.sweep["n_samples"] > 0
+        assert "HC" in result.clinical.bandwidth_bps
 
 
 class TestRunBandwidthAnalysis:
@@ -408,13 +556,62 @@ class TestErrorHandling:
         with pytest.raises((ValueError, TypeError)):
             model.compute(Pi_e=-1.0)  # Invalid negative precision
 
-    def test_missing_dependencies(self):
-        """Test behavior when dependencies are missing."""
-        # This test ensures graceful degradation when numpy is not available
-        with patch.dict("sys.modules", {"numpy": None}):
-            # Should handle ImportError gracefully
-            with pytest.raises(ImportError):
-                pass  # Import should fail gracefully
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"Pi_e": -1.0},
+            {"Pi_e": 0.0},
+            {"Pi_i": -0.5},
+            {"Pi_i": 0.0},
+            {"alpha": -2.0},
+            {"alpha": 0.0},
+            {"stimulus_rate_Hz": -5.0},
+            {"sigma_theta": -0.1},
+            {"Pi_e": float("nan")},
+            {"Pi_e": float("inf")},
+            {"theta_baseline": float("nan")},
+        ],
+    )
+    def test_non_physical_parameters_rejected(self, kwargs):
+        """Precisions and gains are positive by definition.
+
+        Accepting a negative precision produced a plausible-looking bandwidth
+        from physically meaningless input — silently wrong output, the worst
+        failure mode for a validation framework.
+        """
+        from Theory.APGI_Information_Theoretic_Bandwidth import BandwidthDerivation
+
+        with pytest.raises(ValueError):
+            BandwidthDerivation().compute(**kwargs)
+
+    def test_valid_parameters_accepted(self):
+        """The guard must not reject legitimate parameter sets."""
+        from Theory.APGI_Information_Theoretic_Bandwidth import BandwidthDerivation
+
+        result = BandwidthDerivation().compute(Pi_e=1.0, Pi_i=0.5, alpha=2.0, sigma_theta=0.0)
+        assert result is not None
+
+    def test_mutual_info_falls_back_when_sklearn_raises(self):
+        """Dependency skew must degrade to the exact NumPy path, not crash.
+
+        Some scipy/sklearn combinations raise
+        "matrix.sum() got an unexpected keyword argument 'initial'" inside
+        mutual_info_score.
+        """
+        import numpy as np
+
+        from Theory import APGI_Information_Theoretic_Bandwidth as mod
+
+        labels = np.array([0, 1, 2, 3] * 25)
+
+        def _boom(*args, **kwargs):
+            raise TypeError("matrix.sum() got an unexpected keyword argument 'initial'")
+
+        with patch.object(mod, "_skl_mi", _boom):
+            mi = mod._mutual_info_bits(labels, labels)
+
+        # Four equiprobable, perfectly correlated labels carry log2(4) = 2 bits.
+        assert mi == pytest.approx(2.0, abs=1e-9)
 
 
 if __name__ == "__main__":

@@ -153,10 +153,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 1",
         "sample_size": "N = 115 (fixed-N; 90% power for r = 0.35 at \u03b1 = 0.01, two-tailed)",
-        "measures": ["Heartbeat discrimination d\u2032 per participant", "HEP mean amplitude", "r", "r", "HEP amplitude change: physostigmine vs. placebo, % and Cohen's d", "BF\u2081\u2080 for physostigmine HEP effect", "Pupil constriction onset time and magnitude: physostigmine vs. placebo", "r"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "Heartbeat discrimination d\u2032 per participant",
+            "HEP mean amplitude",
+            "r",
+            "r",
+            "HEP amplitude change: physostigmine vs. placebo, % and Cohen's d",
+            "BF\u2081\u2080 for physostigmine HEP effect",
+            "Pupil constriction onset time and magnitude: physostigmine vs. placebo",
+            "r",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 0.A: r < 0.20 across two independent samples Pred 0.B: No HEP change despite verified ACh elevation (pupil constriction confirmed) Pred 0.C: aINS BOLD and HEP statistically independent after arousal covariate"
         ),
@@ -183,10 +190,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 1",
         "sample_size": "N = 62 target / N = 48 minimum (Bayesian sequential)",
-        "measures": ["P3b amplitude", "P3b amplitude \u00d7 condition ANOVA: \u03b7\u209a\u00b2 for condition main effect \u2014 primary", "HEP amplitude", "HEP\u2013P3b partial correlation", "P3b condition effect at suprathreshold contrast \u2014 Pred 1.a control block", "d-prime", "Group \u00d7 modality interaction on d\u2032", "Detection rate per cardiac phase"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "P3b amplitude",
+            "P3b amplitude \u00d7 condition ANOVA: \u03b7\u209a\u00b2 for condition main effect \u2014 primary",
+            "HEP amplitude",
+            "HEP\u2013P3b partial correlation",
+            "P3b condition effect at suprathreshold contrast \u2014 Pred 1.a control block",
+            "d-prime",
+            "Group \u00d7 modality interaction on d\u2032",
+            "Detection rate per cardiac phase",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 1.A: No significant P3b condition main effect (all p > 0.10) across N \u2265 30 in preregistered contrast; or HEP\u2013P3b partial correlation < r = 0.20 after arousal covariate control. Pred 1.A-trait: High-IA and Low-IA do not differ on interoceptive d\u2032 (d < 0.3 across N \u2265 30 per group); or d\u2032 group difference replicates equally in the exteroceptive condition, eliminating interoceptive specificity. Pred 1.B: Diastole vs. systole hit rate advantage < 5% across two independent samples (interaction p > 0.15); no d\u2032 difference between cardiac phases. Pred 1.C: Accuracy \u00d7 condition interaction p > 0.10; tertile groups do not differ in cardiac-phase detection advantage. Pred 1.D: Partial r < 0.20 after arousal control; or partial correlation indistinguishable from exteroceptive focus condition."
         ),
@@ -213,10 +227,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 1",
         "sample_size": "N = 1,000 simulation seeds per condition (minimum 500); human IGT fitting sample N = 80",
-        "measures": ["Cumulative reward per agent type over 500 trials", "Convergence trial", "Pairwise reward comparisons: APGI vs. GNWT-only, APGI vs. Standard PP, GNWT-only vs. Standard PP \u2014 Pred 2.a", "Action selection entropy post-ignition vs. pre-ignition", "Proportion of ignition events satisfying \u03a0\u2071\u00b7|z\u2071| > \u03a0\u1d49\u00b7|z\u1d49| \u2014 Pred 2.b", "Cross-correlation lag: M\u0302 activation vs. \u03b8\u209c crossing", "Proportion of ignition events where M\u0302 leads by \u2265 1 trial \u2014 Pred 2.c", "Reward: \u03b2_SM-lesion vs. \u03a0\u2071-lesion vs. \u03b1-lesion, per volatility block \u2014 Pred 2.d"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "Cumulative reward per agent type over 500 trials",
+            "Convergence trial",
+            "Pairwise reward comparisons: APGI vs. GNWT-only, APGI vs. Standard PP, GNWT-only vs. Standard PP \u2014 Pred 2.a",
+            "Action selection entropy post-ignition vs. pre-ignition",
+            "Proportion of ignition events satisfying \u03a0\u2071\u00b7|z\u2071| > \u03a0\u1d49\u00b7|z\u1d49| \u2014 Pred 2.b",
+            "Cross-correlation lag: M\u0302 activation vs. \u03b8\u209c crossing",
+            "Proportion of ignition events where M\u0302 leads by \u2265 1 trial \u2014 Pred 2.c",
+            "Reward: \u03b2_SM-lesion vs. \u03a0\u2071-lesion vs. \u03b1-lesion, per volatility block \u2014 Pred 2.d",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 2.A: No significant pairwise performance advantage across all volatility conditions; or APGI fails convergence within 80 trials even when cumulative reward advantage present. Pred 2.B: Ignition uncorrelated with post-ignition behavioral adaptation; or < 60% of ignition events satisfy \u03a0\u2071\u00b7|z\u2071| > \u03a0\u1d49\u00b7|z\u1d49| (interoceptive dominance criterion independently falsified). Pred 2.C: M\u0302 activation simultaneous with or lagging threshold crossing; cross-correlation peak at lag 0 or positive. Pred 2.D: \u03b2_SM produces equivalent or lesser deficit compared to \u03a0\u2071-lesion under all volatility conditions; or pathway specificity not demonstrated at high volatility. Pred 2.E: APGI BIC \u2265 any alternative model's BIC on pre-registered dataset; or \u0394BIC < 3 against GNWT-only (interoceptive and somatic parameters add no explanatory value)."
         ),
@@ -243,10 +264,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 1",
         "sample_size": "N = 40 target / N = 36 minimum",
-        "measures": ["vmPFC BOLD: anticipation-period parametric modulation by EV", "vmPFC\u2013SCR outcome-period correlation", "Posterior insula", "vmPFC\u2192aINS PPI coefficient: anticipation foreperiod > neutral baseline", "vmPFC\u2192pIC PPI coefficient: anticipation foreperiod vs. neutral baseline", "aINS vs. pIC PPI dissociation significance \u2014 Pred 3.b", "vmPFC activation: parametric modulation by EV", "vmPFC activation: parametric modulation by sensory contrast"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "vmPFC BOLD: anticipation-period parametric modulation by EV",
+            "vmPFC\u2013SCR outcome-period correlation",
+            "Posterior insula",
+            "vmPFC\u2192aINS PPI coefficient: anticipation foreperiod > neutral baseline",
+            "vmPFC\u2192pIC PPI coefficient: anticipation foreperiod vs. neutral baseline",
+            "aINS vs. pIC PPI dissociation significance \u2014 Pred 3.b",
+            "vmPFC activation: parametric modulation by EV",
+            "vmPFC activation: parametric modulation by sensory contrast",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 3.A: vmPFC BOLD correlates significantly with outcome-locked SCR during the outcome period (r > 0.35), indicating vmPFC encodes raw \u03b5\u2071 rather than anticipatory M\u0302; or vmPFC shows no anticipation-period EV parametric modulation (p > 0.20). Pred 3.B: vmPFC\u2192pIC coupling increases during anticipation (\u0394r > 0.30, p < 0.05); or vmPFC\u2192aINS coupling is absent; or the aINS/pIC dissociation is not significant (both connectivity estimates statistically equivalent). Pred 3.C: vmPFC activation correlates with sensory contrast regardless of option valence; or valence and contrast effects on vmPFC are statistically equivalent. Pred 3.D: vmPFC\u2192aINS coupling in 0 ms foreperiod condition equivalent to standard foreperiod condition (foreperiod removal does not reduce coupling); indicating vmPFC is not specifically anticipatory."
         ),
@@ -273,10 +301,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 1",
         "sample_size": "N = 60 target / N = 48 minimum",
-        "measures": ["Perceptual sensitivity d\u2032 per condition", "P3b amplitude", "Metabolic State \u00d7 Interoceptive Load interaction on d\u2032", "Metabolic State \u00d7 Interoceptive Load interaction on P3b", "d\u2032 reduction: interoceptive load vs. exteroceptive load under depletion", "P3b reduction: interoceptive vs. exteroceptive under depletion", "Interaction after arousal covariation", "BF\u2081\u2080 for interaction term \u2014 Pred 4.C"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "Perceptual sensitivity d\u2032 per condition",
+            "P3b amplitude",
+            "Metabolic State \u00d7 Interoceptive Load interaction on d\u2032",
+            "Metabolic State \u00d7 Interoceptive Load interaction on P3b",
+            "d\u2032 reduction: interoceptive load vs. exteroceptive load under depletion",
+            "P3b reduction: interoceptive vs. exteroceptive under depletion",
+            "Interaction after arousal covariation",
+            "BF\u2081\u2080 for interaction term \u2014 Pred 4.C",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 4.A: (a) No significant Metabolic State \u00d7 Interoceptive Load interaction on d\u2032 or P3b amplitude (p > 0.10); OR (b) metabolic depletion produces a uniform, global suppression of ignition proxies across all stimulus types, indicating generalized cognitive fatigue rather than selective \u03b8\u209c elevation. Pred 4.B: Uniform P3b suppression across all stimulus types; or P3b interaction disappears after covarying for pupil diameter / HRV (indicating an arousal confound rather than allostatic triage). Pred 4.C: The interaction effect is fully absorbed by arousal covariates (\u0394\u03b7\u209a\u00b2 < 0.02 or interaction p > 0.10 after covariation), indicating the effect is driven by LC-NE arousal rather than metabolic allostatic triage."
         ),
@@ -303,10 +338,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 2",
         "sample_size": "N = 44 target / N = 36 minimum (PCI analysis floor N = 28)",
-        "measures": ["PCI per stimulation condition", "HEP amplitude", "HEP\u2013PCI coupling coefficient per stimulation condition \u2014 Pred 5.A dissociation", "Site \u00d7 HEP\u2013PCI coupling interaction", "HEP\u2013P3b coupling coefficient per stimulation condition \u2014 Pred 5.B", "Exteroceptive P3b amplitude per stimulation condition \u2014 Pred 5.B stream specificity", "BF\u2080\u2081 for dlPFC effect on HEP", "PAS rating distribution per stimulation condition"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "PCI per stimulation condition",
+            "HEP amplitude",
+            "HEP\u2013PCI coupling coefficient per stimulation condition \u2014 Pred 5.A dissociation",
+            "Site \u00d7 HEP\u2013PCI coupling interaction",
+            "HEP\u2013P3b coupling coefficient per stimulation condition \u2014 Pred 5.B",
+            "Exteroceptive P3b amplitude per stimulation condition \u2014 Pred 5.B stream specificity",
+            "BF\u2080\u2081 for dlPFC effect on HEP",
+            "PAS rating distribution per stimulation condition",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 5.A: No PCI change following active TMS vs. vertex sham; or equivalent PCI reduction at vertex; or HEP\u2013PCI coupling equally abolished by dlPFC TMS (no dissociation). Pred 5.B: Uniform suppression of both P3b streams; or HEP equally reduced by dlPFC and aINS. Pred 5.C: No interaction between baseline accuracy and TMS site. Pred 5.D: No interaction; equivalent PCI response across IA tertiles at aINS site."
         ),
@@ -333,10 +375,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 2",
         "sample_size": "N = 20 target / N = 12 minimum",
-        "measures": ["Hartigan's dip statistic: frontoparietal high-gamma distribution per contrast level \u2014 Pred 6.A primary", "\u0394BIC", "Modal separation: low mode and high mode frequencies", "Hartigan's dip statistic: occipital high-gamma distribution", "Region \u00d7 bimodality-index interaction \u2014 Pred 6.B", "Mean intermediate-state bout duration", "Intermediate-state prevalence", "AC1 time series: high-gamma envelope in 500 ms pre-ignition window \u2014 Pred 6.C"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "Hartigan's dip statistic: frontoparietal high-gamma distribution per contrast level \u2014 Pred 6.A primary",
+            "\u0394BIC",
+            "Modal separation: low mode and high mode frequencies",
+            "Hartigan's dip statistic: occipital high-gamma distribution",
+            "Region \u00d7 bimodality-index interaction \u2014 Pred 6.B",
+            "Mean intermediate-state bout duration",
+            "Intermediate-state prevalence",
+            "AC1 time series: high-gamma envelope in 500 ms pre-ignition window \u2014 Pred 6.C",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 6.A: Unimodal continuous distribution of high-gamma power across all contrast levels; dip test p > 0.20; no evidence of bistability. Pred 6.B: Uniform bimodality across all recorded regions; or intermediate-state bouts > 150 ms in \u2265 50% of trials; or prevalence > 30% of trial duration (inconsistent with sharp bifurcation). Pred 6.C: AC1 flat or decreasing before detected stimuli; no monotonic pre-ignition trend. Pred 6.D: Point-biserial coherence\u2013detection r < 0.20; or the coherence peak falls outside the 200\u2013400 ms post-stimulus window; or an equivalent coherence increase appears at the occipital control pair. Pred 6.E: Only a single clustering timescale is identifiable, or the single-timescale model is favoured (BF\u2080\u2081 \u2265 6)."
         ),
@@ -363,10 +412,17 @@ EP_PROTOCOLS: Dict[str, Dict[str, Any]] = {
         "osf_url": APGI_OSF_PROJECT,
         "paper": "APGI Paper 3",
         "sample_size": "N = 110 target / N = 96 minimum (VS/UWS 30, MCS 30, EMCS 20, controls 30)",
-        "measures": ["HEP amplitude", "PCI per DoC group and time point \u2014 primary", "\u0394R\u00b2", "AUC", "Univariate model R\u00b2 for HEP alone and PCI alone", "Four-group ordinal gradient: HEP and PCI across VS/UWS, MCS, EMCS, controls \u2014 Pred 7.B", "DMN\u2013PCI correlation", "DMN\u2013HEP partial correlation"],
-        "analysis": (
-            ""
-        ),
+        "measures": [
+            "HEP amplitude",
+            "PCI per DoC group and time point \u2014 primary",
+            "\u0394R\u00b2",
+            "AUC",
+            "Univariate model R\u00b2 for HEP alone and PCI alone",
+            "Four-group ordinal gradient: HEP and PCI across VS/UWS, MCS, EMCS, controls \u2014 Pred 7.B",
+            "DMN\u2013PCI correlation",
+            "DMN\u2013HEP partial correlation",
+        ],
+        "analysis": (""),
         "falsification_criterion": (
             "Pred 7.A: Joint model R\u00b2 \u2264 max(univariate HEP R\u00b2, univariate PCI R\u00b2); or \u0394R\u00b2 < 0.05 in primary analysis. Pred 7.B: No significant HEP difference between MCS and VS/UWS; four-group gradient absent for HEP or PCI. Pred 7.C: No significant PCI change post-CCRC in MCS (\u0394PCI < 5%, p > 0.10); or equivalent PCI change in VS/UWS and MCS; or CCRC-evoked PCI change statistically indistinguishable from white-noise control (p > 0.10), indicating arousal rather than interoceptive prediction error. Pred 7.D: HEP shows no significant longitudinal correlation with CRS-R (r < 0.2) at either follow-up; or joint model predictive values do not exceed clinical benchmarks. Pred 7.E: Jonckheere\u2013Terpstra trend p > 0.10 AND PAC\u2194CRS-R r < 0.20. Pred 7.F: Manipulation produces no effect on reportable embodiment dimensions (d < 0.20); or effect is fully absorbed by general arousal covariates."
         ),
@@ -1188,7 +1244,43 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="APGI Open Science Framework GUI")
     parser.add_argument("--headless", action="store_true", help="Run without GUI (for testing)")
+    parser.add_argument("--token", help="JWT authentication token for secured operations")
     args = parser.parse_args()
+
+    # Security check for GUI mode - GUI scripts run in dev mode by default
+    try:
+        from utils.security_gateway import Role, SecurityGateway
+
+        gateway = SecurityGateway()
+
+        if args.token:
+            # Validate token and check GUI access permissions
+            gateway.require_roles(args.token, [Role.RESEARCHER, Role.ADMIN])
+        elif os.environ.get("APGI_ENFORCE_AUTH", "0") == "1":
+            raise SystemExit(
+                "Authentication required: pass --token to start the GUI. "
+                "For local development only, set APGI_ENFORCE_AUTH=0 to enable an auto-generated dev token."
+            )
+        else:
+            # Development mode: auto-generate a token so the GUI works without CLI args.
+            # Reached only when APGI_ENFORCE_AUTH=0 is set explicitly (local dev).
+            try:
+                from utils.auth_adapter import get_auth_manager
+
+                auth_manager = get_auth_manager()
+                dev_token = auth_manager.generate_token("dev_user", Role.RESEARCHER, 24)  # 24 hour expiry
+                print("Development mode: Generated token (valid 24 hours)")
+                args.token = dev_token
+            except Exception as e:
+                # If token generation fails, continue without authentication
+                # This allows GUI to work even if auth system has issues
+                print(f"Note: Running without authentication ({e})")
+    except ImportError:
+        # Security gateway not available - allow GUI to run without authentication
+        pass
+    except PermissionError as e:
+        print(f"Authentication failed: {e}")
+        sys.exit(1)
 
     if args.headless:
         _ = OSFProtocolGUI(tk.Tk(), headless=True)

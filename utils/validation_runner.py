@@ -599,6 +599,8 @@ def validate_parameter_consistency() -> Dict[str, Any]:
         from utils.falsification_thresholds import (
             F1_1_ALPHA,
             F1_1_MIN_ADVANTAGE_PCT,
+            F1_1_MIN_ADVANTAGE_PCT_PAPER_SPEC,
+            F1_1_MIN_ADVANTAGE_PCT_SIMULATION,
             F1_1_MIN_COHENS_D,
             F2_1_MIN_ADVANTAGE_PCT,
             F2_5_MIN_ADVANTAGE_PCT,
@@ -606,9 +608,18 @@ def validate_parameter_consistency() -> Dict[str, Any]:
             F5_5_PCA_MIN_VARIANCE,
         )
 
-        # Check for logical consistency
+        # F1.1 ships two regimes: a strict paper-spec threshold (18%) and a
+        # looser simulation threshold (5%). The active constant selects one of
+        # them, so its plausible range must admit both — checking it against the
+        # paper-spec range alone would fail whenever simulation mode is active.
         consistency_checks = {
-            "f1_advantage_pct_reasonable": 10 <= F1_1_MIN_ADVANTAGE_PCT <= 50,  # Updated range for 18.0
+            "f1_paper_spec_advantage_pct_reasonable": 10 <= F1_1_MIN_ADVANTAGE_PCT_PAPER_SPEC <= 50,
+            "f1_simulation_advantage_pct_reasonable": 1 <= F1_1_MIN_ADVANTAGE_PCT_SIMULATION <= 50,
+            "f1_simulation_not_stricter_than_paper": (
+                F1_1_MIN_ADVANTAGE_PCT_SIMULATION <= F1_1_MIN_ADVANTAGE_PCT_PAPER_SPEC
+            ),
+            "f1_active_advantage_pct_is_a_declared_regime": F1_1_MIN_ADVANTAGE_PCT
+            in (F1_1_MIN_ADVANTAGE_PCT_PAPER_SPEC, F1_1_MIN_ADVANTAGE_PCT_SIMULATION),
             "f1_cohens_d_reasonable": 0.2 <= F1_1_MIN_COHENS_D <= 1.0,
             "f1_alpha_reasonable": 0.01 <= F1_1_ALPHA <= 0.1,
             "f2_advantage_pct_consistent": F2_1_MIN_ADVANTAGE_PCT <= F2_5_MIN_ADVANTAGE_PCT,
@@ -637,15 +648,16 @@ def run_comprehensive_validation() -> Dict[str, Any]:
     """Run all validation checks"""
     logger.info("Starting comprehensive validation...")
 
-    # Run individual protocol validations
-    validate_fp02_data_variance()
-    validate_fp03_dependencies()
-    validate_fp04_te_computation()
-    validate_fp05_empirical_data()
-    validate_parameter_consistency()
-
-    # Build results dict with expected keys
-    validation_results: Dict[str, Any] = {}
+    # Run individual protocol validations and KEEP their results. Discarding
+    # them left `statuses` empty, so overall_status was unconditionally PASSED
+    # no matter what the individual checks reported.
+    validation_results: Dict[str, Any] = {
+        "fp02_data_variance": validate_fp02_data_variance(),
+        "fp03_dependencies": validate_fp03_dependencies(),
+        "fp04_te_computation": validate_fp04_te_computation(),
+        "fp05_empirical_data": validate_fp05_empirical_data(),
+        "parameter_consistency": validate_parameter_consistency(),
+    }
 
     # Calculate overall status
     statuses = [result["status"] for result in validation_results.values()]
@@ -665,10 +677,13 @@ def run_comprehensive_validation() -> Dict[str, Any]:
         "errors": errors,
     }
 
-    # Add protocol_results wrapper for test compatibility
-    validation_results["protocol_results"] = {}
+    # Grouped view of the same per-check results, for callers that prefer a
+    # single nested mapping over top-level keys.
+    validation_results["protocol_results"] = {
+        name: result for name, result in validation_results.items() if name != "summary"
+    }
 
-    # Add overall_status at top level for test compatibility
+    # Add overall_status at top level for convenience
     validation_results["overall_status"] = overall_status
 
     return validation_results
@@ -690,15 +705,17 @@ def main():
             continue
 
         status = result.get("status", "UNKNOWN")
-        status_symbol = "✓" if status == "PASS" else "✗" if status == "FAIL" else "⚠"
+        status_symbol = "✓" if status == "PASSED" else "✗" if status == "FAILED" else "⚠"
 
         print(f"{status_symbol} {check_name}: {status}")
 
         if status == "ERROR":
             print(f"   Error: {result.get('error', 'Unknown error')}")
-        elif status == "FAIL":
+        elif status == "FAILED":
             if "reason" in result:
                 print(f"   Reason: {result['reason']}")
+            if result.get("failed_checks"):
+                print(f"   Failed checks: {', '.join(result['failed_checks'])}")
 
     print()
     print("Summary:")

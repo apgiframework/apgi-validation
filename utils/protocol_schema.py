@@ -81,6 +81,20 @@ class ProtocolResult(BaseModel):
     errors: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
+    def model_dump(self, **kwargs: Any) -> dict:
+        """Dump to a dict containing only plain JSON types.
+
+        Protocol metadata routinely carries NumPy scalars (``np.bool_`` from
+        comparisons, ``np.float64`` from statistics). Under NumPy 2.x these are
+        not Python builtins, so a plain ``json.dumps`` of the result raises
+        "Object of type bool is not JSON serializable". Sanitising here keeps
+        the documented contract — every protocol result is serializable — at
+        the one point every protocol passes through.
+        """
+        from utils.json_serialization import to_json_safe
+
+        return to_json_safe(super().model_dump(**kwargs))
+
     def to_dict(self) -> dict:
         """Convert to dictionary (JSON-serializable) representation."""
         return self.model_dump()

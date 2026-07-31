@@ -186,15 +186,15 @@ class TestValidationProtocolPartialRecovery:
         report = validator.generate_master_report()
 
         # Access attributes instead of subscripting
-        assert report.total_protocols == 3, "Report should show 3 total protocols"  # nosec B101
-        # The actual implementation counts protocols based on _is_protocol_passed logic
-        # Protocol-2 has empty named_predictions, so it's counted as passed despite metadata
-        assert (
-            report.passed_protocols == 3
-        ), "Report should show 3 passed protocols (empty predictions count as passed)"  # nosec B101
-        assert "Protocol-1" in report.protocol_results, "Report should contain Protocol-1 results"  # nosec B101
-        assert "Protocol-2" in report.protocol_results, "Report should contain Protocol-2 results"  # nosec B101
-        assert "Protocol-3" in report.protocol_results, "Report should contain Protocol-3 results"  # nosec B101
+        assert report["total_protocols"] == 3, "Report should show 3 total protocols"  # nosec B101
+        # Protocol-2 carries status "error", which _is_protocol_passed correctly
+        # excludes from the pass set. A protocol that failed mid-run must not be
+        # counted as passed just because it produced no predictions — the
+        # previous expectation of 3 encoded exactly that bug.
+        assert report["passed_protocols"] == 2, "A protocol that errored mid-run must not count as passed"  # nosec B101
+        assert "Protocol-1" in report["protocol_results"], "Report should contain Protocol-1 results"  # nosec B101
+        assert "Protocol-2" in report["protocol_results"], "Report should contain Protocol-2 results"  # nosec B101
+        assert "Protocol-3" in report["protocol_results"], "Report should contain Protocol-3 results"  # nosec B101
 
     def test_report_generation_after_partial_failures(self):
         """Test that reports can be generated even with partial protocol failures."""
@@ -232,8 +232,8 @@ class TestValidationProtocolPartialRecovery:
         report = validator.generate_master_report()
 
         # Report should be generated successfully
-        assert report.overall_decision is not None, "Report should have an overall decision"  # nosec B101
-        assert report.total_protocols == 2, "Report should show 2 total protocols"  # nosec B101
+        assert report["overall_decision"] is not None, "Report should have an overall decision"  # nosec B101
+        assert report["total_protocols"] == 2, "Report should show 2 total protocols"  # nosec B101
 
     def test_recovery_from_corrupted_results(self):
         """Test recovery when result data is corrupted."""
@@ -334,9 +334,9 @@ class TestValidationProtocolTimeoutHandling:
 
         report = validator.generate_master_report()
 
-        assert "Protocol-1" in report.protocol_results, "Report should contain Protocol-1 results"  # nosec B101
+        assert "Protocol-1" in report["protocol_results"], "Report should contain Protocol-1 results"  # nosec B101
         assert (
-            report.protocol_results["Protocol-1"].metadata.get("status") == "timeout"
+            report["protocol_results"]["Protocol-1"].metadata.get("status") == "timeout"
         ), "Protocol-1 should have timeout status"  # nosec B101
 
     def test_interrupt_handling(self):
@@ -508,7 +508,7 @@ class TestValidationProtocolEdgeCases:
         report = validator.generate_master_report()
 
         # Note: The actual implementation uses PROTOCOL_TIERS count which may be larger
-        assert report.total_protocols >= 3, "Report should show at least 3 total protocols"  # nosec B101
+        assert report["total_protocols"] >= 3, "Report should show at least 3 total protocols"  # nosec B101
 
 
 class TestValidationProtocolResourceCleanup:

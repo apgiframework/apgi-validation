@@ -145,8 +145,8 @@ tests/test_validation_protocol_integration.py::TestValidationProtocolExecution::
 | ------ | ------- | ------ | ----- |
 | **Total Test Files** | 117 | 120+ | ✅ COMPLETE |
 | **Total Tests** | ~2,636 | 2,500+ | ✅ 105% Complete |
-| **Line Coverage** | **~8%** (actual) | 100% | +92% |
-| **Branch Coverage** | **~8%** (actual) | 100% | +92% |
+| **Line Coverage** | see `--cov-fail-under` in pytest.ini | ratchet upward | — |
+| **Branch Coverage** | see `--cov-fail-under` in pytest.ini | ratchet upward | — |
 | **Module Coverage** | 32/194 files tested | 194/194 | 162 untested |
 | **Unit Tests** | ~1,800 | 1,800+ | ✅ Complete |
 | **Integration Tests** | ~420 | 600+ | ~180 needed |
@@ -154,11 +154,24 @@ tests/test_validation_protocol_integration.py::TestValidationProtocolExecution::
 | **Property-Based Tests** | ~100 | 150+ | ~50 needed |
 | **Security Tests** | ~85 | 150+ | ~65 needed |
 
-### Known Issues
+### Coverage gate
 
-- **pytest.ini** has `--cov-fail-under=100` which causes test runs to fail even when all tests pass
-- Actual coverage measured at **8%** (86,084 lines covered out of ~940,520 total)
-- Previous coverage estimates of 85-90% were inaccurate
+`pytest.ini` enforces `--cov-fail-under` across whole packages (`apgi_core`,
+`utils`, `gui`, `main`, and every `*_GUI.py`), not a hand-picked list of ten
+modules. The earlier scope excluded all 111 `utils/` modules, every GUI and
+every protocol, so the reported figure described almost none of the shipped
+code — and the gate itself was set to 8%, which nothing could fail.
+
+Treat the gate as a **ratchet**: raise it as coverage improves, never lower it
+to make a run pass.
+
+### Known issues
+
+- `Protocols_GUI.py` and `OSF_GUI.py` had no test importing them at all until
+  they were added to `tests/test_gui_smoke_cross_platform.py`.
+- PyMC-backed protocols (FP-10, VP-11) require a working C toolchain. Where it
+  is unavailable, set `APGI_FORCE_NUMPY_MCMC=1` to use the pure-NumPy sampler.
+  That fallback is not yet honoured by every MCMC call site.
 
 ### Status Indicators
 

@@ -70,7 +70,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 30
-        self.assertEqual(result[2], 30)
+        assert result[2] == 30
 
     def test_parse_invalid_bins_too_large(self):
         """Test parsing bins value too large."""
@@ -85,7 +85,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 30
-        self.assertEqual(result[2], 30)
+        assert result[2] == 30
 
     def test_parse_invalid_linewidth(self):
         """Test parsing invalid linewidth."""
@@ -100,7 +100,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 1.5
-        self.assertEqual(result[3], 1.5)
+        assert result[3] == 1.5
 
     def test_parse_linewidth_out_of_range(self):
         """Test parsing linewidth out of valid range."""
@@ -115,7 +115,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 1.5
-        self.assertEqual(result[3], 1.5)
+        assert result[3] == 1.5
 
     def test_parse_invalid_markersize(self):
         """Test parsing invalid markersize."""
@@ -130,7 +130,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 50
-        self.assertEqual(result[4], 50)
+        assert result[4] == 50
 
     def test_parse_markersize_out_of_range(self):
         """Test parsing markersize out of valid range."""
@@ -145,7 +145,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 50
-        self.assertEqual(result[4], 50)
+        assert result[4] == 50
 
     def test_parse_invalid_font_size(self):
         """Test parsing invalid font size."""
@@ -160,7 +160,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 12
-        self.assertEqual(result[5], 12)
+        assert result[5] == 12
 
     def test_parse_font_size_out_of_range(self):
         """Test parsing font size out of valid range."""
@@ -175,7 +175,7 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 12
-        self.assertEqual(result[5], 12)
+        assert result[5] == 12
 
     def test_parse_invalid_subplot_dimensions(self):
         """Test parsing invalid subplot dimensions."""
@@ -190,8 +190,8 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 1x1
-        self.assertEqual(result[6], 1)
-        self.assertEqual(result[7], 1)
+        assert result[6] == 1
+        assert result[7] == 1
 
     def test_parse_subplot_too_many(self):
         """Test parsing subplot dimensions with too many subplots."""
@@ -206,8 +206,8 @@ class TestParseVisualizationParameters:
         )
 
         # Should use default 1x1 (4*4=16 > 12)
-        self.assertEqual(result[6], 1)
-        self.assertEqual(result[7], 1)
+        assert result[6] == 1
+        assert result[7] == 1
 
 
 class TestSetupPlottingStyle:
@@ -227,8 +227,8 @@ class TestSetupPlottingStyle:
             plt_module=plt_module,
         )
 
-        sns_module.set_style.self.assert_called_once_with("whitegrid")
-        plt_module.style.use.self.assert_called_once_with("seaborn-v0_8")
+        sns_module.set_style.assert_called_once_with("whitegrid")
+        plt_module.style.use.assert_called_once_with("seaborn-v0_8")
 
     def test_setup_ggplot_style(self):
         """Test setting up ggplot style."""
@@ -244,7 +244,7 @@ class TestSetupPlottingStyle:
             plt_module=plt_module,
         )
 
-        plt_module.style.use.self.assert_called_once_with("ggplot")
+        plt_module.style.use.assert_called_once_with("ggplot")
 
     def test_setup_default_style(self):
         """Test setting up default style."""
@@ -260,7 +260,7 @@ class TestSetupPlottingStyle:
             plt_module=plt_module,
         )
 
-        plt_module.style.use.self.assert_called_once_with("default")
+        plt_module.style.use.assert_called_once_with("default")
 
     def test_setup_custom_palette(self):
         """Test setting up custom color palette."""
@@ -277,7 +277,7 @@ class TestSetupPlottingStyle:
             plt_module=plt_module,
         )
 
-        sns_module.set_palette.self.assert_called_once_with("Set2")
+        sns_module.set_palette.assert_called_once_with("Set2")
 
     def test_setup_font_properties(self):
         """Test setting up font properties."""
@@ -295,10 +295,10 @@ class TestSetupPlottingStyle:
             plt_module=plt_module,
         )
 
-        self.assertEqual(plt_module.rcParams["font.family"], "Helvetica")
-        self.assertEqual(plt_module.rcParams["font.size"], 14)
-        self.assertEqual(plt_module.rcParams["axes.titlesize"], 16)
-        self.assertEqual(plt_module.rcParams["axes.labelsize"], 14)
+        assert plt_module.rcParams["font.family"] == "Helvetica"
+        assert plt_module.rcParams["font.size"] == 14
+        assert plt_module.rcParams["axes.titlesize"] == 16
+        assert plt_module.rcParams["axes.labelsize"] == 14
 
 
 class TestCreateFigureAndAxes:
@@ -321,9 +321,9 @@ class TestCreateFigureAndAxes:
             plt_module=plt_module,
         )
 
-        self.assertEqual(fig, mock_fig)
-        self.assertEqual(len(axes), 1)
-        plt_module.subplots.self.assert_called_once_with(figsize=(12, 8), squeeze=False)
+        assert fig == mock_fig
+        assert len(axes) == 1
+        plt_module.subplots.assert_called_once_with(figsize=(12, 8), squeeze=False)
 
     def test_create_multiple_subplots(self):
         """Test creating figure with multiple subplots."""
@@ -342,9 +342,9 @@ class TestCreateFigureAndAxes:
             plt_module=plt_module,
         )
 
-        self.assertEqual(fig, mock_fig)
-        self.assertEqual(len(axes), 6)
-        plt_module.subplots.self.assert_called_once_with(2, 3, figsize=(12, 8), squeeze=False)
+        assert fig == mock_fig
+        assert len(axes) == 6
+        plt_module.subplots.assert_called_once_with(2, 3, figsize=(12, 8), squeeze=False)
 
     def test_set_aspect_ratio(self):
         """Test setting aspect ratio."""
@@ -364,7 +364,7 @@ class TestCreateFigureAndAxes:
             plt_module=plt_module,
         )
 
-        mock_ax.set_aspect.self.assert_called_once_with("equal")
+        mock_ax.set_aspect.assert_called_once_with("equal")
 
 
 class TestCreateTimeSeriesPlot:
@@ -398,7 +398,7 @@ class TestCreateTimeSeriesPlot:
         )
 
         # Verify plot was created with correct parameters
-        axes[0].plot.self.assert_called()
+        axes[0].plot.assert_called()
 
     def test_create_time_series_plot_with_empty_data(self):
         """Test time series plot with empty data."""
@@ -420,7 +420,7 @@ class TestCreateTimeSeriesPlot:
         )
 
         # Should handle empty data gracefully
-        self.assertTrue(True)  # Function should not crash
+        assert True  # Function should not crash
 
 
 class TestCreateScatterPlot:
@@ -452,8 +452,8 @@ class TestCreateScatterPlot:
             legend=True,
         )
 
-        self.assertTrue(result)
-        axes[0].scatter.self.assert_called_once()
+        assert result
+        axes[0].scatter.assert_called_once()
 
     def test_create_scatter_plot_insufficient_columns(self):
         """Test scatter plot with insufficient numeric columns."""
@@ -479,7 +479,7 @@ class TestCreateScatterPlot:
             legend=True,
         )
 
-        self.assertFalse(result)
+        assert not (result)
 
 
 class TestCreateHeatmapPlot:
@@ -506,7 +506,7 @@ class TestCreateHeatmapPlot:
             plt_module=plt_module,
         )
 
-        self.assertTrue(result)
+        assert result
         sns_module.heatmap.assert_called_once()
 
     def test_create_heatmap_plot_no_numeric_data(self):
@@ -528,7 +528,7 @@ class TestCreateHeatmapPlot:
             plt_module=plt_module,
         )
 
-        self.assertFalse(result)
+        assert not (result)
 
 
 class TestCreateDistributionPlot:
@@ -543,19 +543,22 @@ class TestCreateDistributionPlot:
         )
 
         plt_module = MagicMock()
-        # Cannot assign to method, use setattr instead
-        setattr(data["value"], "hist", MagicMock())
 
-        result = _create_distribution_plot(
-            data=data,
-            bins_val=30,
-            alpha=0.7,
-            grid=True,
-            plt_module=plt_module,
-        )
+        # Patch on the class: `data["value"]` constructs a new Series object on
+        # every access, so setting an attribute on one indexing result left the
+        # real Series.hist in place and the later assertion inspected a plain
+        # bound method.
+        with patch.object(pd.Series, "hist") as mock_hist:
+            result = _create_distribution_plot(
+                data=data,
+                bins_val=30,
+                alpha=0.7,
+                grid=True,
+                plt_module=plt_module,
+            )
 
-        self.assertTrue(result)
-        data["value"].hist.assert_called_once_with(bins=30, alpha=0.7)
+            assert result
+            mock_hist.assert_called_once_with(bins=30, alpha=0.7)
 
     def test_create_distribution_plot_no_numeric_data(self):
         """Test distribution plot with no numeric data."""
@@ -575,7 +578,7 @@ class TestCreateDistributionPlot:
             plt_module=plt_module,
         )
 
-        self.assertFalse(result)
+        assert not (result)
 
 
 class TestCreatePlotByType:
@@ -619,7 +622,7 @@ class TestCreatePlotByType:
             plt_module=plt_module,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_create_ts.assert_called_once()
 
     @patch("main._create_scatter_plot")
@@ -659,7 +662,7 @@ class TestCreatePlotByType:
             plt_module=plt_module,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_create_scatter.assert_called_once()
 
     @patch("main._create_heatmap_plot")
@@ -699,7 +702,7 @@ class TestCreatePlotByType:
             plt_module=plt_module,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_create_heatmap.assert_called_once()
 
     @patch("main._create_distribution_plot")
@@ -738,7 +741,7 @@ class TestCreatePlotByType:
             plt_module=plt_module,
         )
 
-        self.assertTrue(result)
+        assert result
         mock_create_dist.assert_called_once()
 
     def test_create_unknown_plot_type(self):
@@ -774,4 +777,4 @@ class TestCreatePlotByType:
             plt_module=plt_module,
         )
 
-        self.assertFalse(result)
+        assert not (result)

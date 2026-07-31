@@ -94,15 +94,25 @@ python3 -m pytest tests/ --cov=. --cov-report=term
 
 ### Full Test Suite
 
+The coverage scope and gate are configured in `pytest.ini`, so a plain
+`pytest` run enforces them. Prefer the Make targets:
+
 ```bash
-# Run full test suite with all coverage reports
-python3 -m pytest tests/ \
-    --cov=. \
-    --cov-report=html \
-    --cov-report=xml \
-    --cov-report=term-missing \
-    --cov-fail-under=100
+make test
 ```
+
+```bash
+make test-slow
+```
+
+To produce all coverage reports explicitly:
+
+```bash
+python3 -m pytest tests/ --cov-report=html --cov-report=xml --cov-report=term-missing
+```
+
+The gate is a **ratchet**: raise `--cov-fail-under` in `pytest.ini` as coverage
+improves, never lower it to make a run pass.
 
 ```bash
 # Run only unit tests

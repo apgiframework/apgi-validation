@@ -10,8 +10,15 @@ Provides common test fixtures and configuration:
 """
 
 # Mock tkinter BEFORE any imports to prevent GUI initialization during tests
+import os
 import sys
 from unittest.mock import MagicMock
+
+# Opt-out for the cross-platform GUI smoke test, which must instantiate real
+# widgets against a real (headless, e.g. xvfb) display. Without this escape
+# hatch the smoke test detects the MagicMock and skips itself unconditionally,
+# so it passes without ever exercising a GUI.
+USE_REAL_TKINTER = os.environ.get("APGI_REAL_TKINTER", "").strip().lower() in {"1", "true", "yes"}
 
 
 # Create a safe mock variable factory for Python 3.14 compatibility
@@ -33,30 +40,13 @@ tkinter_modules = [
     "tkinter.font",
 ]
 
-for module in tkinter_modules:
-    if module not in sys.modules:
-        sys.modules[module] = MagicMock()
+if not USE_REAL_TKINTER:
+    for module in tkinter_modules:
+        if module not in sys.modules:
+            sys.modules[module] = MagicMock()
 
-# Apply the fix to all tkinter modules that might be imported
-for module_name in tkinter_modules:
-    if module_name in sys.modules:
-        mock_module = sys.modules[module_name]
-        # Add the variable factories to each tkinter module
-        mock_module.StringVar = lambda: create_safe_mock_var(0)
-        mock_module.IntVar = lambda: create_safe_mock_var(0)
-        mock_module.DoubleVar = lambda: create_safe_mock_var(0.0)
-        mock_module.BooleanVar = lambda: create_safe_mock_var(False)
-
-# Configure mock tkinter with basic widget behavior
-mock_tk = sys.modules["tkinter"]
-mock_tk.Tk = MagicMock()  # type: ignore
-mock_tk.ttk = MagicMock()  # type: ignore
-mock_tk.messagebox = MagicMock()  # type: ignore
-mock_tk.filedialog = MagicMock()  # type: ignore
 
 # Fix for Python 3.14 compatibility - make Vars return proper values
-
-
 def mock_var_factory(*args, **kwargs):
     default = kwargs.get("value", 0)
     mock_var = MagicMock()
@@ -65,10 +55,28 @@ def mock_var_factory(*args, **kwargs):
     return mock_var
 
 
-mock_tk.StringVar = mock_var_factory  # type: ignore
-mock_tk.BooleanVar = mock_var_factory  # type: ignore
-mock_tk.DoubleVar = mock_var_factory  # type: ignore
-mock_tk.IntVar = mock_var_factory  # type: ignore
+if not USE_REAL_TKINTER:
+    # Apply the fix to all tkinter modules that might be imported
+    for module_name in tkinter_modules:
+        if module_name in sys.modules:
+            mock_module = sys.modules[module_name]
+            # Add the variable factories to each tkinter module
+            mock_module.StringVar = lambda: create_safe_mock_var(0)
+            mock_module.IntVar = lambda: create_safe_mock_var(0)
+            mock_module.DoubleVar = lambda: create_safe_mock_var(0.0)
+            mock_module.BooleanVar = lambda: create_safe_mock_var(False)
+
+    # Configure mock tkinter with basic widget behavior
+    mock_tk = sys.modules["tkinter"]
+    mock_tk.Tk = MagicMock()  # type: ignore
+    mock_tk.ttk = MagicMock()  # type: ignore
+    mock_tk.messagebox = MagicMock()  # type: ignore
+    mock_tk.filedialog = MagicMock()  # type: ignore
+
+    mock_tk.StringVar = mock_var_factory  # type: ignore
+    mock_tk.BooleanVar = mock_var_factory  # type: ignore
+    mock_tk.DoubleVar = mock_var_factory  # type: ignore
+    mock_tk.IntVar = mock_var_factory  # type: ignore
 
 import json
 import os
@@ -493,11 +501,32 @@ def pickle_secret_key(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def apgi_jwt_secret(monkeypatch):
-    """Provide a default APGI_JWT_SECRET for all tests."""
-    secret = "test_jwt_secret_at_least_32_characters_long"
+    """Provide a default APGI_JWT_SECRET for all tests.
+
+    Must be exactly 64 hex characters. The previous value
+    ("test_jwt_secret_at_least_32_characters_long") failed that validation, so
+    the key manager silently fell through to the developer's real ``.keys/``
+    directory — making the suite depend on local key material that no other
+    machine has, and that fails outright once a key cannot be decrypted.
+    """
+    secret = "a1" * 32
     monkeypatch.setenv("APGI_JWT_SECRET", secret)
     monkeypatch.setenv("APGI_SKIP_SECURITY", "true")
     return secret
+
+
+@pytest.fixture(autouse=True)
+def isolated_key_material(monkeypatch):
+    """Keep tests off real key material.
+
+    Supplies valid 64-hex values for every managed key, so the key manager
+    resolves them from the environment and never reads, writes or mints a file
+    in the repository's ``.keys/`` directory. Tests that exercise the file-backed
+    paths (tests/test_secure_key_manager_fail_closed.py) delete these explicitly.
+    """
+    monkeypatch.setenv("PICKLE_SECRET_KEY", "b2" * 32)
+    monkeypatch.setenv("APGI_BACKUP_HMAC_KEY", "c3" * 32)
+    yield
 
 
 @pytest.fixture(autouse=True)
@@ -912,7 +941,7 @@ def assert_performance_within_tolerance(actual_time: float, expected_time: float
 @pytest.fixture(autouse=True)
 def cleanup_test_profiles():
     """Auto-cleanup test profiles created during tests.
-    
+
     Prevents auto-generated profile files (like profile_0_0.yaml, profile_4_3.yaml)
     from accumulating in config/profiles directory. This fixture automatically runs
     before and after each test to clean up any temporary profiles created by tests.
@@ -920,7 +949,7 @@ def cleanup_test_profiles():
     # Get the profiles directory
     project_root = Path(__file__).parent.parent
     profiles_dir = project_root / "config" / "profiles"
-    
+
     # List of known good profiles that should not be deleted
     protected_profiles = {
         "adhd.yaml",
@@ -949,7 +978,7 @@ def cleanup_test_profiles():
         "somatic-symptom-disorder.yaml",
         "specific-phobia.yaml",
     }
-    
+
     # Cleanup before test (remove any leftover test profiles)
     if profiles_dir.exists():
         for profile_file in profiles_dir.glob("profile_*.yaml"):
@@ -959,9 +988,9 @@ def cleanup_test_profiles():
                     profile_file.unlink()
                 except Exception:
                     pass  # Ignore errors during cleanup
-    
+
     yield
-    
+
     # Cleanup after test (remove any test profiles created during test)
     if profiles_dir.exists():
         for profile_file in profiles_dir.glob("*.yaml"):

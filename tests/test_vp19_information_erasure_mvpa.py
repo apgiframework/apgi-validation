@@ -294,7 +294,7 @@ class TestInformationErasureValidator:
     def test_measurement_gap_note_content(self, fast_validator):
         results = fast_validator.run_full_validation()
         note = results["measurement_gap_note"]
-        assert "Level 3" in note  # nosec B101
+        assert "Tier 3" in note  # nosec B101
         assert "Landauer" in note  # nosec B101
         assert "thermodynamic" in note  # nosec B101
         assert "PET" in note  # nosec B101

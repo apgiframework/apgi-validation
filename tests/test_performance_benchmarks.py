@@ -303,35 +303,43 @@ class TestMemoryBenchmarks:
 
     def test_memory_usage_patterns(self):
         """Test memory usage patterns in different operations."""
+        import gc
         import os
 
         import psutil
 
-        # Get initial memory usage
+        # Measure the growth attributable to each allocation, taking a fresh
+        # baseline immediately before it.
+        #
+        # The previous version compared every measurement against a single
+        # baseline captured at the start and asserted the delta was >= 0. RSS
+        # deltas can legitimately be negative — CPython returns freed arenas to
+        # the OS at unpredictable moments — so that assertion failed whenever
+        # this test ran after others in the full suite, while passing in
+        # isolation.
         process = psutil.Process(os.getpid())
-        initial_memory = process.memory_info().rss
 
-        # Test memory usage with different data sizes
         data_sizes = [1000, 5000, 10000, 50000]
         memory_usage = {}
 
         for size in data_sizes:
-            # Create large arrays
+            gc.collect()
+            before = process.memory_info().rss
+
             large_data = np.random.randn(size, 100)
+            # Touch the array so the pages are actually resident.
+            assert large_data.sum() is not None
 
-            # Get current memory usage
-            current_memory = process.memory_info().rss
-            used_memory = current_memory - initial_memory
+            growth_mb = (process.memory_info().rss - before) / (1024 * 1024)
+            memory_usage[size] = growth_mb
 
-            memory_usage[size] = used_memory / (1024 * 1024)  # Convert to MB
-
-            # Clean up
             del large_data
 
-        # Verify reasonable memory usage
-        for size, memory_mb in memory_usage.items():
-            assert memory_mb < 1000  # Should be less than 1GB
-            assert memory_mb >= 0  # Should be non-negative (may be 0 due to garbage collection)
+        # Growth must stay bounded: each array is size * 100 * 8 bytes, so even
+        # the largest (50000) is ~38MB. 1GB is generous headroom that still
+        # catches a runaway allocation.
+        for size, growth_mb in memory_usage.items():
+            assert growth_mb < 1000, f"Allocating {size}x100 grew RSS by {growth_mb:.1f}MB"
 
     def test_memory_efficiency(self):
         """Test memory efficiency of data structures."""

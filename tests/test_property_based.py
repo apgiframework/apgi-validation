@@ -772,7 +772,20 @@ class TestFileFormatHandlingProperties:
             columns=[
                 pd_st.column("col1", dtype=int),
                 pd_st.column("col2", dtype=float),
-                pd_st.column("col3", dtype=str),
+                # Exclude surrogates and control characters: the default str
+                # strategy emits lone surrogates such as '\ud800', which no
+                # UTF-8 encoder can represent, so the roundtrip failed inside
+                # Hypothesis's own data generation rather than in the code
+                # under test.
+                pd_st.column(
+                    "col3",
+                    elements=strategies.text(
+                        alphabet=strategies.characters(
+                            blacklist_categories=("Cs", "Cc"),
+                        ),
+                        max_size=20,
+                    ),
+                ),
             ],
             index=pd_st.range_indexes(min_size=5, max_size=20),
         )
@@ -1003,7 +1016,8 @@ class TestDataIntegrityProperties:
         assert not df.isin([np.inf, -np.inf]).any().any()
 
         # All values are finite
-        assert df.applymap(lambda x: np.isfinite(x) if isinstance(x, (int, float)) else True).all().all()
+        # DataFrame.applymap was removed in pandas 3.0; .map is the replacement.
+        assert df.map(lambda x: np.isfinite(x) if isinstance(x, (int, float)) else True).all().all()
 
     @given(
         pd_st.data_frames(

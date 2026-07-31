@@ -1,4 +1,5 @@
 import pytest
+
 from utils.protocol_loader import load_all_protocols, load_protocol
 
 
@@ -10,7 +11,7 @@ class TestCanonicalProtocolLoading:
         # Load canonical protocols
         apgi_p01 = load_protocol("APGI-P01")
         apgi_p02 = load_protocol("APGI-P02")
-        
+
         # Both should load successfully
         assert apgi_p01 is not None
         assert apgi_p02 is not None
@@ -20,7 +21,7 @@ class TestCanonicalProtocolLoading:
     def test_load_all_canonical_protocols(self):
         """Test loading all canonical APGI-P## protocols."""
         specs = load_all_protocols()
-        
+
         # Should have only canonical protocols
         assert len(specs) > 0
         # All protocols should start with APGI-P
@@ -45,7 +46,7 @@ class TestLegacyProtocolRejection:
         """Test that legacy VP-## IDs raise ValueError."""
         with pytest.raises(ValueError) as exc_info:
             load_protocol("VP-01")
-        
+
         # Error message should indicate legacy support removed
         assert "PHASE 4" in str(exc_info.value)
         assert "no longer supported" in str(exc_info.value)
@@ -55,7 +56,7 @@ class TestLegacyProtocolRejection:
         """Test that legacy FP-## IDs raise ValueError."""
         with pytest.raises(ValueError) as exc_info:
             load_protocol("FP-01")
-        
+
         # Error message should indicate legacy support removed
         assert "PHASE 4" in str(exc_info.value)
         assert "no longer supported" in str(exc_info.value)
@@ -88,7 +89,7 @@ class TestLegacyProtocolRejection:
     def test_load_all_protocols_contains_only_canonical(self):
         """Verify load_all_protocols returns only canonical APGI-P## protocols."""
         specs = load_all_protocols()
-        
+
         # Should NOT have any VP-## or FP-## protocols
         for protocol_id in specs.keys():
             assert not protocol_id.startswith("VP-"), f"Found legacy VP-## protocol: {protocol_id}"
@@ -98,6 +99,6 @@ class TestLegacyProtocolRejection:
     def test_canonical_protocol_count(self):
         """Verify only canonical protocols are loaded (8 total)."""
         specs = load_all_protocols()
-        
+
         # 8 canonical protocols: APGI-P00 through APGI-P07
         assert len(specs) == 8, f"Expected 8 canonical protocols, got {len(specs)}: {list(specs.keys())}"

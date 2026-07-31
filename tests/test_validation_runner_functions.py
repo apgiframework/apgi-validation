@@ -43,102 +43,103 @@ class TestValidationRunnerFunctions:
         """Test FP-02 data variance validation."""
         result = validate_fp02_data_variance()
 
-        pytest.assertIn("status", result, "Result should contain status field")
-        pytest.assertIn(result["status"], ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values")
+        assert "status" in result, "Result should contain status field"
+        assert result["status"] in ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values"
 
         if result["status"] == "PASSED":
-            pytest.assertIn("variance_metrics", result, "PASSED result should contain variance_metrics")
-            pytest.assertIn("sample_size_adequacy", result, "PASSED result should contain sample_size_adequacy")
+            assert "variance_metrics" in result, "PASSED result should contain variance_metrics"
+            assert "sample_size_adequacy" in result, "PASSED result should contain sample_size_adequacy"
         elif result["status"] == "FAILED":
-            pytest.assertIn("errors", result, "FAILED result should contain errors")
+            assert "errors" in result, "FAILED result should contain errors"
         elif result["status"] == "ERROR":
-            pytest.assertIn("error_message", result, "ERROR result should contain error_message")
+            assert "error_message" in result, "ERROR result should contain error_message"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_validate_fp03_dependencies(self):
         """Test FP-03 dependency validation."""
         result = validate_fp03_dependencies()
 
-        pytest.assertIn("status", result, "Result should contain status field")
-        pytest.assertIn(result["status"], ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values")
+        assert "status" in result, "Result should contain status field"
+        assert result["status"] in ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values"
 
         if result["status"] == "PASSED":
-            pytest.assertIn(
-                "shared_falsification_available", result, "PASSED result should contain shared_falsification_available"
-            )
-            pytest.assertIn("aggregator_available", result, "PASSED result should contain aggregator_available")
+            assert (
+                "shared_falsification_available" in result
+            ), "PASSED result should contain shared_falsification_available"
+            assert "aggregator_available" in result, "PASSED result should contain aggregator_available"
         elif result["status"] == "FAILED":
-            pytest.assertIn("errors", result, "FAILED result should contain errors")
+            assert "errors" in result, "FAILED result should contain errors"
         elif result["status"] == "ERROR":
-            pytest.assertIn("error_message", result, "ERROR result should contain error_message")
+            assert "error_message" in result, "ERROR result should contain error_message"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_validate_fp04_te_computation(self):
         """Test FP-04 TE computation validation."""
         result = validate_fp04_te_computation()
 
-        pytest.assertIn("status", result, "Result should contain status field")
-        pytest.assertIn(result["status"], ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values")
+        assert "status" in result, "Result should contain status field"
+        assert result["status"] in ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values"
 
         if result["status"] == "PASSED":
-            pytest.assertIn("te_mean", result, "PASSED result should contain te_mean")
-            pytest.assertIn("te_values_valid", result, "PASSED result should contain te_values_valid")
+            assert "te_mean" in result, "PASSED result should contain te_mean"
+            assert "te_values_valid" in result, "PASSED result should contain te_values_valid"
         elif result["status"] == "FAILED":
-            pytest.assertIn("errors", result, "FAILED result should contain errors")
+            assert "errors" in result, "FAILED result should contain errors"
         elif result["status"] == "ERROR":
-            pytest.assertIn("error_message", result, "ERROR result should contain error_message")
+            assert "error_message" in result, "ERROR result should contain error_message"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_validate_fp05_empirical_data(self):
         """Test FP-05 empirical data validation."""
         result = validate_fp05_empirical_data()
 
-        pytest.assertIn("status", result, "Result should contain status field")
-        pytest.assertIn(result["status"], ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values")
+        assert "status" in result, "Result should contain status field"
+        assert result["status"] in ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values"
 
         if result["status"] == "PASSED":
-            pytest.assertIn("compliance_rate", result, "PASSED result should contain compliance_rate")
-            pytest.assertIn("theta_gamma_valid_ratio", result, "PASSED result should contain theta_gamma_valid_ratio")
+            assert "compliance_rate" in result, "PASSED result should contain compliance_rate"
+            assert "theta_gamma_valid_ratio" in result, "PASSED result should contain theta_gamma_valid_ratio"
         elif result["status"] == "FAILED":
-            pytest.assertIn("errors", result, "FAILED result should contain errors")
+            assert "errors" in result, "FAILED result should contain errors"
         elif result["status"] == "ERROR":
-            pytest.assertIn("error_message", result, "ERROR result should contain error_message")
+            assert "error_message" in result, "ERROR result should contain error_message"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_validate_parameter_consistency(self):
         """Test parameter consistency validation."""
         result = validate_parameter_consistency()
 
-        pytest.assertIn("status", result, "Result should contain status field")
-        pytest.assertIn(result["status"], ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values")
+        assert "status" in result, "Result should contain status field"
+        assert result["status"] in ["PASSED", "FAILED", "ERROR"], "Status should be one of the expected values"
 
         if result["status"] == "PASSED":
-            pytest.assertIn("consistency_checks", result, "PASSED result should contain consistency_checks")
-            pytest.assertIn("all_consistent", result, "PASSED result should contain all_consistent")
+            assert "consistency_checks" in result, "PASSED result should contain consistency_checks"
+            assert "all_consistent" in result, "PASSED result should contain all_consistent"
         elif result["status"] == "FAILED":
-            pytest.assertIn("errors", result, "FAILED result should contain errors")
+            assert "failed_checks" in result, "FAILED result should name the checks that failed"
+            assert result["failed_checks"], "FAILED result should list at least one failed check"
         elif result["status"] == "ERROR":
-            pytest.assertIn("error_message", result, "ERROR result should contain error_message")
+            assert "error" in result, "ERROR result should contain the error message"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_run_comprehensive_validation(self):
         """Test comprehensive validation suite."""
         result = run_comprehensive_validation()
 
-        pytest.assertIn("summary", result, "Result should contain summary")
-        pytest.assertIn("fp02_data_variance", result, "Result should contain fp02_data_variance")
-        pytest.assertIn("fp03_dependencies", result, "Result should contain fp03_dependencies")
-        pytest.assertIn("fp04_te_computation", result, "Result should contain fp04_te_computation")
-        pytest.assertIn("fp05_empirical_data", result, "Result should contain fp05_empirical_data")
-        pytest.assertIn("parameter_consistency", result, "Result should contain parameter_consistency")
+        assert "summary" in result, "Result should contain summary"
+        assert "fp02_data_variance" in result, "Result should contain fp02_data_variance"
+        assert "fp03_dependencies" in result, "Result should contain fp03_dependencies"
+        assert "fp04_te_computation" in result, "Result should contain fp04_te_computation"
+        assert "fp05_empirical_data" in result, "Result should contain fp05_empirical_data"
+        assert "parameter_consistency" in result, "Result should contain parameter_consistency"
 
         # Check summary statistics
         summary = result["summary"]
-        pytest.assertIn("total_checks", summary, "Summary should contain total_checks")
-        pytest.assertIn("passed", summary, "Summary should contain passed")
-        pytest.assertIn("failed", summary, "Summary should contain failed")
-        pytest.assertIn("errors", summary, "Summary should contain errors")
-        pytest.assertEqual(summary["total_checks"], 5, "Should have 5 total checks")
+        assert "total_checks" in summary, "Summary should contain total_checks"
+        assert "passed" in summary, "Summary should contain passed"
+        assert "failed" in summary, "Summary should contain failed"
+        assert "errors" in summary, "Summary should contain errors"
+        assert summary["total_checks"] == 5, "Should have 5 total checks"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_error_handling_temp_directory_issue(self):
@@ -147,10 +148,8 @@ class TestValidationRunnerFunctions:
         with patch("tempfile.mkdtemp", side_effect=OSError("No usable temporary directory")):
             result = validate_fp02_data_variance()
 
-            pytest.assertEqual(result["status"], "ERROR", "Should return ERROR status when temp directory fails")
-            pytest.assertIn(
-                "temp directory", result["error_message"].lower(), "Error message should mention temp directory"
-            )
+            assert result["status"] == "ERROR", "Should return ERROR status when temp directory fails"
+            assert "temp directory" in result["error_message"].lower(), "Error message should mention temp directory"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_import_error_handling(self):
@@ -162,9 +161,7 @@ class TestValidationRunnerFunctions:
         ):
             result = validate_fp02_data_variance()
 
-            pytest.assertIn(
-                result["status"], ["ERROR", "FAILED"], "Should return ERROR or FAILED status when module missing"
-            )
+            assert result["status"] in ["ERROR", "FAILED"], "Should return ERROR or FAILED status when module missing"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_result_serialization(self):
@@ -174,11 +171,11 @@ class TestValidationRunnerFunctions:
         # Should be JSON serializable
         try:
             json_str = json.dumps(result)
-            pytest.assertIsInstance(json_str, str, "JSON serialization should produce string")
+            assert isinstance(json_str, str), "JSON serialization should produce string"
 
             # Should be able to load back
             loaded_result = json.loads(json_str)
-            pytest.assertEqual(loaded_result, result, "Deserialized result should match original")
+            assert loaded_result == result, "Deserialized result should match original"
         except (TypeError, ValueError) as e:
             pytest.fail(f"Result not JSON serializable: {e}")
 
@@ -195,7 +192,7 @@ class TestValidationRunnerFunctions:
         execution_time = end_time - start_time
 
         # Should complete within reasonable time (adjust threshold as needed)
-        pytest.assertTrue(execution_time < 300, "Should complete within 5 minutes (300 seconds)")
+        assert execution_time < 300, "Should complete within 5 minutes (300 seconds)"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_individual_protocol_isolation(self):
@@ -216,13 +213,13 @@ class TestValidationRunnerFunctions:
                 results[protocol_name] = result
 
                 # Verify basic structure
-                pytest.assertIn("status", result, f"Protocol {protocol_name} result should contain status")
+                assert "status" in result, f"Protocol {protocol_name} result should contain status"
 
             except Exception as e:
                 pytest.fail(f"Protocol {protocol_name} failed: {e}")
 
         # Should have results for all protocols
-        pytest.assertEqual(len(results), 5, "Should have results for all 5 protocols")
+        assert len(results) == 5, "Should have results for all 5 protocols"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_validation_consistency(self):
@@ -232,16 +229,12 @@ class TestValidationRunnerFunctions:
         result2 = run_comprehensive_validation()
 
         # Overall status should be consistent
-        pytest.assertEqual(
-            result1["overall_status"], result2["overall_status"], "Overall status should be consistent across runs"
-        )
+        assert result1["overall_status"] == result2["overall_status"], "Overall status should be consistent across runs"
 
         # Protocol counts should be consistent
-        pytest.assertEqual(
-            result1["summary"]["total_protocols"],
-            result2["summary"]["total_protocols"],
-            "Protocol counts should be consistent across runs",
-        )
+        assert (
+            result1["summary"]["total_protocols"] == result2["summary"]["total_protocols"]
+        ), "Protocol counts should be consistent across runs"
 
         # Individual protocol statuses should be consistent (unless they have randomness)
         for protocol in result1["protocol_results"]:
@@ -251,7 +244,7 @@ class TestValidationRunnerFunctions:
 
                 # Allow for ERROR status differences due to environmental factors
                 if status1 != "ERROR" and status2 != "ERROR":
-                    pytest.assertEqual(status1, status2, f"Protocol {protocol} status should be consistent across runs")
+                    assert status1 == status2, f"Protocol {protocol} status should be consistent across runs"
 
     @pytest.mark.skipif(not VALIDATION_RUNNER_AVAILABLE, reason="validation_runner not available")
     def test_validation_output_structure(self):
@@ -261,16 +254,16 @@ class TestValidationRunnerFunctions:
         # Check top-level structure
         required_keys = ["overall_status", "protocol_results", "summary"]
         for key in required_keys:
-            pytest.assertIn(key, result, f"Result should contain {key}")
+            assert key in result, f"Result should contain {key}"
 
         # Check protocol results structure
         for protocol, protocol_result in result["protocol_results"].items():
-            pytest.assertIn("status", protocol_result, f"Protocol {protocol} result should contain status")
+            assert "status" in protocol_result, f"Protocol {protocol} result should contain status"
 
             # If passed, should have metrics
             if protocol_result["status"] == "PASSED":
                 # Should have some kind of metrics (specific keys vary by protocol)
-                pytest.assertTrue(len(protocol_result) > 1, f"Protocol {protocol} should have more than just status")
+                assert len(protocol_result) > 1, f"Protocol {protocol} should have more than just status"
 
         # Check summary structure
         summary = result["summary"]
@@ -281,9 +274,9 @@ class TestValidationRunnerFunctions:
             "errors",
         ]
         for key in required_summary_keys:
-            pytest.assertIn(key, summary, f"Summary should contain {key}")
-            pytest.assertIsInstance(summary[key], int, f"Summary {key} should be an integer")
+            assert key in summary, f"Summary should contain {key}"
+            assert isinstance(summary[key], int), f"Summary {key} should be an integer"
 
         # Summary counts should add up
         total = summary["passed"] + summary["failed"] + summary["errors"]
-        pytest.assertEqual(total, summary["total_checks"], "Summary counts should add up to total_checks")
+        assert total == summary["total_checks"], "Summary counts should add up to total_checks"

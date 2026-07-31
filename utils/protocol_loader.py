@@ -115,19 +115,18 @@ def _iter_protocol_files() -> List[Path]:
     return sorted(_PROTOCOLS_DIR.glob("protocol_*.json"))
 
 
-
 def _find_protocol_file(protocol_id: str) -> Optional[Path]:
     """Resolve a protocol ID to its JSON file.
-    
+
     Phase 4 (Hard Deprecation): ONLY canonical APGI-P## naming is supported.
     Legacy VP-##/FP-## IDs will raise ValueError with clear error message.
-    
+
     Args:
         protocol_id: The protocol ID (must be in APGI-P## format)
-        
+
     Returns:
         Path to protocol JSON file, or None if not found
-        
+
     Raises:
         ValueError: If legacy VP-##/FP-## naming is attempted
     """
@@ -135,7 +134,7 @@ def _find_protocol_file(protocol_id: str) -> Optional[Path]:
         return None
 
     normalized_id = protocol_id.strip()
-    
+
     # PHASE 4: REJECT legacy protocol IDs
     if normalized_id.startswith("VP-") or normalized_id.startswith("FP-"):
         raise ValueError(
@@ -180,7 +179,6 @@ def _find_protocol_file(protocol_id: str) -> Optional[Path]:
     return None
 
 
-
 def load_protocol(protocol_id: str) -> Optional[ProtocolSpec]:
     """Load a protocol spec by ID (e.g. 'APGI-P01'). Returns None if not found."""
     path = _find_protocol_file(protocol_id)
@@ -198,13 +196,13 @@ def load_protocol_file(path: Path) -> ProtocolSpec:
 
 def load_all_protocols() -> Dict[str, ProtocolSpec]:
     """Load all canonical protocol specs (APGI-P## only), keyed by protocol_id.
-    
+
     Phase 4 (Hard Deprecation): Legacy protocols in protocols/legacy/ are no
     longer accessible. Only canonical APGI-P## protocols can be loaded.
-    
+
     For legacy protocol references, update your code to use canonical naming
     and review PROTOCOL-MIGRATION-USER-GUIDE.md for the mapping.
-    
+
     Returns:
         Dict mapping protocol_id (e.g., "APGI-P01") to ProtocolSpec objects
     """
@@ -216,7 +214,6 @@ def load_all_protocols() -> Dict[str, ProtocolSpec]:
         except Exception:  # nosec B110
             pass
     return specs
-
 
 
 def get_apgi_parameters(protocol_id: str) -> Dict[str, Any]:

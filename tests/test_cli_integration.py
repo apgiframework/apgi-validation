@@ -310,13 +310,26 @@ class TestComprehensiveValidationCommand:
 class TestGUICommand:
     """Tests for the gui CLI command."""
 
-    def test_gui_launch(self):
-        """Test GUI launch command."""
+    def test_gui_launch(self, monkeypatch):
+        """Test GUI launch command.
+
+        Authentication is enforced by default, so an unauthenticated launch
+        exits with a message rather than starting a window. Development mode
+        (APGI_ENFORCE_AUTH=0) issues an auto-generated token instead.
+        """
+        monkeypatch.setenv("APGI_ENFORCE_AUTH", "0")
         runner = CliRunner()
         cli = get_cli()
-        runner = CliRunner()
         result = runner.invoke(cli, ["gui"])
         assert result.exit_code == 0
+
+    def test_gui_launch_requires_token_when_enforced(self, monkeypatch):
+        """With enforcement on (the default), launching without a token fails."""
+        monkeypatch.setenv("APGI_ENFORCE_AUTH", "1")
+        runner = CliRunner()
+        cli = get_cli()
+        result = runner.invoke(cli, ["gui"])
+        assert result.exit_code != 0
 
     def test_gui_with_config(self, temp_dir):
         """Test GUI launch with custom config."""

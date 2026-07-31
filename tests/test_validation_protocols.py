@@ -467,8 +467,8 @@ class TestMasterValidation:
 
             # Run all validations
             master_results = master.run_all_validations(protocols)
-            pytest.assertIsInstance(master_results, dict, "Master results should be a dict")
-            pytest.assertEqual(len(master_results), len(protocols), "Should have results for all protocols")
+            assert isinstance(master_results, dict), "Master results should be a dict"
+            assert len(master_results) == len(protocols), "Should have results for all protocols"
 
         except Exception:
             pass
@@ -511,7 +511,7 @@ class TestNeuralNetworkInductiveBias:
 
             # Measure bias
             bias_score = benchmark.measure_bias(mock_network)
-            pytest.assertIsInstance(bias_score, (float, int), "Bias score should be a number")
+            assert isinstance(bias_score, (float, int)), "Bias score should be a number"
             assert bias_score >= 0, "Bias score should be non-negative"
 
         except Exception:
@@ -691,11 +691,9 @@ class TestTMSPharmacologicalCausalIntervention:
 
             # Apply intervention
             intervention_result = intervention.apply_intervention(baseline_data, intervention_type="tms", intensity=1.0)
-            pytest.assertEqual(
-                intervention_result.shape,
-                baseline_data.shape,
-                "Intervention result should have same shape as baseline data",
-            )
+            assert (
+                intervention_result.shape == baseline_data.shape
+            ), "Intervention result should have same shape as baseline data"
 
         except Exception:
             pass

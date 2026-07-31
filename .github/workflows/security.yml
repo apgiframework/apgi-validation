@@ -1,58 +1,89 @@
 name: Security Audit
+
 on: [push, pull_request]
+
+permissions:
+  contents: read
+
 jobs:
   sast:
+    name: Static analysis (Bandit + Semgrep)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install dependencies
+
+      - name: Install scanners
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install bandit safety semgrep
+          python3 -m pip install bandit semgrep
+
+      # Fails the build on MEDIUM+ severity at MEDIUM+ confidence.
+      # Thresholds, skips and excluded dirs live in .bandit.yml.
       - name: Run Bandit SAST
         run: |
-          bandit -r . -f json -o bandit-report.json || true
-          bandit -r . -f txt -o bandit-report.txt || true
-      - name: Run Safety check
-        run: |
-          safety check --json --output safety-report.json || true
-          safety check || true
+          bandit -c .bandit.yml -r . -f json -o bandit-report.json
+          bandit -c .bandit.yml -r . -f txt
+
       - name: Run Semgrep SAST
-        run: |
-          semgrep --config=auto --json --output=semgrep-report.json . || true
-          semgrep --config=auto . || true
+        run: semgrep --config=auto --error --json --output=semgrep-report.json .
+
       - name: Upload security reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: security-reports
           path: |
             bandit-report.json
-            bandit-report.txt
-            safety-report.json
             semgrep-report.json
 
   dependency-scan:
+    name: Dependency vulnerabilities
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install dependencies
+
+      - name: Install pip-audit
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install pip-audit
+
+      # Fails on any known vulnerability in the declared dependency set.
       - name: Run pip-audit
         run: |
-          pip-audit --format json --output pip-audit-report.json || true
-          pip-audit || true
+          pip-audit -r requirements.txt --format json --output pip-audit-report.json
+          pip-audit -r requirements.txt
+
       - name: Upload dependency report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dependency-reports
           path: pip-audit-report.json
+
+  secret-scan:
+    name: Committed secret material
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Encrypted key files were previously tracked in git. They are now
+      # gitignored; this keeps them from coming back.
+      - name: Fail if key material is tracked
+        run: |
+          tracked=$(git ls-files | grep -E '(^|/)\.keys/|\.enc$|\.pem$|(^|/)\.env$' || true)
+          if [ -n "$tracked" ]; then
+            echo "::error::Key material or .env is tracked in git:"
+            echo "$tracked"
+            exit 1
+          fi
+          echo "No key material tracked."

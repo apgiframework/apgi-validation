@@ -254,7 +254,7 @@ class TestCheckCompliance:
         register_standard(standard)
 
         result = check_compliance("COMP-001", 0.95)
-        assert result.level == ComplianceLevel.FULL
+        assert result == ComplianceLevel.FULL
 
     def test_check_partial_compliance(self):
         """Test checking partial compliance."""
@@ -303,7 +303,7 @@ class TestCheckCompliance:
         register_standard(standard)
 
         result = check_compliance("PART-001", 0.7)
-        assert result.level == ComplianceLevel.PARTIAL
+        assert result == ComplianceLevel.PARTIAL
 
 
 class TestSevenStandards:

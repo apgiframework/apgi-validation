@@ -227,7 +227,7 @@ class TestGFPMicrostateValidator:
     def test_measurement_gap_note_content(self, small_validator):
         results = small_validator.run_full_validation()
         note = results["measurement_gap_note"]
-        required_terms = ["Level 3", "Landauer", "thermodynamic"]
+        required_terms = ["Tier 3", "Landauer", "thermodynamic"]
         missing_terms = [term for term in required_terms if term not in note]
         if missing_terms:
             raise AssertionError(f"Note missing required terms: {missing_terms}")

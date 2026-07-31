@@ -57,6 +57,10 @@ import numpy as np
 
 PROJECT_ROOT = Path(__file__).parent
 
+# Metabolic sensitivity used by the interactive parameter explorer.
+# Canonical value from config/config_template.yaml (valid range -0.5 to 0.5).
+GAMMA_M_DEFAULT = -0.3
+
 
 def safe_import_module(module_name: str, file_path: Path) -> Optional[Any]:
     """Safely import a module with detailed error reporting."""
@@ -2214,7 +2218,10 @@ class APGIValidationGUI:
             if str(project_root) not in sys.path:
                 sys.path.insert(0, str(project_root))
 
-            # Import APGI equations for simulation
+            # Import APGI equations for simulation. The threshold update is
+            # delegated to apgi_core.update_threshold so the GUI can never drift
+            # from the canonical model (see APGI-Equations.md §Threshold).
+            from apgi_core import compute_information_value, update_threshold
             from apgi_core.equations import CoreIgnitionSystem
 
             ignition_system = CoreIgnitionSystem()
@@ -2225,10 +2232,12 @@ class APGIValidationGUI:
 
             # Initialize variables
             S = 0.0
-            theta = params["theta_0"]
+            theta_0 = params["theta_0"]
+            theta = theta_0
             tau_S = params["tau_S"]
             tau_theta = params["tau_theta"]
             alpha = params["alpha"]
+            gamma_M = params.get("gamma_M", GAMMA_M_DEFAULT)
 
             # Track variables over time
             S_history = []
@@ -2243,9 +2252,19 @@ class APGIValidationGUI:
                 dS_dt = (stimulus_strength - S) / tau_S
                 S += dS_dt * dt
 
-                # Update threshold adaptation
-                dtheta_dt = (params["theta_0"] - theta) / tau_theta
-                theta += dtheta_dt * dt
+                # Update threshold: homeostatic restoration toward theta_0
+                # competes with signal-driven metabolic depression, so tau_theta
+                # controls the recovery rate of an actually-displaced threshold.
+                V_info = compute_information_value(S, S)
+                theta = update_threshold(
+                    theta=theta,
+                    theta0=theta_0,
+                    S=S,
+                    V_info=V_info,
+                    dt=dt,
+                    tau_theta=tau_theta,
+                    gamma_M=gamma_M,
+                )
 
                 # Calculate ignition probability
                 ignition_prob = ignition_system.ignition_probability(S, theta, alpha)
@@ -2305,14 +2324,14 @@ Interpretation:
 
             # Protocol file mapping — canonical APGI-P00 through APGI-P07.
             protocol_file_map = {
-                0: "VP_00_HEPProxyValidation.py",           # APGI-P00
-                1: "VP_01_SyntheticEEGMLClassification.py", # APGI-P01
-                2: "VP_03_ActiveInferenceAgentSimulations.py", # APGI-P02
-                3: "VP_14_FMRIAnticipationExperience.py",   # APGI-P03
-                4: "VP_16_MetabolicATPGroundTruth.py",      # APGI-P04
-                5: "VP_07_TMSCausalInterventions.py",       # APGI-P05
-                6: "VP_20_EmpiricalIEEG.py",                # APGI-P06
-                7: "VP_13_EpistemicArchitecture.py",        # APGI-P07
+                0: "VP_00_HEPProxyValidation.py",  # APGI-P00
+                1: "VP_01_SyntheticEEGMLClassification.py",  # APGI-P01
+                2: "VP_03_ActiveInferenceAgentSimulations.py",  # APGI-P02
+                3: "VP_14_FMRIAnticipationExperience.py",  # APGI-P03
+                4: "VP_16_MetabolicATPGroundTruth.py",  # APGI-P04
+                5: "VP_07_TMSCausalInterventions.py",  # APGI-P05
+                6: "VP_20_EmpiricalIEEG.py",  # APGI-P06
+                7: "VP_13_EpistemicArchitecture.py",  # APGI-P07
             }
 
             if protocol_num not in protocol_file_map:
@@ -3302,10 +3321,13 @@ def main() -> None:
                 # Validate token and check GUI access permissions
                 gateway.require_roles(args.token, [Role.RESEARCHER, Role.ADMIN])
             elif os.environ.get("APGI_ENFORCE_AUTH", "0") == "1":
-                raise SystemExit("APGI_ENFORCE_AUTH=1 is set: a --token is required to start the GUI.")
+                raise SystemExit(
+                    "Authentication required: pass --token to start the GUI. "
+                    "For local development only, set APGI_ENFORCE_AUTH=0 to enable an auto-generated dev token."
+                )
             else:
                 # Development mode: auto-generate a token so the GUI works without CLI args.
-                # Set APGI_ENFORCE_AUTH=1 in production / multi-user deployments to disable this.
+                # Reached only when APGI_ENFORCE_AUTH=0 is set explicitly (local dev).
                 try:
                     from utils.auth_adapter import get_auth_manager
 

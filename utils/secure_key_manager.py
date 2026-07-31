@@ -19,6 +19,21 @@ from cryptography.fernet import Fernet
 _singleton_lock = threading.Lock()
 
 
+class KeyIntegrityError(RuntimeError):
+    """Raised when existing key material cannot be decrypted or verified.
+
+    This is deliberately fatal. Silently regenerating a key that failed to
+    decrypt would invalidate every artefact signed or encrypted with the
+    previous key (backup HMACs, issued JWTs) while reporting success, so
+    integrity checks would then "pass" against unverifiable state.
+
+    Recovery is an explicit operator action:
+        - restore the correct ``APGI_MASTER_KEY``, or
+        - run ``python3 -m utils.key_rotation_manager --rotate`` to mint new
+          keys, accepting that artefacts under the old keys become invalid.
+    """
+
+
 class SecureKeyManager:
     """Thread-safe secure key manager with point-of-use retrieval."""
 
@@ -101,21 +116,23 @@ class SecureKeyManager:
         encrypted = key_file.read_bytes()
         try:
             decrypted_b64 = fernet.decrypt(encrypted).decode("utf-8")
-            try:
-                # Check if content is valid base64 by attempting to decode
-                decoded_bytes = base64.b64decode(decrypted_b64)
-                # If successful, convert to hex string
-                key_bytes_hex = decoded_bytes.hex()
-                return key_bytes_hex
-            except Exception as decode_error:
-                # If both decryption and base64 decode fail, raise ValueError
-                raise ValueError(f"Invalid key format in {key_file.name}: {decode_error}")
         except Exception as decrypt_error:
-            # Remove the corrupted/old key file and force regeneration
-            key_file.unlink(missing_ok=True)
-            raise ValueError(
-                f"Key file {key_file.name} could not be decrypted with current master key"
+            # The key file is preserved: it may still be recoverable with the
+            # correct master key, and destroying it would be unrecoverable.
+            raise KeyIntegrityError(
+                f"Key file {key_file.name} could not be decrypted with the current APGI_MASTER_KEY. "
+                f"The file has been left intact. Restore the correct master key, or run "
+                f"'python3 -m utils.key_rotation_manager --rotate' to mint new keys "
+                f"(artefacts signed with the previous key will no longer verify)."
             ) from decrypt_error
+
+        try:
+            # Check if content is valid base64 by attempting to decode
+            decoded_bytes = base64.b64decode(decrypted_b64)
+        except Exception as decode_error:
+            raise KeyIntegrityError(f"Invalid key format in {key_file.name}: {decode_error}") from decode_error
+
+        return decoded_bytes.hex()
 
     def _generate_and_save_key(self, key_file: Path) -> str:
         """
@@ -155,41 +172,55 @@ class SecureKeyManager:
         self.logger.info(f"Generated new key with fingerprint {fingerprint}")
         return fingerprint
 
+    def _get_or_create_key(self, cache_key: str, key_file: Path, env_var: str) -> str:
+        """Resolve one key: environment override, then file, then first-run mint.
+
+        Bootstrapping a *missing* key file is legitimate. Failing to decrypt an
+        *existing* one is not — that propagates as :class:`KeyIntegrityError`
+        rather than being papered over with a fresh key.
+
+        Args:
+            cache_key: Internal cache slot name.
+            key_file: Encrypted key file for this purpose.
+            env_var: Environment variable that overrides the file.
+
+        Returns:
+            Hex-encoded key.
+
+        Raises:
+            KeyIntegrityError: If an existing key file cannot be decrypted.
+        """
+        with self._lock:
+            if cache_key in self._key_cache:
+                return self._key_cache[cache_key]
+
+            env_key = os.environ.get(env_var)
+            if env_key and self._is_valid_hex_key(env_key):
+                self._key_cache[cache_key] = env_key
+                return env_key
+
+            if key_file.exists():
+                # Any failure here is fatal by design — see KeyIntegrityError.
+                key_hex = self._load_encrypted_key(key_file)
+            else:
+                fingerprint = self._generate_and_save_key(key_file)
+                key_hex = self._load_encrypted_key(key_file)
+                self.logger.info(f"Generated new {env_var} with fingerprint {fingerprint}")
+
+            self._key_cache[cache_key] = key_hex
+            return key_hex
+
     def get_pickle_secret_key(self) -> str:
         """
         Get PICKLE_SECRET_KEY securely.
 
         Returns:
             Hex-encoded secret key
+
+        Raises:
+            KeyIntegrityError: If the existing key file cannot be decrypted.
         """
-        with self._lock:
-            if "pickle_secret" not in self._key_cache:
-                # Check environment variable first
-                env_key = os.environ.get("PICKLE_SECRET_KEY")
-                if env_key and self._is_valid_hex_key(env_key):
-                    self._key_cache["pickle_secret"] = env_key
-                    return self._key_cache["pickle_secret"]
-
-                # If no valid env var, try to load from file or generate
-                try:
-                    if self._pickle_key_file.exists():
-                        key_hex = self._load_encrypted_key(self._pickle_key_file)
-                        self._key_cache["pickle_secret"] = key_hex
-                    else:
-                        # Generate new key if none exists
-                        fingerprint = self._generate_and_save_key(self._pickle_key_file)
-                        key_hex = self._load_encrypted_key(self._pickle_key_file)
-                        self._key_cache["pickle_secret"] = key_hex
-                        self.logger.info(f"Generated new PICKLE_SECRET_KEY with fingerprint {fingerprint}")
-                except ValueError as e:
-                    # Key file couldn't be decrypted, regenerate it
-                    self.logger.warning(f"Regenerating pickle secret key: {e}")
-                    fingerprint = self._generate_and_save_key(self._pickle_key_file)
-                    key_hex = self._load_encrypted_key(self._pickle_key_file)
-                    self._key_cache["pickle_secret"] = key_hex
-                    self.logger.info(f"Generated new PICKLE_SECRET_KEY with fingerprint {fingerprint}")
-
-            return self._key_cache["pickle_secret"]
+        return self._get_or_create_key("pickle_secret", self._pickle_key_file, "PICKLE_SECRET_KEY")
 
     def _is_valid_hex_key(self, key: str) -> bool:
         """Check if key is valid 64-character hex string."""
@@ -207,71 +238,27 @@ class SecureKeyManager:
 
         Returns:
             Hex-encoded HMAC key
+
+        Raises:
+            KeyIntegrityError: If the existing key file cannot be decrypted.
         """
-        with self._lock:
-            if "backup_hmac" not in self._key_cache:
-                # Check environment variable first
-                env_key = os.environ.get("APGI_BACKUP_HMAC_KEY")
-                if env_key and self._is_valid_hex_key(env_key):
-                    self._key_cache["backup_hmac"] = env_key
-                    return self._key_cache["backup_hmac"]
-
-                # If no valid env var, try to load from file or generate
-                try:
-                    if self._backup_key_file.exists():
-                        key_hex = self._load_encrypted_key(self._backup_key_file)
-                        self._key_cache["backup_hmac"] = key_hex
-                    else:
-                        # Generate new key if none exists
-                        fingerprint = self._generate_and_save_key(self._backup_key_file)
-                        key_hex = self._load_encrypted_key(self._backup_key_file)
-                        self._key_cache["backup_hmac"] = key_hex
-                        self.logger.info(f"Generated new APGI_BACKUP_HMAC_KEY with fingerprint {fingerprint}")
-                except ValueError as e:
-                    # Key file couldn't be decrypted, regenerate it
-                    self.logger.warning(f"Regenerating backup HMAC key: {e}")
-                    fingerprint = self._generate_and_save_key(self._backup_key_file)
-                    key_hex = self._load_encrypted_key(self._backup_key_file)
-                    self._key_cache["backup_hmac"] = key_hex
-                    self.logger.info(f"Generated new APGI_BACKUP_HMAC_KEY with fingerprint {fingerprint}")
-
-            return self._key_cache["backup_hmac"]
+        return self._get_or_create_key("backup_hmac", self._backup_key_file, "APGI_BACKUP_HMAC_KEY")
 
     def get_jwt_secret_key(self) -> str:
         """
         Get APGI_JWT_SECRET securely.
 
+        Backed by its own key file. JWT signing material is never shared with
+        the pickle or backup-HMAC keys: distinct cryptographic purposes get
+        distinct keys, so rotating one does not silently invalidate another.
+
         Returns:
             Hex-encoded JWT secret key
+
+        Raises:
+            KeyIntegrityError: If the existing key file cannot be decrypted.
         """
-        with self._lock:
-            if "jwt_secret" not in self._key_cache:
-                # Check environment variable first
-                env_key = os.environ.get("APGI_JWT_SECRET")
-                if env_key and self._is_valid_hex_key(env_key):
-                    self._key_cache["jwt_secret"] = env_key
-                    return self._key_cache["jwt_secret"]
-
-                # If no valid env var, try to load from file or generate
-                try:
-                    if self._jwt_key_file.exists():
-                        key_hex = self._load_encrypted_key(self._jwt_key_file)
-                        self._key_cache["jwt_secret"] = key_hex
-                    else:
-                        # Generate new key if none exists
-                        fingerprint = self._generate_and_save_key(self._jwt_key_file)
-                        key_hex = self._load_encrypted_key(self._jwt_key_file)
-                        self._key_cache["jwt_secret"] = key_hex
-                        self.logger.info(f"Generated new APGI_JWT_SECRET with fingerprint {fingerprint}")
-                except ValueError as e:
-                    # Key file couldn't be decrypted, regenerate it
-                    self.logger.warning(f"Regenerating JWT secret key: {e}")
-                    fingerprint = self._generate_and_save_key(self._jwt_key_file)
-                    key_hex = self._load_encrypted_key(self._jwt_key_file)
-                    self._key_cache["jwt_secret"] = key_hex
-                    self.logger.info(f"Generated new APGI_JWT_SECRET with fingerprint {fingerprint}")
-
-            return self._key_cache["jwt_secret"]
+        return self._get_or_create_key("jwt_secret", self._jwt_key_file, "APGI_JWT_SECRET")
 
     def clear_cache(self) -> None:
         """Clear key cache - call after key rotation."""
@@ -280,54 +267,51 @@ class SecureKeyManager:
 
     def rotate_keys(self) -> dict:
         """
-        Rotate both keys and return rotation info.
+        Rotate all managed keys and return rotation info.
+
+        This is the sanctioned recovery path when key material cannot be
+        decrypted. Rotation is explicit and destructive by intent: artefacts
+        signed with the previous keys will no longer verify.
 
         Returns:
-            Dictionary with rotation results
+            Dictionary mapping each key name to its old and new fingerprints.
         """
+        managed = (
+            ("pickle_secret_key", "pickle_secret", self._pickle_key_file),
+            ("backup_hmac_key", "backup_hmac", self._backup_key_file),
+            ("jwt_secret_key", "jwt_secret", self._jwt_key_file),
+        )
+
         with self._lock:
             # Clear cache to force reload of new keys
             self.clear_cache()
 
-            # Get old fingerprints before rotation
-            old_pickle_fingerprint = None
-            old_backup_fingerprint = None
+            rotation_results: Dict[str, Dict[str, Optional[str]]] = {}
+            summary_parts = []
 
-            if self._pickle_key_file.exists():
-                old_key_hex = self._load_encrypted_key(self._pickle_key_file)
-                old_pickle_fingerprint = hashlib.sha256(old_key_hex.encode()).hexdigest()[:16]
+            for label, cache_key, key_file in managed:
+                old_fingerprint = None
+                if key_file.exists():
+                    try:
+                        old_key_hex = self._load_encrypted_key(key_file)
+                        old_fingerprint = hashlib.sha256(old_key_hex.encode()).hexdigest()[:16]
+                    except KeyIntegrityError:
+                        # Undecryptable material is precisely what rotation
+                        # exists to replace; record it as unknown and continue.
+                        old_fingerprint = None
+                        self.logger.warning(f"Previous {label} could not be read; rotating to a fresh key")
 
-            if self._backup_key_file.exists():
-                old_key_hex = self._load_encrypted_key(self._backup_key_file)
-                old_backup_fingerprint = hashlib.sha256(old_key_hex.encode()).hexdigest()[:16]
+                new_fingerprint = self._generate_and_save_key(key_file)
+                self._key_cache[cache_key] = self._load_encrypted_key(key_file)
 
-            # Generate new keys
-            new_pickle_fingerprint = self._generate_and_save_key(self._pickle_key_file)
-            new_backup_fingerprint = self._generate_and_save_key(self._backup_key_file)
+                rotation_results[label] = {
+                    "old_fingerprint": old_fingerprint,
+                    "new_fingerprint": new_fingerprint,
+                }
+                old_short = f"{old_fingerprint[:8]}..." if old_fingerprint else "none"
+                summary_parts.append(f"{label} {old_short} -> {new_fingerprint[:8]}...")
 
-            # Cache new keys
-            pickle_key_hex = self._load_encrypted_key(self._pickle_key_file)
-            backup_key_hex = self._load_encrypted_key(self._backup_key_file)
-            self._key_cache["pickle_secret"] = pickle_key_hex
-            self._key_cache["backup_hmac"] = backup_key_hex
-
-            rotation_results = {
-                "pickle_secret_key": {
-                    "old_fingerprint": old_pickle_fingerprint,
-                    "new_fingerprint": new_pickle_fingerprint,
-                },
-                "backup_hmac_key": {
-                    "old_fingerprint": old_backup_fingerprint,
-                    "new_fingerprint": new_backup_fingerprint,
-                },
-            }
-
-            old_pickle_short = f"{old_pickle_fingerprint[:8]}..." if old_pickle_fingerprint else "none"
-            old_backup_short = f"{old_backup_fingerprint[:8]}..." if old_backup_fingerprint else "none"
-            self.logger.info(
-                f"Key rotation completed: pickle_secret {old_pickle_short} -> {new_pickle_fingerprint[:8]}..., "
-                f"backup_hmac {old_backup_short} -> {new_backup_fingerprint[:8]}..."
-            )
+            self.logger.info(f"Key rotation completed: {', '.join(summary_parts)}")
 
             return rotation_results
 
@@ -380,13 +364,17 @@ def get_backup_hmac_key() -> str:
 
 
 def get_jwt_secret() -> str:
-    """Get APGI_JWT_SECRET securely."""
+    """Get APGI_JWT_SECRET securely.
+
+    Uses dedicated JWT key material. Reusing the pickle secret here would mean
+    a pickle-key rotation silently invalidated every issued token, and would
+    give one compromised key authority over two trust domains.
+    """
     # Check environment variable first for global functions
     env_key = os.environ.get("APGI_JWT_SECRET")
     if env_key and len(env_key) == 64 and all(c in "0123456789abcdefABCDEF" for c in env_key):
         return env_key
-    # Use the same key as pickle_secret for JWT signing
-    return get_secure_key_manager().get_pickle_secret_key()
+    return get_secure_key_manager().get_jwt_secret_key()
 
 
 def rotate_keys() -> dict:

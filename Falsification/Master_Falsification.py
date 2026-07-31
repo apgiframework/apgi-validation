@@ -580,6 +580,18 @@ class APGIMasterFalsifier:
 
         self.timeout_seconds = 300  # 5 minutes default timeout
 
+    def get_available_protocols(self) -> List[str]:
+        """Get list of all available falsification protocols.
+
+        Mirrors APGIMasterValidator.get_available_protocols() so callers can
+        discover protocols the same way from either master orchestrator. The
+        asymmetry previously broke cross-protocol consistency checks.
+
+        Returns:
+            List of available protocol names
+        """
+        return [str(k) for k in self.PROTOCOL_TIERS.keys()]
+
     def get_criteria_by_protocol(self, protocol_num: int) -> Dict[str, Dict]:
         """Get all falsification criteria for a specific protocol.
 

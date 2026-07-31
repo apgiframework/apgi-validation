@@ -291,6 +291,35 @@ def _ensure_numpy_array_utils_shim() -> None:
     sys.modules["numpy.lib.array_utils"] = module
 
 
+_PYTENSOR_COMPILE_OK: Optional[bool] = None
+
+
+def _pytensor_can_compile() -> bool:
+    """Return True if PyTensor can build a trivial C-backed function.
+
+    Cached: the probe compiles once per process. Any failure (missing
+    compiler, SDK mismatch, read-only cache dir) means PyMC sampling would
+    fail later, so callers should use the NumPy fallback instead.
+    """
+    global _PYTENSOR_COMPILE_OK
+    if _PYTENSOR_COMPILE_OK is not None:
+        return _PYTENSOR_COMPILE_OK
+
+    try:
+        import pytensor
+        import pytensor.tensor as pt
+
+        x = pt.dvector("x")
+        fn = pytensor.function([x], (x * 2.0).sum())
+        fn(np.ones(3))
+        _PYTENSOR_COMPILE_OK = True
+    except Exception as exc:  # noqa: BLE001 - any failure means "cannot compile"
+        logger.debug(f"PyTensor compilation probe failed: {exc}")
+        _PYTENSOR_COMPILE_OK = False
+
+    return _PYTENSOR_COMPILE_OK
+
+
 def attempt_imports():
     global pm, az, HAS_PYMC, HAS_ARVIZ, LAST_IMPORT_ERROR
     if HAS_PYMC:
@@ -317,6 +346,19 @@ def attempt_imports():
 
         import arviz as _az
         import pymc as _pm
+
+        # Importing PyMC is not enough: PyTensor compiles C extensions at
+        # sample time, and a missing or mismatched toolchain fails there with
+        # "Compilation failed (return status=1)" — deep inside sampling, after
+        # the import guard has already reported success. Probe the compiler
+        # once here so the NumPy fallback engages automatically instead of
+        # requiring the operator to know about APGI_FORCE_NUMPY_MCMC.
+        if not _pytensor_can_compile():
+            HAS_PYMC = False
+            HAS_ARVIZ = False
+            LAST_IMPORT_ERROR = "PyTensor C compilation unavailable; using NumPy MCMC fallback"
+            logger.warning(LAST_IMPORT_ERROR)
+            return
 
         pm = _pm
         az = _az

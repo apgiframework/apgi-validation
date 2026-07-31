@@ -16,13 +16,25 @@ except ImportError:
 import numpy as np
 from scipy import signal
 
-try:
-    from specparam import FOOOF
+# Aperiodic-slope fitting is provided by fooof (<=1.x) or its successor
+# specparam (>=2.x), which renamed the model class FOOOF -> SpectralModel.
+# Importing only `specparam.FOOOF` silently disabled this analysis on any
+# machine with specparam 2.x installed: the guard reported the library as
+# missing while a perfectly working one was present.
+FOOOF = None
+SPECPARAM_AVAILABLE = False
 
-    SPECPARAM_AVAILABLE = True
-except ImportError:
-    SPECPARAM_AVAILABLE = False
-    FOOOF = None
+for _module, _attr in (
+    ("fooof", "FOOOF"),  # legacy API, matches the attribute names used below
+    ("specparam", "FOOOF"),  # specparam 1.x compatibility shim
+    ("specparam", "SpectralModel"),  # specparam 2.x
+):
+    try:
+        FOOOF = getattr(__import__(_module, fromlist=[_attr]), _attr)
+        SPECPARAM_AVAILABLE = True
+        break
+    except (ImportError, AttributeError):
+        continue
 
 logger = logging.getLogger(__name__)
 

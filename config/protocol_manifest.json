@@ -3,14 +3,14 @@
   "directories": {
     "Theory": {
       "APGI_Bayesian_Estimation_Framework.py": "a4c19382501479e71da5bcaabd368279793c97740224da38a54f99bdc1dfd1dd",
-      "APGI_Computational_Benchmarking.py": "306b7ea3972662766516799082b0f87d07367151bb163d4dd92d99d64fe2df1a",
+      "APGI_Computational_Benchmarking.py": "22e716a725ffb4fb4c53321ffa643d66c6212a5dd7d9abbbcd7de20b0321135b",
       "APGI_Cross_Species_Scaling.py": "9d739219886b649cd5c0bc4f83a4e573b206240ad0a996074e1148a483048833",
       "APGI_Cultural_Neuroscience.py": "e3b4977eb06152ac6e6c19480df2217672307c1e81f990baba9d64cb86c17a68",
       "APGI_Entropy_Implementation.py": "da94b2c5b5c18205690ec20f6fa31d7785cba654f5e3643a5e01e7de762d8c7b",
       "APGI_Falsification_Framework.py": "d6bc6fd946503bcec3aba95273d2953b59ee801328e6cebae2cdcd0abf1bb5e3",
       "APGI_Fractal_Threshold_Dynamics.py": "e3def9824a97ddd3038b65b6c76730af4b755c02d87df4ef6707157032c8329e",
       "APGI_Hierarchical_Temporal_Tiling.py": "474c741baf52bd78ed8f89d8dff4d877160ae30bfe53fb490bd2cc0277c66a73",
-      "APGI_Information_Theoretic_Bandwidth.py": "1de1ebf210e37a0746e1dbbdf5a917b313df9f96126c416982161f02b130f99f",
+      "APGI_Information_Theoretic_Bandwidth.py": "9b4bf4ffe5147041c706d3308f036719133c89722ca5342d041e78b3051a5b99",
       "APGI_LNN_Bifurcation_Analysis.py": "442ad3845e2fb427c598676aa70af2d09154e222e956294428ef29f2f1286e11",
       "APGI_Liquid_Network_Implementation.py": "aba85241f0fc40e8d89ce4d111b8354a840272985fa3976ee8cf7bf2f73a781a",
       "APGI_Multimodal_Classifier.py": "1cfae740a73136db819c7fce3399863504899deb448b2173e3691ceb7d286a7a",
@@ -26,7 +26,7 @@
     "Validation": {
       "Master_Validation.py": "1197db167d2825fdd8cf9241a97037e28ddc2fefd983315c36238df330d6400c",
       "VP_00_HEPProxyValidation.py": "3dc7bce2073e202ee1704fdc2e289c0d4eb26652df5c95b39d2ae57a90821bfe",
-      "VP_01_SyntheticEEGMLClassification.py": "5b429c595fae592fc48a6ef318de20bfe449faeb078ce7f1f5b0b8307ce05480",
+      "VP_01_SyntheticEEGMLClassification.py": "096b73e2c915f1caaf049ff674d3bf0b6aa79217d47f6a236ba7482b79c2be93",
       "VP_02_BehavioralBayesianComparison.py": "52d92c8875b19ff2b8082102599dd5e4bd23e9126fd21827eb8890d03c5009f9",
       "VP_03_ActiveInferenceAgentSimulations.py": "8558d5fcc16dad4d4bf7838d921c151dcbd8da2bb190b82562daec3da6182533",
       "VP_04_PhaseTransitionEpistemicLevel2.py": "3b138d5601978225894714514f97a3c982128192a48e66393df22f3990a62e01",
@@ -56,19 +56,19 @@
       "FP_02_AgentComparisonConvergenceBenchmark.py": "55b98163524055801d84070f24eadaea08cd8dda94a30e93995f9fff8ce02a25",
       "FP_03_FrameworkLevelMultiProtocol.py": "d8d06773c351a5d986c5c068dabdfb2713065f0b80a321a7b6d5037db6cdb47f",
       "FP_04_PhaseTransitionEpistemicArchitecture.py": "5bdf8caa172f3bb87ebf9c7ed2a2bdf4a25f999b90f79b9fc9c436eee823f3ff",
-      "FP_05_EvolutionaryPlausibility.py": "5ff26a5df76b6f2081ee68e66eae243881f4eb30e6e04deb0f17919485bf64c3",
+      "FP_05_EvolutionaryPlausibility.py": "f2a22a66042e28e39c3ceb954ba85ab3497be63d37e4e50240bbb38ba4bb70d2",
       "FP_06_LiquidNetworkEnergyBenchmark.py": "345e519bc33f9456ec747a9365c4e0a0532894047f5f256d1a0f62bcb715e2e5",
       "FP_07_MathematicalConsistency.py": "cc2e157daaffbdd7df9e1b7921a56b88c0961289691d1f66d462c9a7d73dacd5",
       "FP_08_ParameterSensitivityIdentifiability.py": "f7570b8b3b0333d5e07589594d8ecd046beacfa483d2b359aa29f561bbb76609",
       "FP_09_NeuralSignaturesP3bHEP.py": "b15af7e19f0255268d8dbc450a4eb0fc6407187a28f9361014280e4864674ec0",
-      "FP_10_BayesianEstimationMCMC.py": "d69e1339a72f1083f2d6412f14f6f19058b5fb9e6d946101c351854f9870f73e",
+      "FP_10_BayesianEstimationMCMC.py": "94d54822305e0a6ec3a4f76bbcf7c698b0bb5e098af8b7e062766e3a0c7cc60e",
       "FP_11_LiquidNetworkDynamicsEchoState.py": "14baa1d2e8c2a347324cee79634d45f6929722782800be26564387301e532dde",
       "FP_12_CrossSpeciesScaling.py": "5f1d97af340009dfaa2f5a682043e1a766e8af8981c69ecd2943b653c3b94710",
       "FP_13_Clinical_CrossSpecies_Convergence.py": "5f1086363231d8f2ffe878be8800f72148dc80ee567fd39ecd1d6e9978d56e34",
       "FP_14_fMRI_Anticipation_vmPFC.py": "87db8e1b7b1be0a05a8f1024d6bd8ed1769efcc669c3b6e76adedd83a343803d",
       "FP_15_AllenVisualCoding_Fatigue.py": "b1190a329bc67c0375343503adcd4696cfb88844a73decd7a1dc0ecced447084",
       "FP_ALL_Aggregator.py": "dd95ff7f690f279c583676dfed86d748937653867008a8e4bcb647244424f67d",
-      "Master_Falsification.py": "6ac0d61b47191138b3951658046acd48bc6804c2f7985175affd917841ea69f8"
+      "Master_Falsification.py": "4d8108b8355f72f920d1cd28f9e136c7e79a6329ac09a8e7c229839fe3ff743b"
     }
   }
 }

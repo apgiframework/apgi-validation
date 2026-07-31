@@ -847,9 +847,13 @@ def validate_parameter_recovery(n_simulations: int = 100, quick_mode: bool = Fal
                     logger.warning("Used Metropolis sampling as NUTS fallback")
                 except Exception as fallback_error:
                     logger.error(f"Fallback sampling also failed: {fallback_error}")
-                    # Create minimal trace for continuity
-                    import numpy as np
-
+                    # Create minimal trace for continuity.
+                    # NOTE: numpy is already imported at module scope. A local
+                    # `import numpy as np` here rebound np as a function-local,
+                    # which made every earlier use of np in this function raise
+                    # UnboundLocalError — a crash that only appeared once this
+                    # branch existed, i.e. exactly when sampling had already
+                    # failed and the fallback mattered most.
                     trace = type(
                         "MockTrace",
                         (),
@@ -1063,7 +1067,6 @@ def compute_fisher_information_matrix(trace, data: ConsciousnessDataset) -> Dict
             "fim": None,
             "eigenvalues": None,
             "condition_number": None,
-            "eigenvalues": None,
             "identifiability_metrics": None,
             "param_names": param_names,
         }

@@ -1,5 +1,7 @@
 """Tests for FP_10 Falsification Bayesian Estimation - increase coverage from 0%."""
 
+import json
+
 import numpy as np
 
 from Falsification.FP_10_BayesianEstimationMCMC import (
@@ -347,7 +349,13 @@ class TestBayesFactors:
         assert isinstance(result, dict)
         assert "bayes_factors" in result
         assert "comparison_summary" in result
-        assert "interpretation" in result
+
+        # "interpretation" lives on each pairwise comparison, not at the top
+        # level; the top-level keys are the ones asserted below.
+        assert {"best_model", "model_ranking", "model_evidence"} <= set(result)
+        assert result["best_model"] == "APGI", "Highest evidence model should win"
+        for pair, comparison in result["bayes_factors"].items():
+            assert "interpretation" in comparison, f"{pair} missing interpretation"
 
 
 class TestPosteriorPredictive:
@@ -453,7 +461,12 @@ class TestAlternativeModels:
         try:
             result = run_alternative_models(stimulus_data, response_data, n_samples=50, n_chains=1)
             assert isinstance(result, dict)
-            assert "standard_pp" in result or "error" in result
+            # Model keys are CamelCase ("StandardPP", "GWTOnly"), not snake_case.
+            assert "StandardPP" in result or "error" in result
+            for name, fit in result.items():
+                if name == "error":
+                    continue
+                assert "log_evidence" in fit, f"{name} produced no evidence estimate"
         except ImportError as e:
             # Expected when PyMC is not available
             assert "PyMC is required" in str(e)
@@ -463,18 +476,24 @@ class TestParameterRecovery:
     """Test parameter recovery functionality."""
 
     def test_generate_parameter_recovery_data(self):
-        """Test generating parameter recovery data."""
-        try:
-            from Falsification.FP_10_BayesianEstimationMCMC import generate_parameter_recovery_data
+        """Test generating parameter recovery data.
 
-            stimulus, response = generate_parameter_recovery_data(n_trials=20)
-            assert len(stimulus) == 20
-            assert len(response) == 20
-            assert all(0 <= s <= 1 for s in stimulus)
-            assert all(r in [0, 1] for r in response)
-        except Exception as e:
-            # Expected when temporary directories are not accessible
-            assert "temporary directory" in str(e).lower() or "tempfile" in str(e).lower()
+        The blanket `except Exception` here previously swallowed the real
+        assertion failure and re-asserted an unrelated claim about temporary
+        directories, so the actual defect — stimulus values being asserted
+        against the wrong range — was invisible.
+
+        Stimulus is a physical intensity (roughly 0.05 to 2.5), not a
+        probability, so the [0, 1] bound never held.
+        """
+        from Falsification.FP_10_BayesianEstimationMCMC import generate_parameter_recovery_data
+
+        stimulus, response = generate_parameter_recovery_data(n_trials=20)
+
+        assert len(stimulus) == 20
+        assert len(response) == 20
+        assert all(s > 0 for s in stimulus), "Stimulus intensities must be positive"
+        assert all(r in [0, 1] for r in response), "Responses must be binary detections"
 
     def test_generate_empirical_plausible_data(self):
         """Test generating empirical plausible data."""
@@ -493,6 +512,13 @@ class TestProtocolRunner:
         from Falsification.FP_10_BayesianEstimationMCMC import run_protocol_main
 
         result = run_protocol_main()
-        assert isinstance(result, dict)
-        # Should handle gracefully even if PyMC not available
-        assert "error" in result or "falsification_criteria" in result
+
+        # Protocols return the canonical ProtocolResult, not a bare dict.
+        assert result.protocol_id == "FP_10_BayesianEstimationMCMC"
+        assert result.status in {"success", "failed", "error", "partial"}
+
+        # Must degrade gracefully when the PyTensor toolchain is unavailable:
+        # a NumPy-fallback run still yields a serialisable result.
+        payload = result.model_dump()
+        assert isinstance(payload, dict)
+        json.dumps(payload)  # protocol results must be plain-JSON serialisable

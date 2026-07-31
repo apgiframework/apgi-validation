@@ -7,13 +7,64 @@ name = "apgi-validation"
 version = "1.3.0"
 description = "Adaptive Pattern Generation and Integration Theory Implementation"
 readme = "README.md"
-requires-python = ">=3.9"
+# 3.11 and 3.12 are the versions exercised by CI (.github/workflows/tests.yml).
+requires-python = ">=3.11"
+
+# Runtime dependencies for the CLI and GUIs. These must stay in step with
+# requirements.txt: previously only five were declared, so `pip install .` built
+# an environment without scipy/torch/mne and the `apgi-cli` entry point failed
+# on first import. Heavier protocol-only dependencies live in the `protocols`
+# extra (see requirements-protocols.txt).
 dependencies = [
-    "pydantic>=2.0.0",
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "pandas>=2.2.0",
+    "scikit-learn>=1.4.0",
     "click>=8.0.0",
-    "numpy>=1.21.0",
-    "pyyaml>=6.0.0",
-    "pandas>=1.3.0"
+    "pydantic>=2.8.0",
+    "pyyaml>=6.0.1",
+    "jsonschema>=4.21.0",
+    "rich>=13.7.0",
+    "tqdm>=4.66.0",
+    "matplotlib>=3.8.0",
+    "psutil>=5.9.0",
+    "cryptography>=41.0.0",
+    "pyjwt>=2.8.0",
+    "python-dotenv>=1.0.0",
+    "python-dateutil>=2.8.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+# Heavier scientific stack required only by individual validation and
+# falsification protocols.
+protocols = [
+    "torch>=2.2.0",
+    "pymc>=5.0.0,<6.0.0",
+    "arviz>=0.17.0,<1.0.0",
+    "mne>=1.7.0,<1.8.0",
+    "SALib>=1.5.0,<2.0.0",
+    "nolds>=0.6.0,<1.7.0",
+    "sympy>=1.12,<2.0.0",
+    "numba>=0.59.0",
+    "lifelines>=0.28.0,<0.29.0",
+    "shap>=0.44.0",
+    "captum>=0.8.0,<0.9.0",
+]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "pytest-xdist>=3.5.0",
+    "pytest-timeout>=2.2.0",
+    "hypothesis>=6.96.0",
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "ruff>=0.4.0",
+    "mypy>=1.9.0",
+    "bandit>=1.7.0",
+    "pip-audit>=2.0.0",
+    "pre-commit>=3.0.0",
 ]
 
 [project.scripts]
@@ -25,6 +76,43 @@ include = ["apgi_core*", "gui*", "utils*", "Validation*", "Falsification*", "The
 # After updating this file run: pip install -e .
 # Once installed, the sys.path.insert(0, ...) calls in the GUI entry points
 # can be removed — the package will be on PYTHONPATH via the editable install.
+
+[tool.ruff]
+# Mirrors the project's established flake8 standard (.flake8) so `make lint`
+# and the CI gate enforce the same rules the codebase was written against.
+line-length = 120
+target-version = "py311"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    ".hypothesis",
+    ".mypy_cache",
+    ".ruff_cache",
+    "build",
+    "dist",
+    "*.egg-info",
+    ".venv",
+    "venv",
+]
+
+[tool.ruff.lint]
+ignore = [
+    "E203", # whitespace before ':' — conflicts with black
+    "E501", # line length — enforced by black
+    # Protocol and GUI entry points manipulate sys.path before importing
+    # project modules, so imports legitimately follow executable statements.
+    "E402",
+    "F811", # redefinition — widely used for optional-dependency shims
+    "E741", # ambiguous name (l, I, O) — appears in established equations
+    # Modules re-export names through try/except import fallbacks, which ruff
+    # cannot always resolve.
+    "F823",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]        # re-exports are the point of a package __init__
+"tests/*" = ["F401", "F841"]    # fixtures and imports kept for readability
 
 [tool.mutmut]
 paths_to_mutate = "Validation/"
@@ -61,3 +149,9 @@ extend-exclude = '''
   | dist
 )/
 '''
+
+[tool.isort]
+# Match black so the two formatters cannot disagree.
+profile = "black"
+line_length = 120
+skip_gitignore = true
