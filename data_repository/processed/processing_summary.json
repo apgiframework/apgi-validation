@@ -1,8 +1,8 @@
 {
-  "input_file": "/var/folders/hw/90rxt5lj6rsgmbyczxm62vb80000gn/T/tmpt9akr0je/test.json",
+  "input_file": "/var/folders/hw/90rxt5lj6rsgmbyczxm62vb80000gn/T/tmponuv8m3z/test.json",
   "modalities_processed": [],
   "output_directory": "/Users/lesoto/Sites/PYTHON/apgi-validation/data_repository/processed",
-  "processing_timestamp": "2026-07-30T22:30:35.797176",
+  "processing_timestamp": "2026-07-30T23:40:40.272511",
   "config_used": {
     "eeg_bandpass": "0.5-40.0 Hz",
     "pupil_smoothing": "5 samples",
