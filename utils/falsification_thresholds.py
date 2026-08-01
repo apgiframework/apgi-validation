@@ -410,7 +410,7 @@ P12_C_PROPFOLOL_REDUCTION_MIN_PCT = P12_C_PROPFOLOL_REDUCTION_MIN_PCT_PAPER_SPEC
 # F1.1 thresholds
 F1_1_MIN_ADVANTAGE_PCT_PAPER_SPEC = 18.0
 F1_1_MIN_ADVANTAGE_PCT_SIMULATION = 5.0  # Fixed: 5% for simulation (was 15.0)
-F1_1_MIN_ADVANTAGE_PCT = F1_1_MIN_ADVANTAGE_PCT_SIMULATION  # Use simulation threshold
+F1_1_MIN_ADVANTAGE_PCT = F1_1_MIN_ADVANTAGE_PCT_PAPER_SPEC  # Use paper specification threshold
 F1_1_MIN_APGI_ADVANTAGE = F1_1_MIN_ADVANTAGE_PCT
 F1_1_MIN_COHENS_D: float = 0.60
 F1_1_ALPHA: float = 0.01
@@ -563,23 +563,20 @@ F4_SUSCEPTIBILITY_MIN_RATIO: float = 2.0  # Susceptibility ratio > 2.0 to confir
 #
 # This value is FIXED from the APGI theory, NOT calibrated to pass tests.
 # If the validation fails with this value, it indicates a genuine falsification.
-# RECALIBRATED: Increased from 0.012 to 0.055 to achieve d≈0.4-0.6 for P1.1
-# The previous value (0.012) was too small to produce detectable effect sizes.
-# Calibration verified: Pi_i ∈ [0.5, 2.5] with δ_pi=0.055 produces threshold
-# shifts of ~0.05-0.12, yielding Cohen's d ≈ 0.40-0.60 as required.
-VP2_DELTA_PI_COUPLING: float = 0.029  # Calibrated for d≈0.5 for P1.1 (combined with theta_0 correlation 0.039)
-# Recalibrated to achieve d≈0.4-0.6 for P1.1
+# RECALIBRATED: Analytically derived from Critchley et al. (2004).
+# Previous value (0.029) was a calibration attempt; reverting to paper-specified 0.012.
 # Based on behavioral validation calibration (Critchley et al. 2004)
-# Supporting interoceptive awareness with stronger arousal coupling
+# Supporting interoceptive awareness with arousal coupling
 # Citation: Critchley HD, Wiens S, Rotshtein P, Ohman A, Dolan RJ. Neural systems
 # supporting interoceptive awareness. Nat Neurosci. 2004;7(2):189-195.
+VP2_DELTA_PI_COUPLING: float = 0.012  # Analytically derived per Critchley et al. 2004
 VP2_AROUSAL_COUPLING_SCALE: float = 0.50
 VP2_AROUSAL_BOOST_MAX: float = 0.60
 
 # VP-04 suite-calibrated phase transition parameters
 VP4_CALIBRATED_TAU: float = 0.20
 VP4_CALIBRATED_THETA_0: float = 0.12
-VP4_CALIBRATED_ALPHA: float = 35.0
+VP4_CALIBRATED_ALPHA: float = 7.5  # Within paper range [0.1, 10.0]
 
 # VP-04 transfer entropy threshold for Tier 2 phase transition analysis
 TRANSFER_ENTROPY_THRESHOLD: float = 0.1  # Critical threshold for information flow (aligned with F4_TE_THRESHOLD)

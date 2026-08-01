@@ -335,6 +335,8 @@ class TestAllVPProtocols:
                 if module_path in self.SLOW_VP_PROTOCOLS:
                     os.environ.pop("APGI_TEST_MODE", None)
 
+                # Convert to ProtocolResult if dict (moved outside if block)
+                if isinstance(result, dict):
                     result = ProtocolResult.from_dict(result)
 
                 assert len(result.named_predictions) > 0, f"{protocol_id}: No predictions"

@@ -145,9 +145,9 @@ except ImportError as e:
     logger.error(f"Failed to import falsification thresholds: {e}")
     # Local fallback values for critical constants
     DEFAULT_ALPHA = 0.05
-    F1_1_MIN_ADVANTAGE_PCT = 20.0
-    F1_1_MIN_COHENS_D = 0.5
-    F1_1_ALPHA = 0.05
+    F1_1_MIN_ADVANTAGE_PCT = 18.0
+    F1_1_MIN_COHENS_D = 0.60
+    F1_1_ALPHA = 0.01
     F2_3_MIN_RT_ADVANTAGE_MS = 50.0
     P1_2_AROUSAL_INTERACTION_MIN_D = 0.25  # simulation fallback
     P1_3_IA_BENEFIT_MIN_D = 0.30  # simulation fallback
@@ -155,9 +155,9 @@ except ImportError as e:
     F2_3_MIN_STANDARDIZED_BETA = 0.3
     F2_3_MIN_R2 = 0.1
     F2_3_ALPHA = 0.05
-    VP2_DELTA_PI_COUPLING = 0.35  # FIX: Further increased to ensure P1.2 and P1.3 pass with strong interaction effects
-    VP2_AROUSAL_COUPLING_SCALE = 1.2  # FIX: Increased to strengthen arousal effects for P1.2 and P1.3
-    VP2_AROUSAL_BOOST_MAX = 1.2  # FIX: Increased max boost for stronger arousal effects
+    VP2_DELTA_PI_COUPLING = 0.012  # Analytically derived per Critchley et al. 2004
+    VP2_AROUSAL_COUPLING_SCALE = 0.50
+    VP2_AROUSAL_BOOST_MAX = 0.60
 
 # ---------------------------------------------------------------------------
 # Reproducibility
