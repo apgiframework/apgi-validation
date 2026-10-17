@@ -1,200 +1,381 @@
 {
+  "$schema": "schemas/protocol.schema.json",
+  "schema_version": "1.1.0",
   "protocol_id": "APGI-P04",
   "registry_ep": "EP-4",
   "registry_protocol_label": "Protocol 4 — Metabolic-State Crossover",
   "title": "Metabolic-State Crossover: Allostatic Threshold Modulation Under Energy Deficit",
   "paper": "APGI Paper 1",
   "osf_url": "https://osf.io/t5hcq",
-  "zenodo_doi": "10.5281/zenodo.21632264",
-  "zenodo_url": "https://doi.org/10.5281/zenodo.21632264",
-  "code_repository": "https://github.com/apgiframework/apgi-implementation",
-  "code_repository_org": "https://github.com/apgiframework",
-  "orcid": "https://orcid.org/0009-0005-0328-2896",
   "version": "1.1.0",
-  "last_updated": "2026-07-30",
-  "description": "This protocol provides the direct human empirical validation for the claim that the ignition threshold θₜ is dynamically regulated by metabolic state as an allostatic triage mechanism. APGI posits that interoceptive precision weighting (Πⁱ_eff) and somatic-marker retrieval rely on metabolically expensive neuromodulatory gain. Under conditions of energy deficit, the framework predicts that the brain selectively elevates θₜ to suppress high-cost interoceptive channels, preserving essential exteroceptive processing. Three sub-predictions are tested: (Pred 4.A) metabolic depletion selectively elevates θₜ for high-interoceptive-load stimuli, reducing d′ disproportionately vs. neutral exteroceptive stimuli (Metabolic State × Interoceptive Load interaction, LMM p < 0.05, ηₚ² ≥ 0.06); (Pred 4.B) the neural ignition proxy (P3b amplitude) reflects selective θₜ elevation, disproportionately suppressed for interoceptive targets under metabolic depletion; (Pred 4.C) the allostatic triage effect is mediated by metabolic cost, not generalized cognitive fatigue — the interaction survives strict covariation for trial-level pupil diameter and RMSSD.",
-  "prediction_cluster": "Pred 4.A–4.C",
-  "prediction_cluster_label": "Metabolic Allostatic Triage: Selective θₜ Elevation for High-Interoceptive-Load Stimuli",
+  "last_updated": "2026-10-16",
+  "specification_date": "2026-10-16",
+  "study_status": "pre_collection",
+  "description": "Four-session, two-site crossover compares fasting/fed and vigilance/rested states for selective interoceptive impairment beyond arousal; the two depletion modalities remain distinct.",
+  "prediction_cluster": "Pred 4.A–C",
   "sub_predictions": [
     {
       "id": "Pred 4.A",
+      "status": "confirmatory",
       "claim": "Metabolic depletion selectively elevates θₜ for high-interoceptive-load stimuli, reducing d′ disproportionately compared to neutral exteroceptive stimuli.",
-      "confirming_evidence": "Significant Metabolic State × Interoceptive Load interaction on d′ (LMM p < 0.05, ηₚ² ≥ 0.06); simple effects show d′ reduction for interoceptive load > 15% greater than for exteroceptive load under depletion.",
-      "falsifying_evidence": "(a) No significant Metabolic State × Interoceptive Load interaction on d′ or P3b, classified as Scenario E (frequentist p ≥ 0.05 AND BF₀₁ ≥ 6); OR (b) metabolic depletion produces uniform suppression of ignition proxies across all stimulus types, indicating generalised cognitive fatigue rather than selective θₜ elevation.",
+      "confirming_evidence": "State x Load interaction on d-prime: p <0.0167, BF10 >=100 and eta_p_squared >=0.06; signed depletion contrast delta_dprime_extero - delta_dprime_intero >=0.15 * rested_intero_dprime, where delta=depleted-rested and rested_intero_dprime must be positive.",
+      "falsifying_evidence": "(a) No significant Metabolic State × Interoceptive Load interaction classified as Scenario E (p ≥ 0.05 AND BF₀₁ ≥ 6) on d′ or P3b amplitude; OR (b) metabolic depletion produces a uniform, global suppression of ignition proxies across all stimulus types, indicating generalized cognitive fatigue rather than selective θₜ elevation.",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "lmm_interaction_p_threshold": 0.05,
+        "alpha": 0.0167,
+        "bf10_minimum": 100,
         "eta_p_squared_minimum": 0.06,
-        "d_prime_interoceptive_vs_exteroceptive_reduction_minimum_percent": 15,
-        "analysis": "Linear mixed-effects model with Metabolic State × Interoceptive Load interaction"
+        "proportional_margin": 0.15
       },
-      "falsifying_thresholds": {
-        "scenario_e_p_minimum": 0.05,
-        "scenario_e_bf01_minimum": 6,
-        "condition_1": "No significant interaction meeting Scenario E (p ≥ 0.05 AND BF₀₁ ≥ 6) on d′ or P3b",
-        "condition_2": "Uniform global suppression across all stimulus types (generalised fatigue)"
-      }
+      "signed_margin": "delta_dprime_extero - delta_dprime_intero >= 0.15 * rested_intero_dprime; delta=depleted-rested; baseline must be positive.",
+      "nonpositive_baseline_rule": "Zero or negative rested interoceptive d-prime is inadmissible for the proportional margin; report only the separate absolute-scale secondary contrast >=0.15 d-prime units."
     },
     {
       "id": "Pred 4.B",
+      "status": "confirmatory",
       "claim": "The neural ignition proxy (P3b amplitude) reflects selective θₜ elevation: P3b is disproportionately suppressed for detected high-interoceptive-load stimuli under metabolic depletion.",
-      "confirming_evidence": "Significant Metabolic State × Interoceptive Load interaction on P3b amplitude (p < 0.05); P3b reduction for interoceptive targets exceeds exteroceptive targets by ≥ 1.5 µV after arousal covariation.",
+      "confirming_evidence": "Significant Metabolic State × Interoceptive Load interaction on P3b amplitude (p < 0.0167); P3b reduction for interoceptive targets exceeds exteroceptive targets by ≥ 1.5 µV after arousal covariation.",
       "falsifying_evidence": "Uniform P3b suppression across all stimulus types; or P3b interaction disappears after covarying for pupil diameter / HRV (indicating an arousal confound rather than allostatic triage).",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "interaction_p_threshold": 0.05,
-        "p3b_reduction_interoceptive_vs_exteroceptive_minimum_uv": 1.5,
-        "covariate_control": "arousal covariation (pupil diameter and RMSSD) required",
-        "channels": [
-          "Pz",
-          "P3",
-          "P4"
-        ],
-        "window_ms": [
-          250,
-          500
-        ]
-      },
-      "falsifying_thresholds": {
-        "condition_1": "Uniform P3b suppression across all stimulus types",
-        "condition_2": "Interaction disappears after arousal covariation (Δηₚ² < 0.02 or p > 0.10)"
+        "alpha": 0.0167,
+        "bf10_minimum": 100,
+        "excess_interoceptive_p3b_reduction_uv_minimum": 1.5
       }
     },
     {
       "id": "Pred 4.C",
-      "claim": "The allostatic triage effect is mediated by metabolic cost, not generalized cognitive fatigue: the interaction survives strict covariation for general arousal.",
-      "confirming_evidence": "The Metabolic State × Interoceptive Load interaction on d′ and P3b remains significant (p < 0.05) when trial-level baseline pupil diameter and RMSSD are included as nuisance covariates in the mixed-effects model. BF₁₀ ≥ 100 for the interaction term.",
-      "falsifying_evidence": "The interaction effect is fully absorbed by arousal covariates (Δηₚ² < 0.02 or interaction p > 0.10 after covariation), indicating the effect is driven by LC-NE arousal rather than metabolic allostatic triage.",
+      "status": "confirmatory",
+      "claim": "Selective State x Load effects survive arousal adjustment; adjustment alone does not establish metabolic-cost mediation.",
+      "confirming_evidence": "The Metabolic State × Interoceptive Load interaction on d′ and P3b remains significant (p < 0.0167) when trial-level baseline pupil diameter and RMSSD are included as nuisance covariates in the mixed-effects model.",
+      "falsifying_evidence": "The interaction is absorbed by arousal covariates (reduction Δηₚ² ≥ 0.02, or Scenario E — p ≥ 0.05 and BF₀₁ ≥ 6 — after covariate entry), indicating LC-NE arousal rather than metabolic allostatic triage.",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "interaction_p_threshold": 0.05,
-        "bf10_minimum": 100,
-        "covariates_required": [
-          "trial-level baseline pupil diameter",
-          "RMSSD"
-        ],
-        "covariate_model": "LMM: d′ ~ MetabolicState × InteroceptiveLoad + PupilDiameter + RMSSD + (1 + MetabolicState | Participant) + (1 | Site)"
-      },
-      "falsifying_thresholds": {
-        "condition_1": "Interaction fully absorbed by arousal covariates (Δηₚ² < 0.02 after covariation)",
-        "condition_2": "Interaction p > 0.10 after covariation",
-        "condition_3": "Interaction meets Scenario E (p ≥ 0.05 AND BF₀₁ ≥ 6) after covariation",
-        "doc_note": "APGI-Protocols.md states the absorption criterion as 'Δηₚ² < 0.02' in the Protocol 4 sub-prediction table and as 'Δη² ≥ 0.02' in the framework Falsification Conditions table. The sub-prediction table (Δηₚ² < 0.02, i.e. the interaction no longer carries unique variance) is implemented here; the discrepancy is flagged for author resolution."
+        "alpha": 0.0167,
+        "eta_p_squared_reduction_strict_maximum": 0.02
       }
     }
   ],
-  "validation_status": "specified",
-  "validation_notes": "Pre-registered crossover design. Depends on EP-0 (HEP proxy validation) and EP-1 (cardiac-EEG) for interoceptive load stimulus validation. Multi-site design (≥ 2 independent laboratories) required for target N ≥ 60.",
-  "depends_on": [
-    "EP-0",
-    "EP-1"
-  ],
   "participants": {
-    "n_target": 60,
+    "n_target": 64,
     "n_minimum": 48,
-    "n_sites": 2,
-    "attrition_allowance_percent": 15,
+    "n_analyzable_target": 55,
+    "unit": "human_participants",
+    "sites": 2,
     "inclusion_criteria": [
-      "Age 18–45 years",
-      "Normal or corrected-to-normal vision",
-      "No metabolic or endocrine disorder (diabetes, thyroid disease, eating disorder)",
-      "BMI 18–30 kg/m²",
-      "No history of cardiac arrhythmia or autonomic neuropathy",
-      "Willingness to complete two sessions separated by ≥ 7 days (fasted vs. fed crossover)",
-      "Right-handedness (Edinburgh Handedness Inventory ≥ +40)"
+      "Eligible for fasting, vigilance and EEG task under approved protocol."
     ],
     "exclusion_criteria": [
-      "Diabetes mellitus type 1 or 2 (fasting arm contraindicated)",
-      "Current psychoactive or cardiovascular medication",
-      "Irregular ECG rhythm at screening",
-      "History of hypoglycemic episodes",
-      "History of neurological or psychiatric disorder (DSM-5 criteria)",
-      "Shift work schedule or irregular sleep during the preceding 2 weeks",
-      "Pregnancy or breastfeeding"
-    ],
-    "safety_monitoring": {
-      "fasting_arm": {
-        "screening": "Capillary blood glucose confirmed ≥ 4.5 mmol/L at session onset to confirm euglycemia pre-session",
-        "termination_criteria": [
-          "Symptomatic hypoglycemia (capillary glucose < 3.5 mmol/L)",
-          "Dizziness or presyncope"
-        ],
-        "post_termination": "Participants meeting any criterion are withdrawn from fasting arm but may complete vigilance arm at separate visit; study-level withdrawal requires medical review"
-      },
-      "vigilance_arm": {
-        "termination_criteria": [
-          "HRV (RMSSD) dropping > 40% from baseline with concurrent subjective distress (≥ 6/10 Borg fatigue scale)"
-        ],
-        "study_level_termination": "Two session-level terminations in the same participant require medical review before continuation"
-      },
-      "dsmb_reporting": "All AEs reported to DSMB per Global Safety Protocol"
-    },
-    "design_note": "Fixed-N design across two independent laboratories; no interim analyses are performed and no stopping rule applies."
+      "Diabetes or eating disorders for fasting arm",
+      "More than 30% trial rejection",
+      "Zero/negative rested interoceptive d-prime: inadmissible for proportional 15% margin; retain separately reported absolute-scale secondary analysis.",
+      "History of hypoglycemia",
+      "Metabolic disorders",
+      "Pregnancy"
+    ]
   },
   "apparatus": {
-    "EEG": "64-channel BrainAmp DC (Brain Products GmbH) at 1000 Hz; electrode impedance checks every 60 min during vigilance session; recordings with impedance > 20 kΩ at primary scalp sites flagged for offline interpolation",
-    "ECG": "BrainAmp ExG bipolar lead-II synchronised to EEG",
-    "pupillometry": "Eyelink 1000 Plus (monocular, 500 Hz) for trial-level pupil diameter as arousal covariate",
-    "cardiac_phase": "Real-time Pan-Tompkins R-peak detection; systolic phase 0–150 ms post-R-peak; diastolic phase 300–500 ms post-R-peak",
-    "blood_glucose": "HemoCue Glucose 201+ capillary glucose meter for fasting arm eligibility check and monitoring",
-    "display": "VPixx ProPixx at 120 Hz, gamma-corrected; photodiode-verified stimulus onset"
-  },
-  "design": {
-    "type": "Pre-registered, arousal-matched, within-subject crossover",
-    "metabolic_depletion_modalities": [
-      {
-        "modality": "16-hour overnight fast vs. fed control state",
-        "fed_control": "Standardized 600 kcal mixed-macronutrient meal consumed 2 hours prior; capillary glucose ≥ 4.5 mmol/L at session onset",
-        "counterbalancing": "Counterbalanced across participants or sites"
-      },
-      {
-        "modality": "Prolonged time-on-task vigilance paradigm (4-hour continuous AX-CPT) vs. rested baseline",
-        "counterbalancing": "Counterbalanced across participants or sites"
-      }
-    ],
-    "rationale": "Two validated induction modalities to avoid severe motion, sweat, and sympathetic EMG artifacts associated with exhaustive exercise or hypoglycemic clamps"
+    "EEG": "64-channel 1000 Hz",
+    "pupillometry": "Continuous, trial-level baseline covariate",
+    "ECG": "Continuous ECG and session RMSSD",
+    "glucose": "Capillary glucose measurement",
+    "vigilance_task": "4-hour AX-CPT",
+    "metabolic_manipulation_check": "Capillary glucose and beta-hydroxybutyrate at session onset and end."
   },
   "trial_structure": {
-    "isi_ms": [
-      800,
-      1200
-    ],
-    "fixation_duration_ms": 500,
-    "stimulus_streams": [
-      {
-        "type": "High-interoceptive-load",
-        "description": "Visual targets synchronized to systolic cardiac phase (or threat-conditioned cues validated in EP-1 / EP-3)"
-      },
-      {
-        "type": "Neutral exteroceptive",
-        "description": "Visual targets synchronized to diastole / unconditioned neutral cues"
-      }
-    ],
     "target": {
-      "type": "Near-threshold Gabor patch or validated threat-conditioned cue",
-      "threshold_calibration": "Adaptive QUEST staircase, 50% detection criterion, pre-session",
-      "duration_ms": 33
+      "type": "Near-threshold Gabor or conditioned cues at 0.71/1.0/1.41 x c50, interleaved interoceptive/exteroceptive streams",
+      "duration_ms": null
     },
-    "response": "2AFC (detected / not detected); response window 1500 ms; button press with non-dominant hand"
+    "response": "Seen/unseen responses, d-prime and P3b",
+    "sessions": [
+      "fasted",
+      "fed",
+      "vigilance_depleted",
+      "rested"
+    ],
+    "minimum_between_sessions_hours": 48,
+    "fasting_hours": 16,
+    "fed_meal_kcal": 600,
+    "fed_meal_hours_before": 2,
+    "vigilance_hours": 4,
+    "counterbalancing": "Modality order within each laboratory, not between laboratories."
   },
   "blocks": {
-    "practice_trials": 20,
-    "experimental_blocks": 8,
-    "trials_per_block": 60,
-    "total_experimental_trials": 480,
-    "artifact_monitoring": "Continuous online amplitude threshold ±100 µV; sessions with > 30% trial rejection rate classified as unusable and trigger session-level protocol termination"
+    "practice_trials": 50,
+    "experimental_blocks": 4,
+    "trials_per_block": 320,
+    "total_experimental_trials": 1280,
+    "count_status": "Derived minimum: 3 levels x80 signal plus 80 catch per session; four sessions. QUEST excluded.",
+    "contrast_multipliers_c50": [
+      0.71,
+      1.0,
+      1.41
+    ],
+    "catch_fraction": 0.25
+  },
+  "dependent_variables": [
+    "Signal x State x Load coefficient indexing d-prime interaction",
+    "Signed delta_dprime_extero-minus-intero",
+    "State x Load interaction on P3b, 250–500 ms",
+    "Interaction attenuation after arousal covariates",
+    "Exploratory vigilance-timescale measures, pending mechanistic recovery model"
+  ],
+  "primary_hypothesis": "Depletion reduces interoceptive d-prime and P3b more than exteroceptive measures; the signed interactions survive pupil/RMSSD adjustment.",
+  "primary_analysis": "Pred 4.A: seen ~ Signal * MetabolicState * InteroceptiveLoad + Modality + Site + (1 + Signal * MetabolicState | Participant), probit GLMM. Pred 4.B: P3b ~ MetabolicState * InteroceptiveLoad + Modality + Site + (1 + MetabolicState | Participant). Pred 4.C adds trial PupilDiameter and session RMSSD to both. Alpha=0.0167; BF10>=100, eta_p_squared>=0.06. Adjusted effect is not proof of metabolic mediation.",
+  "power_analysis": {
+    "design_type": "frequentist",
+    "effect_size_d": 0.45,
+    "alpha": 0.0167,
+    "power": 0.8,
+    "n_required": 55,
+    "n_target": 64,
+    "n_minimum": 48,
+    "basis": "Registered interaction design, two laboratories; minimum is not the powered analyzable target."
+  },
+  "pre_registration": {
+    "platform": "OSF",
+    "project_url": "https://osf.io/t5hcq",
+    "base_registration_url": "https://osf.io/yk29g",
+    "base_registration_date": "2026-08-24",
+    "amendment": {
+      "number": 1,
+      "document_stated_date": "2026-10-16",
+      "identifier": null,
+      "verification_status": "Not independently verified; source date is after export date."
+    }
+  },
+  "apgi_parameters": {
+    "model": "Reduced empirical specification: seven core quantities plus somatic modulation; not eight freely fitted parameters in every dataset.",
+    "reduced_quantities": [
+      "theta_0",
+      "eta",
+      "tau_theta",
+      "gamma_sig",
+      "rho",
+      "Pi_i",
+      "Pi_e",
+      "beta_SM"
+    ],
+    "theta_0": {
+      "prior": "Normal(0.35, 0.2)",
+      "unit": "AU",
+      "registered_band": [
+        0.25,
+        0.85
+      ]
+    },
+    "gamma_sig": {
+      "range": [
+        2,
+        7.5
+      ],
+      "unit": "AU^-1",
+      "role": "population-fixed model sigmoid steepness; distinct from alpha_psy"
+    },
+    "tau_theta": {
+      "range_seconds": [
+        10,
+        30
+      ]
+    },
+    "tau_S": {
+      "range_seconds": [
+        0.2,
+        0.5
+      ]
+    },
+    "beta_SM": {
+      "typical_range": [
+        0.3,
+        0.7
+      ],
+      "role": "somatic modulation gain; not independently identifiable from Pi_i using behavior alone"
+    },
+    "kappa": {
+      "value": null,
+      "unit": "ATP/bit",
+      "status": "uncalibrated",
+      "role": "energy-information bridge only; never ignition steepness"
+    },
+    "gain_interpretation": "Pi_i in the reduced confirmatory model is salience-weighted gain; HEP is a candidate indicator, not a direct inverse-variance measurement.",
+    "accumulation": "S_next=(1-a_S)*S+a_S*u; a_S=1-exp(-dt/tau_S); u uses calibration-fixed relative gains and excess magnitudes abs(z)-sqrt(2/pi).",
+    "threshold": "dtheta/dt=-(theta-theta_0)/tau_theta+c_theta*C-Delta_info*V_info+gamma_NE*NE",
+    "somatic_modulation": "Pi_i_eff=Pi_i_baseline*exp(beta_SM*M_hat)",
+    "precision_adaptation": "dPi_i/dt=eta*(abs(epsilon_i)-Pi_i)+rho*(Pi_i_opt-Pi_i)",
+    "ignition": "p_k=1-exp(-r_max*sigmoid(gamma_sig*(S-theta))*dt); single trial-window sigmoid sampling is a distinct convention, never interchanged within a protocol.",
+    "time_step": "dt=0.01 s reduced reference; dt<=min(tau_S,tau_theta,tau_Pi)/10; active reservoir additionally requires dt<=tau_res/10.",
+    "parameter_manifest_status": "Required before confirmatory fitting; no unspecified coefficient is assigned a legacy default.",
+    "source": "OSF §§1.5–1.5.1; Mathematical Specification; Notation Appendix"
+  },
+  "ethics": {
+    "committee": "IRB / Ethics Committee",
+    "approval_status": "not_yet_submitted",
+    "protocol_number": null,
+    "approval_date": null,
+    "sponsoring_institution": null,
+    "source": "Protocols Table 1; OSF §3.4.1",
+    "enrollment_authorized": false
+  },
+  "quality_and_decision_rules": {
+    "data_admissibility": "Apply registered quality gates before inference. Inadmissible data are exploratory, receive no Scenario A–F, and carry no framework vote.",
+    "scenarios": {
+      "A": "Scenario A — Confirmed. p < α and BF₁₀ ≥ 100. Both streams converge on H₁. Counted toward framework-level BY-FDR confirmation and toward the joint Bayesian meta-analysis. No additional replication is required before the claim is filed.",
+      "B": "Scenario B — Tentative confirmation. p < α and 3 ≤ BF₁₀ < 100. The frequentist threshold is met but Bayesian evidence is moderate rather than strong; reported as \"frequentist-significant, Bayesian moderate.\" One pre-registered independent replication is required before the result is elevated to confirmatory status, and that replication is registered before the primary result is published.",
+      "C": "Scenario C — Discordant (frequentist-positive, Bayesian-null). p < α and BF₁₀ < 3. The frequentist threshold is met but the Bayes factor provides less than moderate evidence for H₁ and may favor H₀. Classified as equivocal: the result neither confirms nor falsifies the prediction. It is flagged as equivocal in the results and recorded in the analysis log (not in the protocol-deviation register, which is reserved for departures from registered procedure). Independent replication at ≥ 90% power is required before any interpretation is made.",
+      "D": "Scenario D — Bayesian positive (without frequentist significance). p ≥ α and BF₁₀ ≥ 100. Strong probabilistic support for H₁ while the NHST threshold is missed. Not counted toward BY-FDR (which operates on the frequentist p-values). The original study plus one pre-registered replication are required for elevation to confirmatory status.",
+      "E": "Scenario E — Bayesian falsification. p ≥ α and BF₀₁ ≥ 6. The frequentist result is nonsignificant and the Bayesian analysis supports H₀. Classified as provisional falsification of the specific sub-prediction and reported as such in the primary manuscript. A single Scenario E result triggers independent replication at ≥ 90% power before the sub-prediction is declared definitively falsified, and triggers review of whether the framework-level falsification threshold has been reached (two or more Scenario E results across primary protocols; framework-level decision rule).",
+      "F": "Scenario F — Indeterminate. p ≥ α and 1/6 < BF₁₀ < 100 (i.e., neither BF₁₀ ≥ 100 nor BF₀₁ ≥ 6). Neither stream reaches a decision threshold. Classified as inconclusive: it carries no confirmatory or falsifying weight and is reported transparently as indeterminate. It may motivate a pre-registered replication but does not by itself trigger one, and it is never counted toward BY-FDR confirmation or framework-level falsification."
+    },
+    "exceptions": [
+      "Pred 1.E interval/model comparison",
+      "Pred 5.E interval equivalence",
+      "Pred 7.A cross-validated incremental prediction"
+    ],
+    "framework_family": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "framework_by_fdr_q": 0.05,
+    "framework_confirmation": "At least 4/5 primary protocols, combined hierarchical BF10>=100, and at most one Scenario E protocol. Protocol 0 is a gate; 2 contributes F2; 6 is CE.",
+    "protocol_alpha_specification": "Protocol 4 (Metabolic-State Crossover): Bonferroni α = 0.0167 across the three primary models (Pred 4.A d′, Pred 4.B P3b, Pred 4.C covariate-adjusted); BF₁₀ ≥ 100 required for strong confirmation; minimum effect size ηₚ² ≥ 0.06. Falsification threshold: the interaction is absorbed by arousal covariates (reduction Δηₚ² ≥ 0.02) or meets Scenario E (p ≥ 0.05 and BF₀₁ ≥ 6) after covariate entry.",
+    "decision_precedence": "Prediction-specific estimands, interval/evidence rules and admissibility gates govern over abbreviated source summaries. The A–F matrix applies only where both frequentist and Bayesian hypotheses are explicitly defined; do not invent a point-null Bayes factor. Nonsignificance or a point estimate alone does not establish equivalence or falsification; specificity requires a direct contrast. Unresolved interval bounds or multiplicity allocations require prospective analysis lock."
+  },
+  "submission_blocking_issues": [
+    "Level-2 mechanistic timescale model/recovery simulation not specified; ordering deferred, session trends descriptive.",
+    "Threshold-recovery analysis remains exploratory; no primary framework falsification vote.",
+    "Final site-specific eligibility, approvals, roles, observation model and executable analysis manifest must be prospectively locked; source specification is not a completed operational study authorization."
+  ],
+  "specification_sections": [
+    {
+      "heading": "Metabolic State Modulates Allostatic Thresholds",
+      "source_start_paragraph_line": 2029,
+      "text": "Protocol 4 (Metabolic-State Crossover) is designed to test for the computational claim that the ignition threshold (θₜ) is dynamically regulated by metabolic state as an allostatic triage mechanism. Under conditions of energy deficit, the framework predicts that the brain selectively elevates θₜ to suppress high-cost interoceptive channels while preserving essential exteroceptive processing. This prediction must be reconciled with Pred 2.B, in which homeostatic threat prioritizes interoceptive ignition. The registered resolution is that fasting and prolonged vigilance impose a resource deficit without an acute homeostatic threat signal, so the cost term (c_θ·Cₜ) dominates and costly interoceptive channels are deprioritized, whereas acute threat (Protocol 2 environments) raises V_info for interoceptive errors. If Protocol 4 shows interoceptive prioritization under depletion, the cost-dominance assumption — not the threshold equation — is falsified. The fasting arm manipulates metabolic state directly; the vigilance arm manipulates sustained cognitive load as a resource-depletion proxy, and the two arms are analyzed as distinct modalities.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Experimental Design",
+      "source_start_paragraph_line": 2037,
+      "text": "A pre-registered, arousal-covaried, within-subject crossover design is employed across two independent laboratories (N = 64 enrolled / N = 55 analyzable, minimum N = 48; powered at 0.80 to detect the critical interaction at d = 0.45 with α = 0.0167, accounting for 15% attrition and multi-site variance).\n\nEach participant completes four sessions (fasted, fed, vigilance-depleted, rested) in counterbalanced order with ≥ 48 h between sessions; modality order is counterbalanced within each laboratory, never across laboratories, so that modality is not confounded with site.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Comparison Conditions and Induction Modalities",
+      "source_start_paragraph_line": 2043,
+      "text": "Metabolic depletion is induced via two validated, counterbalanced modalities to prevent modality-specific confounds:\n\nFasting Arm: 16-hour overnight fast vs. fed control state (standardized 600 kcal meal 2 hours prior; capillary glucose confirmed ≥ 4.5 mmol/L at session onset).\n\nVigilance Arm: Prolonged time-on-task vigilance paradigm (4-hour continuous AX-CPT) vs. rested baseline.\n\nWithin each metabolic state, participants detect two interleaved stimulus streams: high-interoceptive-load stimuli (visual targets synchronized to the systolic cardiac phase, or threat-conditioned cues) and neutral exteroceptive stimuli (synchronized to diastole, or unconditioned neutral cues).\n\nLevel-2 ordering falsification target. The three-timescale ordering τ_int,ℓ > τ_ign,ℓ > τ_θ,ℓ (H10; Multi-Scale paper) is most testable at Level 2, where the three constants separate by orders of magnitude. Standard EEG/psychophysics operates at Level 1, where they collapse toward equality. The Protocol 4 sustained-vigilance arm (4-hour continuous AX-CPT) is therefore the committed Level-2 falsification target for the ordering. Three quantities are estimated across the vigilance decrement and tested for the predicted ordering:\n\nτ_int,2 — evidence-accumulation slowing, indexed by the decline in drift rate v from a hierarchical drift-diffusion model fit to AX-CPT responses in successive 30-minute bins.\n\nτ_ign,2 — broadcast-maintenance change, indexed by P3b duration (full width at half maximum of the 250–500 ms parietal component) across the same bins.\n\nτ_θ,2 — refractory recovery, indexed by post-response detection-threshold rebound measured by interleaved near-threshold probes.\n\nThe 30-minute-bin trajectories estimate session-scale change parameters, not τ_int, τ_ign or τ_θ by an exponential fit alone. An ordering test on those mechanistic constants requires the archived generative state and observation equations connecting within-bin probes to each parameter, with recovery and uncertainty simulations. Until that model is specified and validated, the session trends are descriptive and the mechanistic ordering is deferred. Confirming evidence: the posterior probability of the joint ordering τ_int,2 > τ_ign,2 > τ_θ,2 exceeds 0.95. Falsifying evidence: the posterior probability of the ordering is below 0.05, i.e. the predicted ordering is positively disfavored. Where a Level-2 estimate is unavailable for any of the three constants — through insufficient vigilance decrement, model non-convergence, or probe attrition — the ordering prediction is explicitly labeled \"deferred — Level 2\" and is not treated as tested at Level 1. Consistent with H10's \"Speculative\" register status, this test can confirm or defer but cannot serve as a primary framework refuter.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pre-requisite Dependency",
+      "source_start_paragraph_line": 2061,
+      "text": "Protocol 4 has a partial dependency on Protocol 0 (HEP Proxy Validation). Pred 4.A (d′) and Pred 4.B (P3b) do not invoke HEP as a primary measured variable and remain confirmatory regardless of Protocol 0 outcome. The Protocol 0 dependency activates only for any Protocol 4 secondary analysis that includes HEP amplitude as a covariate or mediator; those analyses are automatically reclassified as exploratory if Protocol 0 fails.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Task Environments",
+      "source_start_paragraph_line": 2065,
+      "text": "Near-Threshold Detection Task: Participants perform a visual detection task using Gabor patches or conditioned cues. A 50-trial pre-session adaptive QUEST staircase (50% detection criterion) establishes each participant's individual threshold c₅₀. The main session presents stimuli at c₅₀ ± one geometric step (0.71, 1.0, 1.41 × c₅₀), ≥ 80 trials per level, plus 25% blank catch trials. Stimuli are strictly synchronized to cardiac phases to manipulate interoceptive load.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Methodological Rigor and Safety Protocols",
+      "source_start_paragraph_line": 2069,
+      "text": "Artifact Gating: Continuous online monitoring (technician alert at ±200 µV); offline rejection at 150 µV peak-to-peak (§4.2.1). A session with > 30% trial rejection fails the Data-Admissibility Gate.\n\nPhysiological Monitoring: Continuous pupillometry and HRV (RMSSD) recorded to dissociate allostatic metabolic effects from general LC-NE arousal.\n\nSafety: The fasting arm screens for metabolic contraindications (diabetes, eating disorders); sessions terminate if symptomatic hypoglycaemia (glucose < 3.5 mmol/L) or presyncope occurs. The vigilance arm terminates if HRV drops > 40% from baseline concurrent with subjective distress.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 4.A — Selective Behavioral Threshold Elevation",
+      "source_start_paragraph_line": 2079,
+      "text": "Metabolic depletion selectively elevates θₜ for high-interoceptive-load stimuli, reducing d′ disproportionately relative to neutral exteroceptive stimuli. Confirming: significant Metabolic State × Interoceptive Load interaction on d′ (trial-level probit GLMM, p < 0.0167, ηₚ² ≥ 0.06), with the depletion-induced reduction in d′ for interoceptive-load stimuli exceeding that for exteroceptive stimuli by ≥ 15% of the participant's baseline interoceptive d′ (with Δd′ = depleted − rested, the signed contrast Δd′_exteroceptive − Δd′_interoceptive ≥ 0.15 × d′_interoceptive,rested for participants with positive rested interoceptive d′). Participants with zero or negative rested interoceptive d′ are inadmissible for this proportional margin and enter only a separately reported absolute-scale secondary contrast (Δd′_exteroceptive − Δd′_interoceptive ≥ 0.15 d′ units). An absolute difference without its sign cannot confirm selective interoceptive impairment.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 4.B — Selective Neural Ignition Suppression",
+      "source_start_paragraph_line": 2083,
+      "text": "P3b amplitude (250–500 ms), the neural ignition proxy, reflects selective θₜ elevation. P3b is disproportionately suppressed for detected high-interoceptive-load stimuli under metabolic depletion. Confirming: significant Metabolic State × Interoceptive Load interaction on P3b amplitude (p < 0.0167, BF₁₀ ≥ 100), with P3b reduction for interoceptive targets exceeding exteroceptive targets by ≥ 1.5 µV after arousal covariation.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 4.C — Metabolic Specificity (Arousal Dissociation)",
+      "source_start_paragraph_line": 2087,
+      "text": "The allostatic triage effect is predicted to survive adjustment for arousal markers; this does not by itself establish mediation by metabolic cost. Confirming: the Metabolic State × Interoceptive Load interaction on both d′ and P3b remains significant when trial-level baseline pupil diameter and RMSSD are included as nuisance covariates (Δηₚ² < 0.02 reduction in the interaction term).",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Falsification Criteria",
+      "source_start_paragraph_line": 2091,
+      "text": "No Interaction: No significant Metabolic State × Interoceptive Load interaction on d′ or P3b amplitude, classified as Scenario E (frequentist p ≥ 0.05 AND BF₀₁ ≥ 6) in the primary LMM.\n\nUniform Suppression: Metabolic depletion produces a global suppression of ignition proxies across all stimulus types, indicating generalized cognitive fatigue or LC-NE arousal rather than selective θₜ elevation.\n\nArousal Confound: The interaction effect is fully absorbed by arousal covariates (Δηₚ² ≥ 0.02 loss, or the interaction meets Scenario E — p ≥ 0.05 AND BF₀₁ ≥ 6 — after covariation), indicating the effect is driven by general arousal rather than metabolic allostatic triage.\n\nThreshold time-constant bounds. Following ignition-inducing events, θₜ is predicted to show rapid decrease (τ ≈ 200–500 ms) during surprise accumulation and slow recovery (τ ≈ 10–30 s) following sustained activation. If rapid threshold recovery (τ_θ < 3 s) is observed, or if threshold shows no decay within 60 s (τ_θ > 60 s), in ≥ 60% of participants (N ≥ 60, exact binomial, α = 0.05), the allostatic timescale claim is falsified and APGI's allostatic threshold dynamics require fundamental revision. Deviations within 2–5× of the predicted values (e.g. τ_θ = 5 s or 50 s) necessitate parameter refinement but not framework rejection. The τ_θ recovery analysis is exploratory under the current register and contributes no primary falsification vote. Rapid recovery (< 3 s) and absence of identifiable decay within 60 s are exploratory refinement outcomes, with their uncertainty reported. Any upgrade requires a pre-collection amendment fixing the boundaries, observation model and final analyzable-N/power requirement; otherwise an imprecise or unavailable estimate is deferred.\n\nτ_θ is estimated by the Bayesian state-space model of §4.2.3 from interleaved near-threshold probes in the vigilance arm. This timescale test is not in the confirmatory register (Tables 12 and 15) and is reported as exploratory unless added by amendment before Protocol 4 data collection.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Statistical Analysis",
+      "source_start_paragraph_line": 2102,
+      "text": "Analysis uses Linear Mixed-Effects Models (LMM) fitted via the lme4 package in R, with the following pre-registered model specifications:\n\nPred 4.A (unadjusted) d′ model, trial-level probit GLMM: seen ~ Signal × MetabolicState × InteroceptiveLoad + Modality + Site + (1 + Signal × MetabolicState | Participant); the Signal × MetabolicState × InteroceptiveLoad coefficient is the d′ interaction (DeCarlo, 1998). Pred 4.C (adjusted): the same model plus trial-level PupilDiameter and session-level RMSSD\n\nP3b model (Pred 4.B, unadjusted): P3b_Amplitude ~ MetabolicState × InteroceptiveLoad + Modality + Site + (1 + MetabolicState | Participant). Pred 4.C (adjusted): the same model plus trial-level PupilDiameter and session-level RMSSD.\n\nThe critical test in both models is the interaction term. Confirmation requires p < 0.0167 and BF₁₀ ≥ 100 for that term; ηₚ² ≥ 0.06 is the minimum effect size requirement. Heterogeneous results across the fasting and vigilance modalities trigger a pre-specified modality-stratified secondary analysis with random-effects aggregation.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    }
+  ],
+  "provenance": {
+    "source_files": [
+      {
+        "file": "OSF-Preregistration.docx",
+        "sha256": "ec17e6fcbe4a61d278baba42984734255e1b7b53607b30450b7d6e2334d26cd9"
+      },
+      {
+        "file": "Protocols.docx",
+        "sha256": "09a9d6c6d3827b4f8e320898f9cf0ba5fee0f85ae4198d783a5811cf9f6ff6d4"
+      },
+      {
+        "file": "Mathematical-Specification.docx",
+        "sha256": "6de4017113b2653c0d0b73ae22775f2cd32f3e8ca5c14d3d64da4130ea32f2fa"
+      },
+      {
+        "file": "Notation-Appendix.docx",
+        "sha256": "37f74a40313fb76210d43238429eb371d606996f0b758212b21db1f837ad4a82"
+      }
+    ],
+    "input_file": "protocol_4_metabolic_crossover.json",
+    "input_sha256": "e6c2c85b2eb9a32917bf35e2853129880babe364c6a1036b429d884b5cb1faf2",
+    "input_version": "1.0.0",
+    "precedence": "OSF governs empirical design and statistical decisions; Mathematical Specification governs equations; Notation Appendix governs symbols. Detailed decision rules supersede shorthand summaries; unresolved conflicts are flagged.",
+    "legacy_policy": "Reconstructed from current specifications; unsupported apparatus, approvals, counts and numerical defaults are not silently carried forward.",
+    "source_excerpt_policy": "Specification sections preserve source context; structured decision rules and listed conflict resolutions govern this export. Editorial requests embedded in documents are not executed.",
+    "input_schema_sha256": "6696a50371fd1b695b03cba5d071dcd2d9c89f92642084de500f6bfdd2499070"
   },
   "eeg_analysis_pipeline": {
-    "bandpass_filter_hz": [
+    "sample_rate_hz": 1000,
+    "channels": 64,
+    "offline_reference": "average after RANSAC bad-channel interpolation",
+    "bandpass_hz": [
       0.1,
-      40
+      100
     ],
-    "epoch_window_ms": [
+    "stimulus_epoch_ms": [
       -200,
-      800
+      1000
     ],
-    "baseline_correction_ms": [
+    "stimulus_baseline_ms": [
       -200,
       0
     ],
-    "artifact_rejection_threshold_uv": 100,
+    "hep_epoch_ms": [
+      -200,
+      600
+    ],
+    "hep_window_ms": [
+      250,
+      400
+    ],
+    "hep_channels": [
+      "Cz",
+      "FCz",
+      "Fz"
+    ],
     "p3b_window_ms": [
       250,
       500
@@ -204,85 +385,61 @@
       "P3",
       "P4"
     ],
-    "ica_components": "Automated rejection of cardiac and ocular ICA components (EEGLAB ADJUST)",
-    "minimum_clean_epochs": 40,
-    "arousal_covariates": [
-      "trial-level baseline pupil diameter (z-scored per session)",
-      "RMSSD (30-s window)"
-    ]
+    "artifact_peak_to_peak_uv": 150,
+    "maximum_rejected_fraction": 0.3,
+    "ica": "extended Infomax; ICLabel eye/muscle probability >0.80",
+    "cardiac_template_rejection_r": 0.8,
+    "residual_qrs_check": "> +/-2 uV at 0–80 ms triggers second ICA pass",
+    "hep_confirmation_conjuncts": [
+      "Surrogate-R-peak permutation p < applicable alpha",
+      "Effect survives ECG-amplitude covariate",
+      "Respiratory-phase covariate and registered respiratory exclusion applied"
+    ],
+    "respiratory_extrema_exclusion_ms": 100,
+    "rr_interval_ms": [
+      500,
+      1500
+    ],
+    "ectopic_rr_relative_deviation_maximum": 0.2,
+    "later_hep_robustness_window_ms": [
+      455,
+      595
+    ],
+    "complete_pipeline_source": "OSF §§4.1.1, 4.2.1; Appendix A"
   },
-  "statistical_model": {
-    "behavioral": "d′ ~ MetabolicState × InteroceptiveLoad + PupilDiameter + RMSSD + (1 + MetabolicState | Participant) + (1 | Site)",
-    "neural": "P3b_Amplitude ~ MetabolicState × InteroceptiveLoad + PupilDiameter + RMSSD + (1 + MetabolicState | Participant) + (1 | Site)",
-    "critical_test": "MetabolicState × InteroceptiveLoad interaction term",
-    "bayes_factor": "BF₁₀ computed for interaction term; BF₁₀ ≥ 100 required for strong confirmation",
-    "software": "lme4 package in R; BayesFactor package for BF₁₀"
+  "safety_monitoring": {
+    "fed_session_glucose_minimum_mmol_l": 4.5,
+    "fasting_termination": "Symptomatic hypoglycemia with glucose<3.5 mmol/L or presyncope",
+    "vigilance_termination": "RMSSD drop>40% with distress>=6/10 (Borg CR10); terminated sessions retained, with time-to-termination covariate because termination is informative.",
+    "source": "OSF Protocol 4; study protocol specifications, not medical authorization."
   },
-  "dependent_variables": [
-    "Perceptual sensitivity d′ per condition (Metabolic State × Interoceptive Load) — primary (Pred 4.A)",
-    "P3b amplitude (250–500 ms, Pz/P3/P4) per condition — primary neural (Pred 4.B)",
-    "Metabolic State × Interoceptive Load interaction on d′ (LMM, ηₚ²) — Pred 4.A",
-    "Metabolic State × Interoceptive Load interaction on P3b (LMM, ηₚ²) — Pred 4.B",
-    "d′ reduction: interoceptive load vs. exteroceptive load under depletion (% difference) — Pred 4.A simple effect",
-    "P3b reduction: interoceptive vs. exteroceptive under depletion (µV difference) — Pred 4.B simple effect",
-    "Interaction after arousal covariation (Δηₚ², p-value) — Pred 4.C",
-    "BF₁₀ for interaction term — Pred 4.C",
-    "Trial-level baseline pupil diameter (mm) per condition",
-    "RMSSD (ms) per 30-s window",
-    "Capillary blood glucose (mmol/L) at session onset — fasting arm eligibility"
+  "dependency": "Pred 4.A–4.C remain evaluable independently of HEP validation; secondary HEP covariate/mediator analyses follow Protocol 0 gate.",
+  "methods_source_sections": [
+    {
+      "heading": "Outliers and influence",
+      "text": "4.3.2 Outlier and influential-observation policy\n\nAll rules below are fixed pre-collection and apply to every protocol unless a protocol body specifies otherwise; no post-hoc outlier rule may be introduced. (a) Trial level. Scalp-EEG trials exceeding the 150 µV peak-to-peak criterion (§4.2.1) are rejected; iEEG trials follow the interictal-discharge and |z| > 6 rule of §Protocol 6; behavioral trials in speeded detection tasks with RT < 150 ms or > 3 s are rejected as anticipations or lapses (Protocol 2 IGT and Protocol 7 bedside tasks use the rules in their protocol bodies). No further trial-level trimming is permitted. (b) Participant level. A participant is excluded only for a pre-registered admissibility failure (> 30% trial rejection, Data-Admissibility Gate; failed manipulation check; protocol violation). Statistical outlyingness is never itself an exclusion ground. (c) Observation level in models. Continuous predictors and outcomes are winsorized at ±3 SD within participant before entry into any confirmatory model; the untrimmed analysis is reported alongside as a mandatory sensitivity analysis, and a discrepancy in the confirmatory decision between the two is reported as an instability flag. (d) Influence. For every confirmatory regression or mixed model, Cook's distance is computed and observations with D > 4/n are reported; the model is refit without them as a sensitivity analysis. The trimmed refit is never the confirmatory result. (e) Model diagnostics and fallback. Gaussian models use the registered residual diagnostics; binary/ordinal generalized models use distribution-appropriate simulation or predictive diagnostics, not a Shapiro–Wilk residual gate. Appendix C must identify the exact estimator, tuning constants, inferential test and Bayesian evidence computation for each permitted fallback before lock. A fallback not so specified is a sensitivity analysis and cannot replace the primary confirmatory estimator."
+    },
+    {
+      "heading": "Bayesian prior sensitivity",
+      "text": "Sensitivity analyses\n\nAll confirmatory Bayesian conclusions are re-run under fixed prior transformations. Normal and HalfNormal priors: scale multiplied by 2 and by ½, location and support unchanged. Beta(2, 5) prior on η_RL: mean (2/7) preserved and concentration (sum of shape parameters, 7) multiplied by 2 and by ½, giving Beta(4, 10) and Beta(1, 2.5). Fixed parameters remain fixed or vary over a separately registered grid. Every evidence and interval criterion is recomputed under each sensitivity prior; if a conclusion crosses a §3.5.2 decision boundary (BF₁₀ = 3 or 100, BF₀₁ = 6), it is reported as prior-sensitive and reclassified as exploratory."
+    },
+    {
+      "heading": "Scalp EEG acquisition",
+      "text": "4.1.1 Scalp EEG (Protocols 0, 1, 4, 5, 7)\n\nEEG will be acquired at 1000 Hz (TMS-EEG in Protocol 5: ≥ 5000 Hz on a TMS-compatible amplifier) using a 64-channel active electrode system (BrainProducts actiCHamp or equivalent). Electrode positions will be digitized using 3D photogrammetry (EGI Geodesic or equivalent). Online reference (all protocols): single physical reference at FCz (or the amplifier's default), with A1/A2 or TP9/TP10 recorded as separate channels. Post-acquisition re-referencing (all protocols): average reference after RANSAC bad-channel interpolation (correlation threshold < 0.85 with neighbors). Sites using mastoid-referenced amplifiers must apply offline average-reference conversion before any cross-protocol pooling. The acquisition target is impedance < 10 kΩ. For 10–20 kΩ, the technician attempts correction and records the affected electrodes; data remain admissible only if the registered signal-quality and bad-channel criteria pass. Impedance > 20 kΩ invokes the registered corrective/admissibility procedure. Impedance alone does not override the trial-quality gate.\n\nECG will be simultaneously recorded for HEP analysis (Lead II configuration). Skin conductance (SCR/EDA) will be acquired at 100 Hz from the thenar and hypothenar eminences of the non-dominant hand. Respiration will be recorded via respiratory inductance plethysmography or nasal thermistor (§4.2.1). All auxiliary channels will be synchronized with EEG via trigger pulses with sub-millisecond accuracy.\n\nHeartbeat-evoked potential (HEP) analysis: epochs from −200 to +600 ms relative to the R-peak will be extracted after artifact rejection; the HEP analysis window is 250–400 ms post-R-peak (Appendix A). Ectopic beats are excluded when the R-R interval deviates by > 20% from the median of the five preceding intervals, and R-R intervals outside 500–1500 ms (40–120 bpm) are excluded. Exclusion counts are reported per condition, and differential exclusion between the drug and placebo arms of Protocol 0 is tested. HEP amplitude will be quantified as mean amplitude in the 250–400 ms window over frontocentral electrodes (Fz, FCz, Cz)."
+    },
+    {
+      "heading": "EEG preprocessing and mandatory HEP controls",
+      "text": "4.2.1 EEG Pre-Processing\n\nEEG preprocessing will follow the PREP pipeline (Bigdely-Shamlo et al., 2015) supplemented by custom APGI-specific steps:\n\nRe-reference to average reference (all electrodes except those flagged as bad) after RANSAC bad channel interpolation (threshold: correlation < 0.85 with neighboring channels). This is the binding cross-protocol standard; protocol-specific mastoid references noted in companion documents are superseded for all pooled analyses.\nBandpass filter: 0.1–100 Hz (zero-phase FIR, Hamming window); notch filter at the local mains frequency (50 or 60 Hz) and harmonics. The 0.1–100 Hz pipeline applies to standard ERP analyses only. Infraslow/PAC analyses use a separately frozen branch: DC-coupled (or hardware high-pass ≤ 0.005 Hz) acquisition, a 0.005–100 Hz zero-phase FIR passband, continuous segments of ≥ 30 min for Pred 7.E (≥ 500 s for the MS-H1 infraslow test; §Spectral Fitting Parameters), and removal of the first and last 60 s of each segment to exclude filter transients. Frequencies removed by acquisition or filtering are not reconstructed; a dataset not meeting the DC/≤ 0.005 Hz requirement has its infraslow test deferred\nIndependent Component Analysis (ICA): extended Infomax (MNE-Python); components classified using ICLabel (threshold: eye artifact > 0.80, muscle artifact > 0.80, reject)\nHEP-specific artifact control (binding for all HEP measurement in Protocols 0, 1, 4, 5 and 7). The following supersede the generic ICLabel step for any analysis in which HEP amplitude is a dependent or independent variable, and are mandatory rather than advisory.\nCardiac field artifact — three-stage removal pipeline, applied in sequence. (a) ICA decomposition with cardiac component identification via template matching to simultaneously recorded ECG; a correlation of r > 0.80 with the ECG template is required for rejection. (b) Residual artifact inspection via visual review of the grand-average HEP time-locked to the QRS peak; any deflection exceeding ±2 µV in the 0–80 ms window indicates insufficient cardiac removal and triggers a second ICA pass. (c) HEP analysis restricted to the 250–400 ms post-R-peak window, which lies outside the QRS complex but overlaps the T-wave / cardiac field artifact (CFA, peaking ≈ 300 ms post-R); a surrogate-R-peak control (HEP recomputed on R-peaks shuffled within the participant's R-R distribution) and an ECG-amplitude covariate are confirmatory conjuncts: a primary HEP effect is confirmed only if it exceeds the surrogate distribution (permutation p < α) and survives the ECG covariate. The later window (455–595 ms) is reported as a robustness check. The 250–400 ms window is canonical; deviation requires explicit justification and artifact-check documentation filed as a protocol amendment.\nRespiratory phase. Continuous respiratory monitoring via respiratory inductance plethysmography or nasal thermistor throughout all HEP recording sessions. Any trial in which the R-peak falls within 100 ms of a respiratory peak or trough — defined as the extrema of the bandpass-filtered (0.1–0.5 Hz) respiratory signal — is excluded from HEP analysis. Respiratory phase is additionally included as a nuisance covariate in all HEP general linear models, and reported HEP effects must survive this covariate. If the respiratory covariate absorbs more than 30% of the HEP variance in the primary contrast (partial η² > 0.30), the result is flagged as potentially confounded and reported with a confound-warning label pending replication under paced breathing.\nArousal. Pupil diameter (baseline-corrected, 200–500 ms post-R-peak) is recorded on all trials via high-speed eyetracking (≥ 500 Hz, constant luminance). Any primary HEP–P3b association is reported both uncorrected and as a partial correlation controlling for trial-level pupil diameter; see Pred 1.D for the binding thresholds.\nNon-compliance. An analysis that omits any stage of this pipeline is automatically exploratory under §3.5.3 and carries no framework-level weight.\nEpoch extraction: −200 to +1000 ms relative to stimulus onset; baseline correction −200 to 0 ms\nArtifact rejection: trial-level peak-to-peak amplitude threshold of 150 µV (series-canonical): a trial is rejected when max(x) − min(x) > 150 µV within the analysis epoch on any scalp channel; peak-to-peak amplitudes are nonnegative; the ±200 µV online monitor threshold is a technician alert, not a rejection criterion; linear detrending; muscle artifact detection via high-frequency power (> 3 SD from mean)\nParticipants with > 30% rejected trials fail the registered admissibility gate. Report enrolled, excluded and analyzable counts separately. Replacement recruitment is permitted only within the protocol’s preregistered enrollment cap and stopping rules; exceeding that cap requires an amendment before additional recruitment. Excluded participants remain in the recruitment and adverse-event accounting."
+    },
+    {
+      "heading": "Protocol-specific ethics and regulatory source",
+      "text": "Protocol 4 (Metabolic-State Crossover)\n\nStatus: Ethics approval pending at time of registration lock.\nCommittee: Protocol is registered as a planned study and the registration will be amended with committee name, institution, approval number and date before any participant is approached.\n16-hour fasting protocol: Medical clearance required; contraindicated for diabetes, hypoglycemia history, metabolic disorders, eating disorders and pregnancy. Capillary glucose and β-hydroxybutyrate are measured at session onset and end as the metabolic manipulation check.\n4-hour vigilance task: Fatigue monitoring with the termination rule in §Protocol 4 (RMSSD drop > 40% with distress ≥ 6/10, Borg CR10). Terminated sessions are retained and analyzed with time-to-termination as a covariate, because termination is informative."
+    }
   ],
-  "primary_hypothesis": "Metabolic depletion (16-hour fast or 4-hour vigilance) selectively elevates θₜ for high-interoceptive-load stimuli, producing a significant Metabolic State × Interoceptive Load interaction on d′ (ηₚ² ≥ 0.06) and P3b amplitude that survives strict covariation for arousal (pupil diameter and RMSSD), consistent with allostatic triage rather than generalized cognitive fatigue.",
-  "primary_analysis": "Linear mixed-effects models fitted in R (lme4). Critical test: Metabolic State × Interoceptive Load interaction on d′ and P3b amplitude, with trial-level arousal covariates (pupil, RMSSD). BF₁₀ ≥ 100 required for strong confirmation. Simple effects reported for each metabolic depletion modality separately and combined.",
-  "power_analysis": {
-    "primary_test": "Metabolic State × Interoceptive Load interaction (within-subject 2×2) on d′ and P3b",
-    "effect_size_d": 0.45,
-    "alpha": 0.05,
-    "power": 0.8,
-    "n_required": 60,
-    "n_target": 60,
-    "n_minimum": 48,
-    "attrition_allowance_percent": 15,
-    "software": "G*Power 3.1",
-    "based_on": "Moderate interaction effect for metabolic-state modulation of near-threshold perceptual sensitivity; multi-site variance absorbed by a (1 | Site) random effect"
-  },
-  "pre_registration": {
-    "platform": "OSF",
-    "url": "https://osf.io/t5hcq",
-    "date": "2026-07-30",
-    "zenodo_doi": "10.5281/zenodo.21632264",
-    "orcid": "https://orcid.org/0009-0005-0328-2896"
-  },
-  "apgi_parameters": {
-    "kappa": 100,
-    "alpha": 0.3,
-    "beta_initial_estimate": 0.7,
-    "allostatic_threshold_equation": "dθ/dt = −(θ − θ₀)/τ_θ + γ_M · M(t) + γ_A · A(t)",
-    "gamma_M_estimated": 0.4,
-    "gamma_A_estimated": 0.2,
-    "theta_baseline": 1.0,
-    "tau_theta_estimated": 10
-  },
-  "ethics": {
-    "committee": "Institutional Review Board (multi-site; fasting arm requires metabolic safety clearance)",
-    "protocol_number": "IRB-2026-METABOLIC-XXX",
-    "approval_date": "2026-06-19",
-    "multi_site": "Coordinating IRB approval required; each site obtains local IRB approval for fasting arm"
-  },
-  "submission_blocking_issues": [],
-  "caveats": [
-    "Fasting arm participants must be medically screened for metabolic contraindications (diabetes, eating disorders) before enrollment.",
-    "The two metabolic depletion modalities (fasting vs. vigilance) are pre-specified as independent replications; failure of one modality does not block submission if the other confirms the interaction.",
-    "Electrode impedance must be checked every 60 minutes during the 4-hour vigilance arm; sessions exceeding > 30% trial rejection due to sweat artifacts are classified as unusable.",
-    "Pred 4.C requires that the interaction survives arousal covariation; if it does not, the effect is reclassified as LC-NE arousal-mediated rather than allostatic triage — this is a pre-specified reclassification, not a falsification of the existence of the effect.",
-    "Protocol depends on EP-0 for HEP proxy validity and EP-1 for interoceptive load stimulus characterization; if EP-0 fails, interoceptive load conditions relying on HEP as the Πⁱ index are reclassified as exploratory."
-  ],
-  "multiple_comparisons": {
-    "family": "Two primary models (d′ and P3b) plus the Pred 4.C covariate model",
-    "correction": "Bonferroni",
-    "alpha_per_test": 0.0167,
-    "bayes_factor_requirement": "BF₁₀ ≥ 100 on the interaction term is required for strong confirmation"
-  },
-  "level_2_ordering_falsification_target": "The Protocol 4 sustained-vigilance arm (4-hour AX-CPT) is the committed Level-2 falsification target for the three-timescale ordering τ_int_ℓ > τ_ign_ℓ > τ_θ_ℓ. Evidence-accumulation slowing (τ_int_2, drift-rate decline), broadcast-maintenance change (τ_ign_2, P3b duration) and refractory recovery (τ_θ_2, post-response threshold rebound) are estimated across the vigilance decrement and tested for the predicted ordering. Where a Level-2 estimate is unavailable, the ordering prediction is labelled 'deferred — Level 2' rather than treated as tested at Level 1.",
-  "allostatic_timescale_falsification": "If rapid threshold recovery (τ_θ < 3 s) is observed, or threshold shows no decay within 60 s (τ_θ > 60 s), in ≥ 60% of participants (N ≥ 60, exact binomial, α = 0.05), the allostatic timescale claim is falsified. Deviations within 2–5× (e.g. τ_θ = 5 s or 50 s) require parameter refinement, not framework rejection. Predicted: rapid decrease τ ≈ 200–500 ms during surprise accumulation; slow recovery τ ≈ 10–30 s following sustained activation.",
-  "source_of_truth": "APGI-Protocols.md (Protocols & Prediction Registry) and APGI-OSF-Preregistration.md. Where the two disagree with stored values, the documents govern. Deposited on OSF (osf.io/t5hcq) and archived at Zenodo (DOI 10.5281/zenodo.21632264)."
+  "readiness": {
+    "status": "specification_updated_lock_requirements_pending",
+    "empirical_validation_performed": false,
+    "registration_verified": false,
+    "note": "JSON validation checks file structure, not scientific validity, regulatory approval or analysis-lock completion."
+  }
 }

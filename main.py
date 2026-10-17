@@ -205,7 +205,7 @@ except Exception as e:
 global_config = {
     "version": "1.3.0",
     "project_name": "APGI Theory Framework",
-    "description": "Adaptive Pattern Generation and Integration Theory Implementation",
+    "description": "Allostatic Precision-Gated Ignition (APGI) Validation Framework",
     "verbose": False,
     "quiet": False,
     "max_load_size_mb": 100,  # Configurable size limit for file loading
@@ -495,8 +495,8 @@ def cli(ctx, config_file, log_level, verbose, quiet, token):
     """
     APGI Theory Framework - Unified Command Line Interface
 
-    Comprehensive computational framework for Adaptive Pattern Generation
-    and Integration theory with psychological state dynamics modeling.
+    Comprehensive computational framework for Allostatic Precision-Gated
+    Ignition theory with psychological state dynamics modeling.
     """
     ctx.ensure_object(dict)
     ctx.obj["console"] = console

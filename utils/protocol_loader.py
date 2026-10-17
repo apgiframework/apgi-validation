@@ -29,6 +29,7 @@ See PROTOCOL-MIGRATION-USER-GUIDE.md for migration instructions and examples.
 import json
 import logging
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -36,6 +37,33 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 _PROTOCOLS_DIR = Path(__file__).parent.parent / "protocols"
+_TEMPLATE_PATH = Path(__file__).parent.parent / "config" / "apgi_protocol_template.json"
+
+# Protocol specification release the files in protocols/ must carry. Kept in
+# step with apgi-framework (protocols/CHANGELOG.md, scripts/validate_protocols.py).
+SPECIFICATION_VERSION = "1.1.0"
+
+
+class Verdict(str, Enum):
+    """v1.1 three-way decision for a registered prediction."""
+
+    CONFIRMED = "confirmed"
+    FALSIFIED = "falsified"
+    INDETERMINATE = "indeterminate"
+
+
+def classify_prediction(confirmed: bool, falsified: bool = False) -> Verdict:
+    """Apply the v1.1 rule that a failure to confirm is not falsification.
+
+    ``falsified`` must come from the prediction's own falsifying rule
+    (``falsifying_evidence`` / ``falsifying_thresholds``), never from the
+    negation of ``confirmed``.
+    """
+    if confirmed:
+        return Verdict.CONFIRMED
+    if falsified:
+        return Verdict.FALSIFIED
+    return Verdict.INDETERMINATE
 
 
 @dataclass
@@ -47,6 +75,10 @@ class SubPrediction:
     confirming_evidence: str = ""
     falsifying_evidence: str = ""
     key_measurement_equation: str = ""
+    status: str = ""
+    indeterminate_rule: str = ""
+    confirming_thresholds: Dict[str, Any] = field(default_factory=dict)
+    falsifying_thresholds: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "SubPrediction":
@@ -56,7 +88,16 @@ class SubPrediction:
             confirming_evidence=data.get("confirming_evidence", ""),
             falsifying_evidence=data.get("falsifying_evidence", ""),
             key_measurement_equation=data.get("key_measurement_equation", ""),
+            status=data.get("status", ""),
+            indeterminate_rule=data.get("indeterminate_rule", ""),
+            confirming_thresholds=data.get("confirming_thresholds") or {},
+            falsifying_thresholds=data.get("falsifying_thresholds") or {},
         )
+
+    @property
+    def is_confirmatory(self) -> bool:
+        """True for predictions whose outcome carries a registered framework vote."""
+        return self.status.startswith("confirmatory")
 
 
 @dataclass
@@ -83,16 +124,27 @@ class ProtocolSpec:
             version=data.get("version", "1.0"),
             paper=data.get("paper", ""),
             description=data.get("description", ""),
-            validation_status=data.get("validation_status", "unspecified"),
+            # v1.1 replaced validation_status with study_status and folded the
+            # caveats into submission_blocking_issues.
+            validation_status=data.get("study_status", data.get("validation_status", "unspecified")),
             apgi_parameters=data.get("apgi_parameters", {}),
             sub_predictions=[SubPrediction.from_dict(p) for p in data.get("sub_predictions", [])],
             primary_hypothesis=data.get("primary_hypothesis", ""),
-            caveats=data.get("caveats", []),
+            caveats=data.get("submission_blocking_issues", data.get("caveats", [])),
             _raw=data,
         )
 
     def get_parameter(self, name: str, default: Any = None) -> Any:
         return self.apgi_parameters.get(name, default)
+
+    @property
+    def participants(self) -> Dict[str, Any]:
+        """Registered cohort block (n_target, n_minimum, n_analyzable_target, groups)."""
+        return self._raw.get("participants", {})
+
+    @property
+    def is_current_specification(self) -> bool:
+        return self.version == SPECIFICATION_VERSION
 
     def get_prediction(self, pred_id: str) -> Optional[SubPrediction]:
         for p in self.sub_predictions:
@@ -222,12 +274,59 @@ def get_apgi_parameters(protocol_id: str) -> Dict[str, Any]:
     return spec.apgi_parameters if spec is not None else {}
 
 
+def spec_prediction_results(
+    spec: Optional[ProtocolSpec],
+    linked_results: Dict[str, Any],
+    pred_map: Dict[str, str],
+    sources: List[str],
+) -> Dict[str, Any]:
+    """Report a protocol's registered predictions alongside simulation results.
+
+    ``pred_map`` links a registered prediction ID (e.g. ``"Pred 6.A"``) to the
+    key of the simulation ``PredictionResult`` in ``linked_results`` that
+    implements the same test. Under specification 1.1.0 a simulation can only
+    confirm (synthetically) or leave a prediction INDETERMINATE: it never runs
+    the registered falsifying rule on empirical data, so a missing link or a
+    failed simulation check is never reported as falsification.
+    """
+    from utils.protocol_schema import PredictionResult, PredictionStatus
+
+    results: Dict[str, Any] = {}
+    if spec is None:
+        return results
+    for sub_pred in spec.sub_predictions:
+        linked = linked_results.get(pred_map.get(sub_pred.id, ""))
+        confirmed = bool(linked is not None and linked.passed)
+        verdict = classify_prediction(confirmed)
+        results[sub_pred.id] = PredictionResult(
+            passed=confirmed,
+            value=linked.value if linked is not None else None,
+            threshold=linked.threshold if linked is not None else None,
+            status=PredictionStatus.PASSED if confirmed else PredictionStatus.INDETERMINATE,
+            name=sub_pred.claim,
+            evidence=[e for e in (sub_pred.confirming_evidence, sub_pred.falsifying_evidence) if e],
+            sources=[spec.protocol_id, *sources],
+            metadata={
+                "verdict": verdict.value,
+                "evidence_class": "synthetic",
+                "prediction_status": sub_pred.status,
+                "linked_result": pred_map.get(sub_pred.id),
+                "specification_version": spec.version,
+            },
+        )
+    return results
+
+
 def load_protocol_template() -> Dict[str, Any]:
-    """Load the master protocol template file."""
-    template_path = _PROTOCOLS_DIR / "apgi_protocol_template.json"
-    if not template_path.exists():
+    """Load the legacy (pre-1.1) master protocol template.
+
+    The template predates specification 1.1.0 and lives in config/ so the
+    protocols/ release folder holds only the registered files covered by
+    protocols/MANIFEST.json. Its benchmarks are not v1.1 decision rules.
+    """
+    if not _TEMPLATE_PATH.exists():
         return {}
-    with open(template_path, encoding="utf-8") as fh:
+    with open(_TEMPLATE_PATH, encoding="utf-8") as fh:
         return json.load(fh)
 
 

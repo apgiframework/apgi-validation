@@ -1,6 +1,6 @@
 # APGI Theory Framework
 
-A comprehensive computational framework for implementing the **Adaptive Pattern Generation and Integration (APGI)** theory, which models psychological state dynamics through surprise accumulation, ignition cascades, and multimodal integration.
+A comprehensive computational framework for implementing the **Allostatic Precision-Gated Ignition (APGI)** theory, which models psychological state dynamics through surprise accumulation, ignition cascades, and multimodal integration.
 
 The APGI Theory Framework provides:
 

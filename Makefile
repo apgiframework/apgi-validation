@@ -2,7 +2,7 @@
 # ==================================
 
 .PHONY: help clean test test-fast test-slow test-full gui-smoke lint format threshold-lint \
-        lock lock-check install dev-install venv docs manifest manifest-check
+        lock lock-check install dev-install venv docs manifest manifest-check protocols-check
 
 help:
 	@echo "Available targets:"
@@ -19,6 +19,7 @@ help:
 	@echo "  lock-check     - Verify requirements.lock is current (CI gate)"
 	@echo "  manifest       - Recompute all protocol SHA-256 hashes"
 	@echo "  manifest-check - Check manifest for drift without writing (CI gate)"
+	@echo "  protocols-check - Validate the 1.1.0 protocol specification release (CI gate)"
 	@echo "  install        - Install package and dependencies"
 	@echo "  dev-install    - Install in development mode"
 	@echo "  docs           - Generate documentation"
@@ -94,6 +95,10 @@ manifest:
 manifest-check:
 	@echo "Checking protocol manifest for drift..."
 	python3 -m utils.protocol_manifest --check
+
+protocols-check:
+	@echo "Validating protocol specification release 1.1.0..."
+	python3 scripts/validate_protocols.py
 
 install: venv
 	.venv/bin/pip install .

@@ -2,7 +2,7 @@
 APGI Protocol 5: fMRI Anticipation vs. Experience (Somatic Marker)
 ===================================================================
 
-Enhanced implementation of APGI-P05 for the APGI validation suite.
+Enhanced implementation of APGI-P03 (specification 1.1.0) for the APGI validation suite.
 
 This module was written against the existing VP-14 and VP-15 fMRI protocol
 implementations and follows their simulation-first workflow:
@@ -73,11 +73,14 @@ except ImportError:
     HAS_SCHEMA = False
 
 try:
-    from utils.protocol_loader import load_protocol as _load_protocol_p05
+    from utils.protocol_loader import load_protocol as _load_protocol_p03
+    from utils.protocol_loader import spec_prediction_results
 
-    _PROTOCOL_SPEC_P05 = _load_protocol_p05("APGI-P05")
+    # Specification 1.1.0 numbers fMRI anticipation vs experience as Protocol 3.
+    # The internal P5a–P5d keys below keep the pre-1.1 numbering.
+    _PROTOCOL_SPEC_P03 = _load_protocol_p03("APGI-P03")
 except Exception:
-    _PROTOCOL_SPEC_P05 = None
+    _PROTOCOL_SPEC_P03 = None
 
 try:
     from utils.logging_config import apgi_logger as logger  # type: ignore[assignment]
@@ -102,7 +105,7 @@ ROIS = ("vmPFC", "anterior_insula", "posterior_insula", "somatosensory_cortex", 
 
 
 class Protocol5Config:
-    """Configuration for APGI-P05 simulation and validation."""
+    """Configuration for APGI-P03 simulation and validation."""
 
     def __init__(
         self,
@@ -175,7 +178,7 @@ class APGIP5SomaticProtocol:
     """Protocol 5 validator with simulation and empirical-data support."""
 
     protocol_id = "VP_22_FMRIAnticipationExperience"
-    protocol_name = "APGI-P05 fMRI Anticipation vs. Experience (Somatic Marker)"
+    protocol_name = "APGI-P03 fMRI Anticipation vs. Experience (Somatic Marker)"
 
     def __init__(self, config: Optional[Protocol5Config] = None):
         self.config = config or Protocol5Config()
@@ -530,16 +533,21 @@ def run_protocol_main(config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]
             status=PredictionStatus.PASSED if passed else PredictionStatus.FAILED,
             name=pred_id,
             evidence=[],
-            sources=["APGI-P05", "VP_22_FMRIAnticipationExperience"],
+            sources=["APGI-P03", "VP_22_FMRIAnticipationExperience"],
             metadata={k: v for k, v in pred.items() if k not in {"passed", "actual", "threshold"}},
         )
 
-    if _PROTOCOL_SPEC_P05 is not None:
-        for sub_prediction in _PROTOCOL_SPEC_P05.sub_predictions:
-            if sub_prediction.id not in named_predictions:
-                continue
-            named_predictions[sub_prediction.id].name = sub_prediction.claim
-            named_predictions[sub_prediction.id].evidence = [sub_prediction.confirming_evidence]
+    # Registered APGI-P03 predictions. P5c (valence, not sensory contrast) tests
+    # Pred 3.C. P5d measures vmPFC–posterior-insula coupling, whereas Pred 3.D
+    # registers the vmPFC→aINS pathway, so it is not linked.
+    named_predictions.update(
+        spec_prediction_results(
+            _PROTOCOL_SPEC_P03,
+            named_predictions,
+            {"Pred 3.C": "P5c"},
+            ["VP_22_FMRIAnticipationExperience"],
+        )
+    )
 
     status = "success" if result.get("passed") else "failed"
     completion = 100
@@ -555,7 +563,7 @@ def run_protocol_main(config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]
         methodology="subject_level_somatic_marker_validation",
         errors=[],
         metadata={
-            "protocol_spec_id": "APGI-P05",
+            "protocol_spec_id": "APGI-P03",
             "falsification_status": result.get("falsification_status"),
             "rois": result.get("rois", []),
             "assumptions": result.get("assumptions", {}),

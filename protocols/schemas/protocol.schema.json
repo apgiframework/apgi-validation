@@ -1,17 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/apgiframework/apgi-implementation/protocols/schemas/protocol.schema.json",
-  "title": "APGI Experimental Protocol",
-  "description": "Schema for APGI experimental protocol specification files.",
+  "$id": "https://github.com/apgiframework/apgi-framework/protocols/schemas/protocol.schema.json",
+  "title": "APGI Experimental Protocol 1.1",
+  "description": "Version 1.1 empirical/computational protocol specification. Null denotes explicitly unknown or inapplicable values, never zero or approval. Structural validation does not establish empirical or regulatory readiness.",
+  "x-version": "1.1.0",
   "type": "object",
   "required": [
+    "schema_version",
     "protocol_id",
+    "registry_ep",
     "title",
     "paper",
     "version",
     "last_updated",
+    "specification_date",
+    "study_status",
     "description",
+    "sub_predictions",
     "participants",
+    "apparatus",
     "trial_structure",
     "blocks",
     "dependent_variables",
@@ -20,158 +27,1483 @@
     "power_analysis",
     "pre_registration",
     "apgi_parameters",
-    "ethics"
+    "ethics",
+    "quality_and_decision_rules",
+    "submission_blocking_issues",
+    "specification_sections",
+    "provenance",
+    "readiness"
   ],
   "properties": {
+    "$schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "version": {
+      "const": "1.1.0"
+    },
     "protocol_id": {
       "type": "string",
-      "pattern": "^(APGI-P[0-9]{2}|VP-[0-9]+[a-z]?|FP-[0-9]+)$",
-      "description": "Unique protocol identifier. Canonical EPs: APGI-P01..APGI-P15. Validation Protocols: VP-00..VP-22, VP-07a. Falsification Protocols: FP-01..FP-12."
+      "pattern": "^APGI-P0[0-7]$"
+    },
+    "registry_ep": {
+      "type": "string",
+      "pattern": "^EP-[0-7]$"
     },
     "title": {
       "type": "string",
-      "minLength": 5
+      "minLength": 1
     },
     "paper": {
-      "type": "string"
-    },
-    "osf_url": {
-      "type": "string"
-    },
-    "version": {
       "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
     },
     "last_updated": {
       "type": "string",
       "format": "date"
     },
-    "description": {
+    "specification_date": {
       "type": "string",
-      "minLength": 20
+      "format": "date"
+    },
+    "study_status": {
+      "enum": [
+        "pre_collection",
+        "collecting",
+        "completed"
+      ]
     },
     "participants": {
       "type": "object",
-      "required": ["n_target", "n_minimum", "inclusion_criteria", "exclusion_criteria"],
+      "required": [
+        "n_target",
+        "n_minimum",
+        "unit",
+        "inclusion_criteria",
+        "exclusion_criteria"
+      ],
       "properties": {
-        "n_target": {"type": "integer", "minimum": 1},
-        "n_minimum": {"type": "integer", "minimum": 1},
-        "inclusion_criteria": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-        "exclusion_criteria": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+        "n_target": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "n_minimum": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "n_analyzable_target": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "unit": {
+          "enum": [
+            "human_participants",
+            "simulation_seeds_per_condition",
+            "clinical_participants"
+          ]
+        },
+        "inclusion_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "exclusion_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "groups": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "patient_n_target": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sites": {
+          "type": "integer",
+          "minimum": 1
+        }
       },
       "additionalProperties": true
     },
+    "sub_predictions": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "claim",
+          "confirming_evidence",
+          "falsifying_evidence",
+          "indeterminate_rule",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^Pred [0-7]\\.[A-G]$"
+          },
+          "status": {
+            "enum": [
+              "confirmatory",
+              "secondary",
+              "exploratory",
+              "estimation",
+              "estimation_first",
+              "confirmatory_exploratory"
+            ]
+          },
+          "claim": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confirming_evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "falsifying_evidence": {
+            "type": "string",
+            "minLength": 1
+          },
+          "indeterminate_rule": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confirming_thresholds": {
+            "type": "object"
+          },
+          "falsifying_thresholds": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
     "apparatus": {
-      "type": "object"
+      "type": "object",
+      "minProperties": 1
     },
     "trial_structure": {
       "type": "object",
-      "required": ["target", "response"],
+      "required": [
+        "target",
+        "response"
+      ],
       "properties": {
         "target": {
           "type": "object",
-          "required": ["type", "duration_ms"],
+          "required": [
+            "type",
+            "duration_ms"
+          ],
           "properties": {
-            "type": {"type": "string"},
-            "duration_ms": {"type": "number", "minimum": 0}
+            "type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "duration_ms": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
           }
         },
-        "response": {"type": "string"}
-      },
-      "additionalProperties": true
+        "response": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "blocks": {
       "type": "object",
-      "required": ["practice_trials", "experimental_blocks", "total_experimental_trials"],
+      "required": [
+        "practice_trials",
+        "experimental_blocks",
+        "total_experimental_trials"
+      ],
       "properties": {
-        "practice_trials": {"type": "integer", "minimum": 0},
-        "experimental_blocks": {"type": "integer", "minimum": 1},
-        "total_experimental_trials": {"type": "integer", "minimum": 1}
+        "practice_trials": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "experimental_blocks": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "total_experimental_trials": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "trials_per_block": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "session_quest_topup_trials": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
       },
       "additionalProperties": true
     },
     "dependent_variables": {
       "type": "array",
-      "items": {"type": "string"},
-      "minItems": 1
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "primary_hypothesis": {
       "type": "string",
-      "minLength": 10
+      "minLength": 1
     },
     "primary_analysis": {
       "type": "string",
-      "minLength": 5
+      "minLength": 1
     },
     "power_analysis": {
       "type": "object",
-      "description": "Power analysis. Exactly one effect-size metric is required: effect_size_d for mean-difference designs, or effect_size_r for correlation-powered designs (Protocol 0 is powered on r = 0.35 via Fisher-z, not on a d).",
-      "required": ["alpha", "power", "n_required"],
-      "anyOf": [{"required": ["effect_size_d"]}, {"required": ["effect_size_r"]}],
+      "required": [
+        "design_type"
+      ],
       "properties": {
-        "effect_size_d": {"type": "number", "exclusiveMinimum": 0},
-        "effect_size_r": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
-        "alpha": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
-        "power": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
-        "n_required": {"type": "integer", "minimum": 1},
-        "software": {"type": "string"}
-      }
+        "design_type": {
+          "enum": [
+            "frequentist",
+            "sequential",
+            "simulation",
+            "bayesian",
+            "fixed_n"
+          ]
+        },
+        "alpha": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "power": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "n_required": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "n_target": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bf10_threshold": {
+          "type": "number",
+          "exclusiveMinimum": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "design_type": {
+                "enum": [
+                  "frequentist",
+                  "sequential"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "alpha",
+              "power",
+              "n_required"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "design_type": {
+                "enum": [
+                  "simulation",
+                  "bayesian",
+                  "fixed_n"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "n_target"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": true
     },
     "pre_registration": {
       "type": "object",
-      "required": ["platform", "url", "date"],
+      "required": [
+        "platform",
+        "project_url",
+        "base_registration_url",
+        "base_registration_date",
+        "amendment"
+      ],
       "properties": {
-        "platform": {"type": "string"},
-        "url": {"type": "string"},
-        "date": {"type": "string", "format": "date"}
+        "platform": {
+          "const": "OSF"
+        },
+        "project_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "base_registration_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "base_registration_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "amendment": {
+          "type": "object",
+          "required": [
+            "number",
+            "document_stated_date",
+            "identifier",
+            "verification_status"
+          ],
+          "properties": {
+            "number": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "document_stated_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "identifier": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "verification_status": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
       }
     },
     "apgi_parameters": {
       "type": "object",
-      "required": ["kappa", "alpha", "beta_initial_estimate"],
+      "required": [
+        "model",
+        "reduced_quantities",
+        "kappa",
+        "gain_interpretation",
+        "parameter_manifest_status"
+      ],
       "properties": {
-        "kappa": {"type": "number", "exclusiveMinimum": 0},
-        "alpha": {"type": "number", "minimum": 0},
-        "beta_initial_estimate": {"type": "number", "minimum": 0}
+        "reduced_quantities": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "theta_0",
+              "eta",
+              "tau_theta",
+              "gamma_sig",
+              "rho",
+              "Pi_i",
+              "Pi_e",
+              "beta_SM"
+            ]
+          }
+        },
+        "kappa": {
+          "type": "object",
+          "required": [
+            "value",
+            "unit",
+            "status"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "unit": {
+              "const": "ATP/bit"
+            },
+            "status": {
+              "enum": [
+                "uncalibrated",
+                "calibrated"
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "uncalibrated"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "value": {
+                    "type": "null"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gain_interpretation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parameter_manifest_status": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": true
     },
-    "safety_monitoring": {
-      "type": "object"
-    },
     "ethics": {
       "type": "object",
-      "required": ["committee", "protocol_number", "approval_date"],
+      "required": [
+        "committee",
+        "approval_status",
+        "protocol_number",
+        "approval_date",
+        "enrollment_authorized"
+      ],
       "properties": {
         "committee": {
           "type": "string",
-          "minLength": 3,
-          "description": "Name of the ethics committee or IRB."
+          "minLength": 1
+        },
+        "approval_status": {
+          "enum": [
+            "not_yet_submitted",
+            "pending",
+            "approved",
+            "exempt"
+          ]
         },
         "protocol_number": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Assigned IRB/ethics protocol number."
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "approval_date": {
-          "type": "string",
-          "format": "date",
-          "description": "Date ethics approval was granted (YYYY-MM-DD)."
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
         },
-        "exempt_reason": {
-          "type": "string",
-          "description": "If no human subjects are involved, state the exemption reason."
+        "enrollment_authorized": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "approval_status": {
+                "const": "approved"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "protocol_number": {
+                "type": "string",
+                "minLength": 1
+              },
+              "approval_date": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          }
         },
-        "surrogate_consent": {
+        {
+          "if": {
+            "properties": {
+              "approval_status": {
+                "enum": [
+                  "not_yet_submitted",
+                  "pending"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "protocol_number": {
+                "type": "null"
+              },
+              "approval_date": {
+                "type": "null"
+              },
+              "enrollment_authorized": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "quality_and_decision_rules": {
+      "type": "object",
+      "required": [
+        "data_admissibility",
+        "scenarios",
+        "protocol_alpha_specification"
+      ],
+      "properties": {
+        "data_admissibility": {
           "type": "string",
-          "description": "Surrogate consent procedure for incapacitated participants."
+          "minLength": 1
         },
-        "data_sharing": {
+        "protocol_alpha_specification": {
           "type": "string",
-          "description": "Data sharing and de-identification plan."
+          "minLength": 1
+        },
+        "scenarios": {
+          "type": "object",
+          "required": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F"
+          ],
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "submission_blocking_issues": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "specification_sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "heading",
+          "text"
+        ],
+        "properties": {
+          "heading": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_start_paragraph_line": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source_files",
+        "input_file",
+        "input_sha256",
+        "input_version",
+        "precedence"
+      ],
+      "properties": {
+        "source_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "file",
+              "sha256"
+            ],
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "input_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "input_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "precedence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_schema_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "required": [
+        "status",
+        "empirical_validation_performed",
+        "registration_verified"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "empirical_validation_performed": {
+          "type": "boolean"
+        },
+        "registration_verified": {
+          "type": "boolean"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P00"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-0"
+          },
+          "sub_predictions": {
+            "minItems": 3,
+            "maxItems": 3,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 0.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 0.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 0.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P01"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-1"
+          },
+          "sub_predictions": {
+            "minItems": 6,
+            "maxItems": 6,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 1.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 1.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 1.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 1.D"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 1.E"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 1.F"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P02"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-2"
+          },
+          "sub_predictions": {
+            "minItems": 7,
+            "maxItems": 7,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 2.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 2.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 2.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 2.D"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 2.E"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 2.F"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 2.G"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P03"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-3"
+          },
+          "sub_predictions": {
+            "minItems": 4,
+            "maxItems": 4,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 3.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 3.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 3.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 3.D"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P04"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-4"
+          },
+          "sub_predictions": {
+            "minItems": 3,
+            "maxItems": 3,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 4.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 4.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 4.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P05"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-5"
+          },
+          "sub_predictions": {
+            "minItems": 5,
+            "maxItems": 5,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 5.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 5.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 5.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 5.D"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 5.E"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P06"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-6"
+          },
+          "sub_predictions": {
+            "minItems": 5,
+            "maxItems": 5,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 6.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 6.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 6.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 6.D"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 6.E"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "protocol_id": {
+            "const": "APGI-P07"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "registry_ep": {
+            "const": "EP-7"
+          },
+          "sub_predictions": {
+            "minItems": 7,
+            "maxItems": 7,
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 7.A"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 7.B"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 7.C"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 7.D"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 7.E"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 7.F"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "id": {
+                      "const": "Pred 7.G"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
 }

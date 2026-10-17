@@ -1,0 +1,73 @@
+{
+  "release": "1.1.0",
+  "date": "2026-10-16",
+  "schema": "JSON Schema Draft 2020-12",
+  "files": [
+    {
+      "file": "protocol_0_hep_proxy_validation.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 3
+    },
+    {
+      "file": "protocol_1_cardiac_eeg.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 6
+    },
+    {
+      "file": "protocol_2_somatic_agent_sim.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 7
+    },
+    {
+      "file": "protocol_3_anticipation_fmri.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 4
+    },
+    {
+      "file": "protocol_4_metabolic_crossover.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 3
+    },
+    {
+      "file": "protocol_5_causal_tms.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 5
+    },
+    {
+      "file": "protocol_6_ignition_ieeg.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 5
+    },
+    {
+      "file": "protocol_7_doc_biomarker.json",
+      "schema_valid": true,
+      "semantic_valid": true,
+      "prediction_count": 7
+    }
+  ],
+  "total_protocols": 8,
+  "total_predictions": 40,
+  "checks": [
+    "Strict JSON parsing (duplicate keys and non-finite constants rejected)",
+    "Schema self-validation and instance format checking",
+    "Exact Protocol 0–7 membership and prediction IDs/counts/uniqueness",
+    "Sample minimum/analyzable/enrollment ordering",
+    "Main-trial arithmetic and clinical cohort totals",
+    "Pending approvals cannot authorize enrollment",
+    "Uncalibrated kappa has no numerical estimate",
+    "Release manifest coverage and SHA256 verified by validator"
+  ],
+  "limitations": [
+    "Structural and consistency checks are not empirical validation or power simulations.",
+    "Source provenance is checked only when --source-dir is supplied; historical input hashes are retained as provenance, not revalidated by this report.",
+    "OSF filing stated as 2026-10-16 is not independently verified.",
+    "Source conflicts and pending analysis locks remain listed in each protocol and CHANGELOG.md."
+  ]
+}

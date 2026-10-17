@@ -90,13 +90,26 @@ def _initialize_registry():
 
     # ------------------------------------------------------------------
     # Experimental Protocol Specifications (JSON, protocols/ folder)
+    # Specification release 1.1.0; numbering follows protocols/MANIFEST.json.
     # ------------------------------------------------------------------
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
+            canonical_id="APGI-P00",
+            filename="protocols/protocol_0_hep_proxy_validation.json",
+            title="HEP Proxy Validation",
+            description="Heartbeat-evoked potential as an index of interoceptive gain (Pred 0.A–0.C)",
+            priority_level="Empirical",
+            category="ExperimentalProtocol",
+            aliases=["P00", "HEP-Proxy"],
+        )
+    )
+
+    PROTOCOL_REGISTRY.register_protocol(
+        ProtocolInfo(
             canonical_id="APGI-P01",
-            filename="protocols/protocol_1_eeg_interoceptive_gating.json",
-            title="EEG Study of Interoceptive Precision Gating",
-            description="HEP-P3b coupling and cardiac-phase detection advantage (P1a–P1c)",
+            filename="protocols/protocol_1_cardiac_eeg.json",
+            title="Cardiac-Phase EEG Study of Interoceptive Precision Gating",
+            description="P3b attention effect, cardiac-phase detection and HEP–P3b coupling (Pred 1.A–1.F)",
             priority_level="Empirical",
             category="ExperimentalProtocol",
             aliases=["P01", "EEG-Interoceptive", "HEP-P3b"],
@@ -106,135 +119,87 @@ def _initialize_registry():
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
             canonical_id="APGI-P02",
-            filename="protocols/protocol_2_tms_insular_gating.json",
-            title="TMS Causal Manipulation of Interoceptive Gating",
-            description="Insula/thalamus TMS causal test of θₜ regulation (P2a–P2c)",
-            priority_level="Empirical",
+            filename="protocols/protocol_2_somatic_agent_sim.json",
+            title="Somatic-Marker Agent Simulations",
+            description="Seven-architecture IGT agents and somatic-marker advantages (Pred 2.A–2.G)",
+            priority_level="Computational",
             category="ExperimentalProtocol",
-            aliases=["P02", "TMS-Insular", "TMS-Causal"],
+            aliases=["P02", "ActiveInference-Sim", "SomaticMarker"],
         )
     )
 
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
             canonical_id="APGI-P03",
-            filename="protocols/protocol_3_active_inference_simulations.json",
-            title="Active Inference Agent Simulations",
-            description="Somatic marker M̂(c,a) and adaptive advantages (P3a–P3d)",
-            priority_level="Computational",
+            filename="protocols/protocol_3_anticipation_fmri.json",
+            title="fMRI Anticipation vs Experience",
+            description="vmPFC–insula anticipatory coupling and identifiability gate (Pred 3.A–3.D)",
+            priority_level="Empirical",
             category="ExperimentalProtocol",
-            aliases=["P03", "ActiveInference-Sim", "SomaticMarker"],
+            aliases=["P03", "fMRI-Anticipation", "vmPFC-Coupling"],
         )
     )
 
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
             canonical_id="APGI-P04",
-            filename="protocols/protocol_4_disorders_of_consciousness.json",
-            title="Disorders of Consciousness: HEP + PCI Joint Model",
-            description="Joint HEP+PCI prediction of DoC recovery (P4a–P4d)",
-            priority_level="Clinical",
+            filename="protocols/protocol_4_metabolic_crossover.json",
+            title="Metabolic-State Crossover",
+            description="Allostatic threshold modulation under energy state, two-site d-prime GLMM (Pred 4.A–4.C)",
+            priority_level="Empirical",
             category="ExperimentalProtocol",
-            aliases=["P04", "DoC", "Consciousness-Disorders"],
+            aliases=["P04", "Metabolic-Crossover"],
         )
     )
 
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
             canonical_id="APGI-P05",
-            filename="protocols/protocol_5_fmri_anticipation.json",
-            title="fMRI Anticipation vs Experience",
-            description="vmPFC-posterior insula coupling during anticipation (P5a–P5d)",
+            filename="protocols/protocol_5_causal_tms.json",
+            title="Causal Neuromodulation of Insular and Frontoparietal Gating",
+            description="Right-aINS tFUS/dTMS with modality-matched sham and PCI probes (Pred 5.A–5.E)",
             priority_level="Empirical",
             category="ExperimentalProtocol",
-            aliases=["P05", "fMRI-Anticipation", "vmPFC-Coupling"],
+            aliases=["P05", "TMS-Insular", "TMS-Causal"],
         )
     )
 
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
             canonical_id="APGI-P06",
-            filename="protocols/protocol_6_icEEG_ignition_dynamics.json",
-            title="intracranial EEG Ignition Bifurcation Dynamics",
-            description="All-or-none bistable firing and critical slowing in iEEG (P6a–P6d)",
+            filename="protocols/protocol_6_ignition_ieeg.json",
+            title="Intracranial EEG All-or-None Ignition",
+            description="Bimodal ignition, critical slowing and timescale recovery in iEEG (Pred 6.A–6.E)",
             priority_level="Empirical",
             category="ExperimentalProtocol",
             aliases=["P06", "iEEG-Bifurcation", "CriticalSlowing-iEEG"],
         )
     )
 
-    # ------------------------------------------------------------------
-    # Protocol Template (apgi_protocol_template.json)
-    # ------------------------------------------------------------------
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
-            canonical_id="APGI-P01-TEMPLATE",
-            filename="protocols/apgi_protocol_template.json",
-            title="EEG Interoceptive Precision Gating (Template)",
-            description="Template specification for P01 protocol with typed benchmarks",
-            priority_level="Empirical",
-            category="ExperimentalProtocol",
-            aliases=["P01-TEMPLATE", "EEG-Template"],
-        )
-    )
-
-    PROTOCOL_REGISTRY.register_protocol(
-        ProtocolInfo(
-            canonical_id="APGI-P02-TEMPLATE",
-            filename="protocols/apgi_protocol_template.json",
-            title="TMS Anterior Insular Frontoparietal Gating (Template)",
-            description="Template specification for P02 protocol with typed benchmarks",
-            priority_level="Empirical",
-            category="ExperimentalProtocol",
-            aliases=["P02-TEMPLATE", "TMS-Template"],
-        )
-    )
-
-    PROTOCOL_REGISTRY.register_protocol(
-        ProtocolInfo(
-            canonical_id="APGI-P03-TEMPLATE",
-            filename="protocols/apgi_protocol_template.json",
-            title="Active Inference Agent Simulations (Template)",
-            description="Template specification for P03 protocol with typed benchmarks",
-            priority_level="Computational",
-            category="ExperimentalProtocol",
-            aliases=["P03-TEMPLATE", "ActiveInference-Template"],
-        )
-    )
-
-    PROTOCOL_REGISTRY.register_protocol(
-        ProtocolInfo(
-            canonical_id="APGI-P04-TEMPLATE",
-            filename="protocols/apgi_protocol_template.json",
-            title="Disorders of Consciousness Assessment (Template)",
-            description="Template specification for P04 protocol with typed benchmarks",
+            canonical_id="APGI-P07",
+            filename="protocols/protocol_7_doc_biomarker.json",
+            title="Disorders of Consciousness Biomarker",
+            description="Ignition capacity and interoceptive precision as DoC outcome predictors; Pred 7.G primary (Pred 7.A–7.G)",
             priority_level="Clinical",
             category="ExperimentalProtocol",
-            aliases=["P04-TEMPLATE", "DoC-Template"],
+            aliases=["P07", "DoC", "Consciousness-Disorders"],
         )
     )
 
+    # ------------------------------------------------------------------
+    # Legacy protocol template (pre-1.1 benchmarks; not v1.1 decision rules)
+    # ------------------------------------------------------------------
     PROTOCOL_REGISTRY.register_protocol(
         ProtocolInfo(
-            canonical_id="APGI-P05-TEMPLATE",
-            filename="protocols/apgi_protocol_template.json",
-            title="fMRI Anticipation vs Experience (Template)",
-            description="Template specification for P05 protocol with typed benchmarks",
-            priority_level="Empirical",
+            canonical_id="APGI-PROTOCOL-TEMPLATE",
+            filename="config/apgi_protocol_template.json",
+            title="Legacy APGI Protocol Template (pre-1.1)",
+            description="Typed benchmark template retained for reference; superseded by specification 1.1.0",
+            priority_level="Reference",
             category="ExperimentalProtocol",
-            aliases=["P05-TEMPLATE", "fMRI-Template"],
-        )
-    )
-
-    PROTOCOL_REGISTRY.register_protocol(
-        ProtocolInfo(
-            canonical_id="APGI-P06-TEMPLATE",
-            filename="protocols/apgi_protocol_template.json",
-            title="icEEG All or None Ignition Dynamics (Template)",
-            description="Template specification for P06 protocol with typed benchmarks",
-            priority_level="Empirical",
-            category="ExperimentalProtocol",
-            aliases=["P06-TEMPLATE", "iEEG-Template"],
+            aliases=["PROTOCOL-TEMPLATE"],
         )
     )
 
@@ -506,8 +471,8 @@ def _initialize_registry():
         (
             "VP-03",
             "VP_03_ActiveInferenceAgentSimulations.py",
-            "Active Inference Agent Simulations (APGI-P03 linked)",
-            "Agent-based active inference; linked to APGI-P03",
+            "Active Inference Agent Simulations (APGI-P02 linked)",
+            "Agent-based active inference; linked to APGI-P02",
             ["VP03", "ActiveInference", "AgentSimulations"],
             True,
         ),
@@ -535,8 +500,8 @@ def _initialize_registry():
         (
             "VP-07",
             "VP_07_TMSCausalInterventions.py",
-            "TMS Causal Interventions (APGI-P02 linked)",
-            "TMS/pharmacological intervention predictions; linked to APGI-P02",
+            "TMS Causal Interventions (APGI-P05 linked)",
+            "TMS/pharmacological intervention predictions; linked to APGI-P05",
             ["VP07", "TMS", "CausalInterventions"],
         ),
         (
@@ -563,8 +528,8 @@ def _initialize_registry():
         (
             "VP-10",
             "VP_10_CausalManipulationsPriority2.py",
-            "Causal Manipulations — Priority 2 (APGI-P02 linked)",
-            "Causal manipulation validation; linked to APGI-P02 TMS",
+            "Causal Manipulations — Priority 2 (APGI-P05 linked)",
+            "Causal manipulation validation; linked to APGI-P05 TMS",
             ["VP10", "CausalManipulations", "Priority2"],
         ),
         (
@@ -577,8 +542,8 @@ def _initialize_registry():
         (
             "VP-12",
             "VP_12_ClinicalCrossSpeciesConvergence.py",
-            "Clinical & Cross-Species Convergence (APGI-P04 linked)",
-            "Clinical/cross-species convergence; linked to APGI-P04 DoC",
+            "Clinical & Cross-Species Convergence (APGI-P07 linked)",
+            "Clinical/cross-species convergence; linked to APGI-P07 DoC",
             ["VP12", "Clinical", "CrossSpeciesConvergence"],
         ),
         (
@@ -591,8 +556,8 @@ def _initialize_registry():
         (
             "VP-14",
             "VP_14_FMRIAnticipationExperience.py",
-            "fMRI Anticipation vs Experience (APGI-P05 linked)",
-            "BOLD tracking of S(t)/M(t); linked to APGI-P05 fMRI",
+            "fMRI Anticipation vs Experience (APGI-P03 linked)",
+            "BOLD tracking of S(t)/M(t); linked to APGI-P03 fMRI",
             ["VP14", "fMRI-Anticipation"],
         ),
         (
@@ -647,8 +612,8 @@ def _initialize_registry():
         (
             "VP-22",
             "VP_22_FMRIAnticipationExperience.py",
-            "Enhanced fMRI Anticipation vs Experience (APGI-P05 linked)",
-            "Enhanced anticipation-versus-experience validation; linked to APGI-P05",
+            "Enhanced fMRI Anticipation vs Experience (APGI-P03 linked)",
+            "Enhanced anticipation-versus-experience validation; linked to APGI-P03",
             ["VP22", "fMRI-Anticipation-Enhanced", "SomaticMarker-fMRI"],
         ),
         (
@@ -807,8 +772,8 @@ def _initialize_registry():
         (
             "T-SomaticMarker",
             "APGI_Somatic_Marker_Identifiability.py",
-            "Somatic Marker Identifiability (APGI-P03 linked)",
-            "M̂(c,a) identifiability; validated by APGI-P03",
+            "Somatic Marker Identifiability (APGI-P02 linked)",
+            "M̂(c,a) identifiability; validated by APGI-P02",
             ["SomaticMarkerIdentifiability", "APGI_SomaticMarker"],
         ),
         (

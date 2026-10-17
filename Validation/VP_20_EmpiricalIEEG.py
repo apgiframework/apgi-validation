@@ -1273,6 +1273,7 @@ except ImportError:
 
 try:
     from utils.protocol_loader import load_protocol as _load_protocol_p06
+    from utils.protocol_loader import spec_prediction_results
 
     _PROTOCOL_SPEC_P06 = _load_protocol_p06("APGI-P06")
 except Exception:
@@ -1321,19 +1322,17 @@ def run_protocol_main(config=None) -> Any:
             sources=["VP_20_EmpiricalIEEG"],
         )
 
-    # Add JSON protocol sub-predictions (P6a–P6d from APGI-P06)
-    if _PROTOCOL_SPEC_P06 is not None:
-        _pred_map = {"P6a": "V20.1", "P6b": "V20.2", "P6c": "V20.3", "P6d": "V20.1"}
-        for sub_pred in _PROTOCOL_SPEC_P06.sub_predictions:
-            linked_v = _pred_map.get(sub_pred.id)
-            passed = named[linked_v].passed if linked_v in named else False
-            named[sub_pred.id] = PredictionResult(
-                passed=passed,
-                status=PredictionStatus.PASSED if passed else PredictionStatus.FAILED,
-                name=sub_pred.claim,
-                evidence=[sub_pred.confirming_evidence],
-                sources=["APGI-P06", "VP_20_EmpiricalIEEG"],
-            )
+    # Registered APGI-P06 predictions. V20.1 (bimodal high-gamma) tests Pred 6.A and
+    # V20.2 (pre-stimulus AC1) tests Pred 6.C; V20.3 (variance) is not a registered
+    # 6.C criterion under specification 1.1.0.
+    named.update(
+        spec_prediction_results(
+            _PROTOCOL_SPEC_P06,
+            named,
+            {"Pred 6.A": "V20.1", "Pred 6.C": "V20.2"},
+            ["VP_20_EmpiricalIEEG"],
+        )
+    )
 
     spec_params = _PROTOCOL_SPEC_P06.apgi_parameters if _PROTOCOL_SPEC_P06 else {}
     return ProtocolResult(

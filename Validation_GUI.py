@@ -179,8 +179,8 @@ protocol_files = [
     ("VP-08: Psychophysical Threshold Estimation", "VP_08_PsychophysicalThresholdEstimation.py"),
     # APGI-P01 related validations (convergent neural signatures)
     ("APGI-P01 (Extended): Neural Signatures Priority 1", "VP_09_NeuralSignaturesEmpiricalPriority1.py"),
-    # APGI-P02 related validations (causal manipulations)
-    ("APGI-P02 (Extended): Causal Manipulations Priority 2", "VP_10_CausalManipulationsPriority2.py"),
+    # APGI-P05 related validations (causal manipulations)
+    ("APGI-P05 (Extended): Causal Manipulations Priority 2", "VP_10_CausalManipulationsPriority2.py"),
     # Additional non-canonical validations
     ("VP-11: MCMC Cultural Neuroscience Priority 3", "VP_11_MCMCCulturalNeurosciencePriority3.py"),
     ("VP-17: Allen Visual Coding Fatigue", "VP_17_AllenVisualCodingFatigue.py"),
@@ -189,10 +189,10 @@ protocol_files = [
     ("VP-21: Free Energy & Prediction Error", "VP_21_FreeEnergyPredictionError.py"),
     # APGI-P03 related validations (fMRI vmPFC variants)
     ("APGI-P03 (Variant): fMRI Anticipation vmPFC", "VP_15_FMRIAnticipationVmPFC.py"),
-    # APGI-P04 related validations (metabolic and cross-species)
-    ("APGI-P04 (Extended): Clinical Cross-Species Convergence", "VP_12_ClinicalCrossSpeciesConvergence.py"),
-    # APGI-P05 related validations (enhanced fMRI)
-    ("APGI-P05 (Extended): Enhanced fMRI Anticipation", "VP_22_FMRIAnticipationExperience.py"),
+    # APGI-P07 related validations (clinical and cross-species)
+    ("APGI-P07 (Extended): Clinical Cross-Species Convergence", "VP_12_ClinicalCrossSpeciesConvergence.py"),
+    # APGI-P03 related validations (enhanced fMRI)
+    ("APGI-P03 (Extended): Enhanced fMRI Anticipation", "VP_22_FMRIAnticipationExperience.py"),
     # Aggregator (not a standalone protocol)
     ("⚙️ VP Aggregator (Meta): Combines all VP results", "VP_ALL_Aggregator.py"),
 ]

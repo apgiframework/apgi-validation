@@ -144,7 +144,7 @@ NAMED_PREDICTIONS = {
     "V7a.3": "∂Π_eff/∂M > 0 for M ∈ [−2,+2] (soma-bias excitatory — symbolic proof)",
     "V7a.4": "Π_eff(M=0) = Π_base exactly (baseline identity — zero residual)",
     "V7a.5": "dθ/dt = 0 ↔ θ* = S_t uniquely (one fixed point — bistability precondition)",
-    # VP-22: fMRI Anticipation vs. Experience (Somatic Marker) — APGI-P05 canonical
+    # VP-22: fMRI Anticipation vs. Experience (Somatic Marker) — APGI-P03 canonical (specification 1.1.0)
     # Sub-predictions P5a–P5d with hardcoded rejection thresholds in Protocol5Config.
     "V22.1": "P5a: vmPFC–posterior_insula anticipatory coupling r ≥ 0.40, p < 0.01",
     "V22.2": "P5b: vmPFC does NOT significantly track primary interoceptive prediction error (critical falsification gate)",

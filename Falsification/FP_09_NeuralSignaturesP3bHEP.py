@@ -54,6 +54,7 @@ except ImportError:
 
 try:
     from utils.protocol_loader import load_protocol as _load_protocol_fp09
+    from utils.protocol_loader import spec_prediction_results
 
     _PROTOCOL_SPEC_FP09 = _load_protocol_fp09("APGI-P01")
 except Exception:
@@ -3657,19 +3658,11 @@ def run_protocol_main(config: dict = None) -> Union[dict, object]:
                 },
             )
 
-        # Add JSON protocol sub-predictions (P1a, P1b, P1c from APGI-P01)
-        if _PROTOCOL_SPEC_FP09 is not None:
-            _pred_map = {"P1a": "P4.a", "P1b": "P4.b", "P1c": "P4.c"}
-            for sub_pred in _PROTOCOL_SPEC_FP09.sub_predictions:
-                linked = _pred_map.get(sub_pred.id)
-                passed = named_predictions[linked].passed if linked in named_predictions else False
-                named_predictions[sub_pred.id] = PredictionResult(
-                    passed=passed,
-                    status=PredictionStatus.PASSED if passed else PredictionStatus.FAILED,
-                    name=sub_pred.claim,
-                    evidence=[sub_pred.confirming_evidence, sub_pred.falsifying_evidence],
-                    sources=["APGI-P01", "FP_09_NeuralSignaturesP3bHEP"],
-                )
+        # Registered APGI-P01 predictions. P4.a–P4.d are disorders-of-consciousness
+        # metrics, not Protocol 1 tests, so every Pred 1.x is reported INDETERMINATE.
+        named_predictions.update(
+            spec_prediction_results(_PROTOCOL_SPEC_FP09, named_predictions, {}, ["FP_09_NeuralSignaturesP3bHEP"])
+        )
 
         spec_params = _PROTOCOL_SPEC_FP09.apgi_parameters if _PROTOCOL_SPEC_FP09 else {}
         return ProtocolResult(

@@ -22,6 +22,9 @@ class PredictionStatus(str, Enum):
     DATA_UNAVAILABLE = "data_unavailable"
     NOT_EVALUATED = "not_evaluated"
     PARTIAL = "partial"  # Passed with caveats (e.g., some conditions met)
+    # Specification 1.1.0: not confirmed, but the registered falsifying rule was
+    # not met either. A failure to confirm is not falsification.
+    INDETERMINATE = "indeterminate"
 
 
 class PredictionResult(BaseModel):
