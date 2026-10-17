@@ -1,142 +1,382 @@
 {
+  "$schema": "schemas/protocol.schema.json",
+  "schema_version": "1.1.0",
   "protocol_id": "APGI-P00",
   "registry_ep": "EP-0",
   "registry_protocol_label": "Protocol 0 — Empirical Prerequisite",
   "title": "HEP Proxy Validation: Establishing the Heartbeat-Evoked Potential as a Πⁱ Index",
   "paper": "APGI Paper 1",
   "osf_url": "https://osf.io/t5hcq",
-  "zenodo_doi": "10.5281/zenodo.21632264",
-  "zenodo_url": "https://doi.org/10.5281/zenodo.21632264",
-  "code_repository": "https://github.com/apgiframework/apgi-implementation",
-  "code_repository_org": "https://github.com/apgiframework",
-  "orcid": "https://orcid.org/0009-0005-0328-2896",
   "version": "1.1.0",
-  "last_updated": "2026-07-30",
-  "description": "This empirical prerequisite protocol establishes the heartbeat-evoked potential (HEP, 250–400 ms window) as a valid trial-by-trial proxy for interoceptive precision Πⁱ before any downstream EP-1 through EP-6 analyses are interpreted. Three sub-predictions are tested: that HEP amplitude correlates with an orthogonal Πⁱ index (heartbeat discrimination d′) independent of any EEG measure (Pred 0.A); that pharmacological elevation of acetylcholine via physostigmine increases HEP amplitude in a dose-dependent manner confirmed by pupillometric engagement (Pred 0.B); and that anterior insula (aINS) BOLD signal tracks HEP amplitude trial-by-trial within participants after controlling for arousal (Pred 0.C). All three predictions must pass before HEP is used as a Πⁱ proxy in downstream protocols. Failure of any Pred 0 criterion is a submission-blocking issue for all protocols referencing HEP.",
-  "prediction_cluster": "Pred 0.A–0.C",
-  "prediction_cluster_label": "HEP Proxy Validation (Empirical Prerequisite)",
+  "last_updated": "2026-10-16",
+  "specification_date": "2026-10-16",
+  "study_status": "pre_collection",
+  "description": "Triangulate candidate HEP interoceptive-gain validity using behavioral discrimination, central cholinergic engagement and concurrent aINS fMRI-EEG. Full retention requires all three gates; single unmet gates cause targeted reclassification, not automatic invalidation of every downstream analysis.",
+  "prediction_cluster": "Pred 0.A–C",
   "sub_predictions": [
     {
       "id": "Pred 0.A",
-      "claim": "HEP amplitude correlates with orthogonal Πⁱ index (heartbeat discrimination d′) — independent of any EEG measure",
-      "confirming_evidence": "r(HEP, interoceptive d′) > 0.35, p < 0.01, two-tailed; replicated r ≥ 0.25 in independent validation subsample (N ≥ 30)",
-      "falsifying_evidence": "r < 0.20 across two independent samples",
+      "status": "confirmatory",
+      "claim": "HEP amplitude correlates with orthogonal Πⁱ index",
+      "confirming_evidence": "r(HEP, interoceptive d′) > 0.35, p < 0.01",
+      "falsifying_evidence": "Upper bound of the 95% association interval below 0.20 in each of two independent samples. A point estimate below 0.20 with an interval crossing 0.20 is indeterminate.",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "r_primary_sample": 0.35,
-        "p_primary": 0.01,
-        "r_replication_sample": 0.25,
-        "n_replication_minimum": 30,
-        "test_type": "two-tailed"
-      },
-      "falsifying_thresholds": {
-        "r_threshold": 0.2,
-        "samples_required": 2
+        "r_primary_strict_minimum": 0.35,
+        "alpha_two_tailed": 0.01,
+        "replication_r_minimum": 0.25,
+        "replication_n_minimum": 30,
+        "replication_ci_level": 0.95,
+        "replication_bootstrap_resamples": 10000,
+        "replication_ci_excludes_zero": true
       }
     },
     {
       "id": "Pred 0.B",
-      "claim": "Physostigmine (ACh elevation) increases HEP amplitude",
-      "confirming_evidence": "HEP amplitude increases ≥15% vs. placebo (Cohen's d ≥ 0.50, BF₁₀ ≥ 100); pupil constriction confirms target engagement",
-      "falsifying_evidence": "No HEP change despite verified ACh elevation (pupil constriction confirmed)",
+      "status": "confirmatory",
+      "claim": "Physostigmine (ACh) increases HEP amplitude",
+      "confirming_evidence": "HEP increases ≥ 15% vs. placebo (d ≥ 0.50, BF₁₀ ≥ 100)",
+      "falsifying_evidence": "No HEP change despite confirmed central engagement under the locked EEG marker. Uninterpretable central engagement is indeterminate; pupil constriction alone neither establishes nor is required for central engagement.",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
         "hep_increase_percent_minimum": 15,
         "cohens_d_minimum": 0.5,
         "bf10_minimum": 100,
-        "engagement_check": "pupil constriction confirmed by pupillometry"
-      },
-      "falsifying_thresholds": {
-        "condition": "No HEP change when pupil constriction confirms physostigmine target engagement"
+        "alpha": 0.05,
+        "central_spectral_change_percent_minimum": 10,
+        "central_frequency_range_hz": [
+          8,
+          30
+        ]
       }
     },
     {
       "id": "Pred 0.C",
-      "claim": "Anterior insula (aINS) BOLD tracks HEP amplitude trial-by-trial",
-      "confirming_evidence": "r(HEP amplitude, aINS BOLD) > 0.30 within participants after arousal covariate control",
-      "falsifying_evidence": "aINS BOLD and HEP statistically independent after arousal covariate",
+      "status": "confirmatory",
+      "claim": "Anterior insula BOLD tracks HEP trial-by-trial",
+      "confirming_evidence": "r(HEP amplitude, aINS BOLD) > 0.30 within participants",
+      "falsifying_evidence": "Responsive aINS localizer plus pooled Fisher-z within-participant association 90% interval wholly inside [-sqrt(0.02),+sqrt(0.02)], TOST alpha=0.05. Nonsignificance, a crossing interval or unresponsive localizer is indeterminate.",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "r_within_participant_minimum": 0.3,
-        "covariate_control": "arousal (HRV, pupil diameter)",
-        "analysis_level": "within-participant"
+        "within_participant_r_strict_minimum": 0.3,
+        "alpha": 0.05
       },
       "falsifying_thresholds": {
-        "condition": "Statistically independent after arousal covariate"
+        "equivalence_bounds": [
+          -0.1414213562373095,
+          0.1414213562373095
+        ],
+        "ci_level": 0.9,
+        "localizer_task_response_required": true
       }
     }
   ],
-  "validation_status": "specified",
-  "validation_notes": "Empirical prerequisite for all downstream protocols referencing HEP as a Πⁱ proxy. Failure of any sub-prediction (0.A, 0.B, or 0.C) constitutes a submission-blocking issue requiring protocol amendment before EP-1 through EP-6 results are submitted.",
-  "submission_blocking_status": "PREREQUISITE — all three predictions must pass before HEP is used as Πⁱ proxy in EP-1 through EP-6",
   "participants": {
     "n_target": 115,
     "n_minimum": 115,
-    "n_validation_subsample": 30,
+    "unit": "human_participants",
+    "n_independent_validation_minimum": 30,
+    "validation_sample_relation": "Independent sample from Protocol 1 enrollment stream, separately consented and excluded from Protocol 1 data-lock; not a subset of the 115 primary participants.",
     "inclusion_criteria": [
-      "Age 18–45 years",
-      "Normal or corrected-to-normal vision",
-      "Resting heart rate 50–100 BPM with regular sinus rhythm",
-      "No psychoactive medication within 30 days",
-      "No history of cardiac arrhythmia or autonomic neuropathy",
-      "Willingness to complete two sessions (main + replication subsample)"
+      "Healthy adults; final physician-approved eligibility in prospectively locked pharmacology addendum."
     ],
     "exclusion_criteria": [
-      "Irregular ECG rhythm (assessed by study nurse at screening)",
-      "Resting heart rate < 50 or > 100 BPM",
-      "History of neurological or psychiatric disorder (DSM-5 criteria)",
-      "Use of beta-blockers or other HR-modifying medication",
-      "Contraindication to physostigmine: glaucoma, bradycardia, active asthma, peptic ulcer disease, urinary obstruction",
-      "Inability to maintain fixation for 30-minute EEG blocks",
-      "Pregnant or breastfeeding (physostigmine arm)"
-    ],
-    "physostigmine_arm_criteria": {
-      "n_target": 30,
-      "design": "Double-blind, placebo-controlled, crossover (physostigmine 1.0 mg i.v. vs. saline placebo)",
-      "washout_days": 7,
-      "monitoring": "Continuous ECG, blood pressure, pulse oximetry during infusion; physician present"
-    },
-    "sample_size_rationale": "N = 115 healthy adults: 90% power to detect r = 0.35 at α = 0.01, two-tailed (Fisher-z; n_required = 114). Fixed-N design — the Pred 0.A correlation, not the Pred 0.B pharmacological contrast, sets the sample size.",
-    "screening_criteria": [
-      "Minimum resting RMSSD ≥ 20 ms over a 5-minute supine rest period (required for any HEP-based confirmatory analysis; applied uniformly across Protocols 0, 1, 4, 7)"
+      "Registered EEG/ECG admissibility failures",
+      "Contraindications specified in authorized pharmacological and MRI protocols; eligibility must be fixed before recruitment.",
+      "Asthma",
+      "Severe resting bradycardia <50 bpm",
+      "Cardiac arrhythmia",
+      "Uncontrolled hypertension",
+      "Pregnancy"
     ]
   },
   "apparatus": {
-    "EEG": "64-channel BrainAmp DC (Brain Products GmbH) at 1000 Hz, referenced to FCz; A1/A2 (or TP9/TP10) recorded separately and re-referenced offline to the average reference (mandated cross-protocol for P3b amplitude comparability; supersedes the bilateral mastoid average)",
-    "ECG": "BrainAmp ExG bipolar lead-II at 1000 Hz, synchronised to EEG clock",
-    "pupillometry": "Eyelink 1000 Plus (monocular, 500 Hz) for pupil diameter as arousal covariate and physostigmine engagement check",
-    "fMRI_for_0C": "3T Siemens Prisma, 64-channel head coil; multi-band EPI TR = 1000 ms, TE = 30 ms, 2 mm isotropic (separate sub-session for Pred 0.C)",
-    "cardiac_phase_algorithm": "R-peak detection via Pan-Tompkins (real-time), HEP epoch −200 to +800 ms post R-peak",
-    "heartbeat_discrimination_task": "Modified Schandry task: participants count heartbeats during silent intervals (15, 25, 35, 45, 50 s); d′ computed from hit rate and false alarm rate against reference ECG"
+    "EEG": "64-channel MR-compatible EEG, 1000 Hz",
+    "ECG": "Synchronized Lead II",
+    "pupillometry": "At least 500 Hz, fixed luminance",
+    "fMRI": "3T simultaneous EEG-fMRI",
+    "respiration": "Continuous inductance plethysmography or nasal thermistor"
   },
   "trial_structure": {
-    "isi_ms": null,
     "target": {
-      "type": "Heartbeat discrimination trial: silent interval with ECG-verified heartbeat counting (Pred 0.A); resting EEG + physostigmine infusion (Pred 0.B); resting fMRI + EEG simultaneously (Pred 0.C)",
-      "duration_ms": 0
+      "type": "100-trial heartbeat discrimination; visual detection with simultaneous fMRI-EEG; task-epoch pharmacological crossover",
+      "duration_ms": null
     },
-    "response": "Pred 0.A: verbal count of perceived heartbeats per interval. Pred 0.B: no task (resting state, passive). Pred 0.C: passive resting state fMRI."
+    "response": "Behavioral heartbeat discrimination responses yielding hits and false alarms; visual detection responses. Heartbeat counting is not substituted for discrimination d-prime."
   },
   "blocks": {
-    "practice_trials": 5,
-    "experimental_blocks": 4,
-    "trials_per_block": 10,
-    "total_experimental_trials": 40,
-    "pred_0a_trials": "6 heartbeat discrimination intervals × 2 sessions (main + replication subsample)",
-    "pred_0b_sessions": "2 (physostigmine vs. placebo, counterbalanced, separated by 7-day washout)",
-    "pred_0c_session": "Single 45-minute simultaneous EEG-fMRI resting-state session"
+    "practice_trials": null,
+    "experimental_blocks": null,
+    "total_experimental_trials": null,
+    "heartbeat_discrimination_trials": 100,
+    "visits": 3,
+    "visit_design": [
+      "Behavioral discrimination plus concurrent fMRI-EEG (~3 h)",
+      "Drug/placebo crossover (~2 h)",
+      "Crossover other condition (~2 h), >=7 days washout"
+    ],
+    "count_status": "No overall count specified for visual detection/pharmacology; do not reuse legacy 40-trial total."
+  },
+  "dependent_variables": [
+    "HEP mean amplitude, 250–400 ms post-R at Cz/FCz/Fz",
+    "Behavioral heartbeat-discrimination d-prime",
+    "Independent-sample HEP–d-prime association",
+    "Drug-placebo HEP percentage change and paired effect size",
+    "Central posterior alpha/beta task-epoch power change; peripheral pupil change reported separately",
+    "Within-participant aINS BOLD–HEP slope and pooled association"
+  ],
+  "primary_hypothesis": "All three behavioral, pharmacological and anatomical retention criteria jointly support full HEP proxy retention; results determine the registered downstream reclassification branches.",
+  "primary_analysis": "0.A: Pearson r with two-tailed alpha=0.01; Spearman robustness; independent validation r>=0.25 and 95% BCa CI excluding zero (10,000 resamples). 0.B: paired drug-placebo comparison, alpha=0.05, Cauchy scale 0.707 Bayesian paired t-test; HEP increase>=15%, d>=0.50 and BF10>=100 jointly, contingent on central engagement. 0.C: mixed model with random intercept and HEP slope by participant, HRV, respiration rate and global signal; standardized slope and pooled within-participant association separately reported; alpha=0.05.",
+  "power_analysis": {
+    "design_type": "frequentist",
+    "effect_size_r": 0.35,
+    "alpha": 0.01,
+    "power": 0.9,
+    "n_required": 115,
+    "test_type": "two-tailed",
+    "replication": "N>=30 estimation study; r>=0.25 and 95% BCa CI excludes zero; conjunction power unverified pending archived simulation."
+  },
+  "pre_registration": {
+    "platform": "OSF",
+    "project_url": "https://osf.io/t5hcq",
+    "base_registration_url": "https://osf.io/yk29g",
+    "base_registration_date": "2026-08-24",
+    "amendment": {
+      "number": 1,
+      "document_stated_date": "2026-10-16",
+      "identifier": null,
+      "verification_status": "Not independently verified; source date is after export date."
+    }
+  },
+  "apgi_parameters": {
+    "model": "Reduced empirical specification: seven core quantities plus somatic modulation; not eight freely fitted parameters in every dataset.",
+    "reduced_quantities": [
+      "theta_0",
+      "eta",
+      "tau_theta",
+      "gamma_sig",
+      "rho",
+      "Pi_i",
+      "Pi_e",
+      "beta_SM"
+    ],
+    "theta_0": {
+      "prior": "Normal(0.35, 0.2)",
+      "unit": "AU",
+      "registered_band": [
+        0.25,
+        0.85
+      ]
+    },
+    "gamma_sig": {
+      "range": [
+        2,
+        7.5
+      ],
+      "unit": "AU^-1",
+      "role": "population-fixed model sigmoid steepness; distinct from alpha_psy"
+    },
+    "tau_theta": {
+      "range_seconds": [
+        10,
+        30
+      ]
+    },
+    "tau_S": {
+      "range_seconds": [
+        0.2,
+        0.5
+      ]
+    },
+    "beta_SM": {
+      "typical_range": [
+        0.3,
+        0.7
+      ],
+      "role": "somatic modulation gain; not independently identifiable from Pi_i using behavior alone"
+    },
+    "kappa": {
+      "value": null,
+      "unit": "ATP/bit",
+      "status": "uncalibrated",
+      "role": "energy-information bridge only; never ignition steepness"
+    },
+    "gain_interpretation": "Pi_i in the reduced confirmatory model is salience-weighted gain; HEP is a candidate indicator, not a direct inverse-variance measurement.",
+    "accumulation": "S_next=(1-a_S)*S+a_S*u; a_S=1-exp(-dt/tau_S); u uses calibration-fixed relative gains and excess magnitudes abs(z)-sqrt(2/pi).",
+    "threshold": "dtheta/dt=-(theta-theta_0)/tau_theta+c_theta*C-Delta_info*V_info+gamma_NE*NE",
+    "somatic_modulation": "Pi_i_eff=Pi_i_baseline*exp(beta_SM*M_hat)",
+    "precision_adaptation": "dPi_i/dt=eta*(abs(epsilon_i)-Pi_i)+rho*(Pi_i_opt-Pi_i)",
+    "ignition": "p_k=1-exp(-r_max*sigmoid(gamma_sig*(S-theta))*dt); single trial-window sigmoid sampling is a distinct convention, never interchanged within a protocol.",
+    "time_step": "dt=0.01 s reduced reference; dt<=min(tau_S,tau_theta,tau_Pi)/10; active reservoir additionally requires dt<=tau_res/10.",
+    "parameter_manifest_status": "Required before confirmatory fitting; no unspecified coefficient is assigned a legacy default.",
+    "source": "OSF §§1.5–1.5.1; Mathematical Specification; Notation Appendix"
+  },
+  "ethics": {
+    "committee": "IRB / Ethics Committee",
+    "approval_status": "not_yet_submitted",
+    "protocol_number": null,
+    "approval_date": null,
+    "sponsoring_institution": null,
+    "source": "Protocols Table 1; OSF §3.4.1",
+    "enrollment_authorized": false,
+    "regulatory_requirements": [
+      "IRB approval",
+      "IND/CTA or applicable authorization",
+      "WHO-ICTRP primary-registry trial registration",
+      "Physician-approved drug/dose/infusion/co-medication/stopping addendum"
+    ]
+  },
+  "quality_and_decision_rules": {
+    "data_admissibility": "Apply registered quality gates before inference. Inadmissible data are exploratory, receive no Scenario A–F, and carry no framework vote.",
+    "scenarios": {
+      "A": "Scenario A — Confirmed. p < α and BF₁₀ ≥ 100. Both streams converge on H₁. Counted toward framework-level BY-FDR confirmation and toward the joint Bayesian meta-analysis. No additional replication is required before the claim is filed.",
+      "B": "Scenario B — Tentative confirmation. p < α and 3 ≤ BF₁₀ < 100. The frequentist threshold is met but Bayesian evidence is moderate rather than strong; reported as \"frequentist-significant, Bayesian moderate.\" One pre-registered independent replication is required before the result is elevated to confirmatory status, and that replication is registered before the primary result is published.",
+      "C": "Scenario C — Discordant (frequentist-positive, Bayesian-null). p < α and BF₁₀ < 3. The frequentist threshold is met but the Bayes factor provides less than moderate evidence for H₁ and may favor H₀. Classified as equivocal: the result neither confirms nor falsifies the prediction. It is flagged as equivocal in the results and recorded in the analysis log (not in the protocol-deviation register, which is reserved for departures from registered procedure). Independent replication at ≥ 90% power is required before any interpretation is made.",
+      "D": "Scenario D — Bayesian positive (without frequentist significance). p ≥ α and BF₁₀ ≥ 100. Strong probabilistic support for H₁ while the NHST threshold is missed. Not counted toward BY-FDR (which operates on the frequentist p-values). The original study plus one pre-registered replication are required for elevation to confirmatory status.",
+      "E": "Scenario E — Bayesian falsification. p ≥ α and BF₀₁ ≥ 6. The frequentist result is nonsignificant and the Bayesian analysis supports H₀. Classified as provisional falsification of the specific sub-prediction and reported as such in the primary manuscript. A single Scenario E result triggers independent replication at ≥ 90% power before the sub-prediction is declared definitively falsified, and triggers review of whether the framework-level falsification threshold has been reached (two or more Scenario E results across primary protocols; framework-level decision rule).",
+      "F": "Scenario F — Indeterminate. p ≥ α and 1/6 < BF₁₀ < 100 (i.e., neither BF₁₀ ≥ 100 nor BF₀₁ ≥ 6). Neither stream reaches a decision threshold. Classified as inconclusive: it carries no confirmatory or falsifying weight and is reported transparently as indeterminate. It may motivate a pre-registered replication but does not by itself trigger one, and it is never counted toward BY-FDR confirmation or framework-level falsification."
+    },
+    "exceptions": [
+      "Pred 1.E interval/model comparison",
+      "Pred 5.E interval equivalence",
+      "Pred 7.A cross-validated incremental prediction"
+    ],
+    "framework_family": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "framework_by_fdr_q": 0.05,
+    "framework_confirmation": "At least 4/5 primary protocols, combined hierarchical BF10>=100, and at most one Scenario E protocol. Protocol 0 is a gate; 2 contributes F2; 6 is CE.",
+    "protocol_alpha_specification": "Protocol 0 (HEP Proxy Validation): Primary correlation (Pred 0.A) α = 0.01, two-tailed. Pharmacological contrast (Pred 0.B) α = 0.05; pre-registered Bayesian confirmation threshold for this prediction is BF₁₀ ≥ 100, reflecting the heightened evidential standard required for pharmacological mechanism claims; this threshold is canonical and applies to both the summary table (Pred 0.B) and this section. fMRI-EEG tracking (Pred 0.C) α = 0.05. Failure of any single primary threshold triggers the targeted reclassification in the Protocol 0 decision tree; failure of ≥ 2 reclassifies all HEP-dependent confirmatory claims (Protocols 1, 5, 7) as exploratory.",
+    "decision_precedence": "Prediction-specific estimands, interval/evidence rules and admissibility gates govern over abbreviated source summaries. The A–F matrix applies only where both frequentist and Bayesian hypotheses are explicitly defined; do not invent a point-null Bayes factor. Nonsignificance or a point estimate alone does not establish equivalence or falsification; specificity requires a direct contrast. Unresolved interval bounds or multiplicity allocations require prospective analysis lock."
+  },
+  "submission_blocking_issues": [
+    "Pred 0.B central EEG engagement band/direction/normalization/window and authorized pharmacological protocol must be locked; no fixed dose schedule is authorized by this JSON.",
+    "Replication conjunction power simulation pending.",
+    "Pred 0.A/0.C source alternates > and >= at retention boundary; strict > used provisionally from prediction table; exact-boundary results require source clarification.",
+    "Final site-specific eligibility, approvals, roles, observation model and executable analysis manifest must be prospectively locked; source specification is not a completed operational study authorization."
+  ],
+  "specification_sections": [
+    {
+      "heading": "Validation of the Interoceptive Precision Proxy",
+      "source_start_paragraph_line": 1630,
+      "text": "Protocol 0 adjudicates the candidate HEP–interoceptive-gain mapping before HEP-dependent outcome unblinding. Full retention requires all three criteria; single unmet criteria invoke the targeted reclassification branches, and two or more unmet criteria invoke the broader suspension rule. Failure to meet a retention threshold is distinguished from evidence of invalidity. HEP-independent outcomes in Protocols 2 and 6 remain evaluable. A substitute proxy can support only a prospectively registered replacement measurement model and estimand; it cannot validate HEP-specific predictions.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Experimental Design",
+      "source_start_paragraph_line": 1638,
+      "text": "The protocol employs a within-subject design (N = 115 healthy adults; 90% power to detect r = 0.35 at α = 0.01, two-tailed; Fisher-z, n_required = 115) comprising three tasks across three visits — Visit 1 (behavioral heartbeat discrimination + concurrent fMRI-EEG, ~3 h) and Visits 2–3 (double-blind pharmacological crossover, ≥ 1 week washout, EEG + pupillometry, ~2 h each) — to triangulate the HEP proxy across behavioral, pharmacological, and neuroimaging domains.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Comparison Conditions",
+      "source_start_paragraph_line": 1642,
+      "text": "Behavioral Orthogonal Index: Interoceptive d′ derived from a heartbeat discrimination task, independent of EEG and calculated purely from behavioral accuracy and criterion.\n\nPharmacological Modulation: Double-blind, placebo-controlled crossover of physostigmine (1 mg IV, verified cholinergic probe) vs. saline, counterbalanced with ≥ 1-week washout.\n\nNeuroimaging Tracking: Trial-level HEP amplitude regressed against trial-level anterior insula (aINS) BOLD signal during a visual detection task.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Task Environments",
+      "source_start_paragraph_line": 1650,
+      "text": "Heartbeat Discrimination Task: 100 trials yielding interoceptive d′ as the orthogonal Πⁱ index.\n\nPharmacological Crossover: EEG and pupillometry recorded continuously throughout the physostigmine/saline infusion to verify target engagement (expected pupil constriction 0.5–1.0 mm) and measure HEP amplitude (250–400 ms post-R-peak). Because pupillary miosis indexes peripheral cholinesterase inhibition rather than central ACh elevation, central target engagement is additionally verified by a ≥ 10% change (vs. placebo) in parietal EEG spectral power, in posterior (parieto-occipital) alpha/beta power (8–30 Hz), with the exact band, direction, baseline normalization, post-dose window and threshold fixed in the Protocol 0 analysis script (immutable revision recorded in the manifest, tag v1.1) before unblinding. The band follows Bauer et al. (2012), who found with MEG that physostigmine enhanced attention-related alpha/beta modulation in visual cortex while leaving gamma unchanged; because that effect was attention-dependent, the marker is computed within task epochs. Pred 0.B's falsifier requires the central marker to confirm engagement; pupil constriction is reported as the peripheral check. Until this specification and the authorized pharmacological protocol are complete, Pred 0.B is not ready for confirmatory registration lock.\n\nConcurrent fMRI-EEG: Standard visual detection task with simultaneous 3T fMRI and 64-channel MR-compatible EEG. The primary ROI is the bilateral anterior insula (aINS; 5 mm sphere around MNI ±34, 14, 0).",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Methodological Rigor and Data-Lock Mechanism",
+      "source_start_paragraph_line": 1658,
+      "text": "Protocol 0 acts as a hard data-lock gate. Protocol 1 (Cardiac-EEG) data collected concurrently are sealed under a cryptographic data-lock (AES-256 at rest; k-of-n Shamir key custody across independent trustees; a physical air-gapped server is an acceptable but non-mandatory implementation) and released only upon presentation of the OSF-timestamped Protocol 0 final report. Any access log entry to the locked Protocol 1 dataset prior to key release constitutes a critical protocol deviation.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 0.A — Behavioral Convergence",
+      "source_start_paragraph_line": 1664,
+      "text": "HEP amplitude correlates significantly with the orthogonal behavioral Πⁱ index (interoceptive d′). Confirming: r > 0.35, p < 0.01, two-tailed. This tests whether HEP covaries with the behavioral interoceptive index; distinguishing precision from cardiac afference requires the convergent controls.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 0.B — Pharmacological Sensitivity",
+      "source_start_paragraph_line": 1668,
+      "text": "Elevating acetylcholine (ACh) via physostigmine increases HEP amplitude. Confirming criterion: HEP amplitude increases ≥ 15% vs. placebo (Cohen's d ≥ 0.50, BF₁₀ ≥ 100). This establishes that HEP is sensitive to the neuromodulatory gain mechanisms computationally defined as precision.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 0.C — Anatomical Specificity",
+      "source_start_paragraph_line": 1672,
+      "text": "Anterior insula BOLD tracks HEP trial-by-trial. Confirming: standardized within-participant HEP slope and pooled within-participant correlation (reported separately) ≥ 0.30 from a mixed-effects model with random slopes by participant, controlling for HRV, respiration rate, and global signal. This establishes that the HEP reflects insula-mediated precision computation rather than a peripheral cardiac-cortical artifact.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Falsification Criteria and Reclassification Decision Tree",
+      "source_start_paragraph_line": 1676,
+      "text": "Pred 0.A fails (r < 0.20): HEP reflects ACh/insula activity but not individual-level Πⁱ variation. Reclassify HEP as a state marker (manipulation check) only; all between-subject predictions using HEP become exploratory.\n\nPred 0.B not passed (d < 0.50, or BF₁₀ < 100 — a Scenario B or F outcome is 'not passed', not 'falsified'): HEP tracks interoception but not cholinergic precision. Reclassify HEP as an interoceptive attention proxy only; remove from neuromodulator mapping claims.\n\nPred 0.C retention criterion not met (aINS association): The registered insula-association criterion was not met. HEP is not interpreted as an insula-mediated index, and missing association evidence alone does not establish a peripheral origin; all claims requiring the insula-HEP mechanistic chain become exploratory.\n\n≥ 2 of Pred 0.A–0.C fail: Proxy insufficiently validated. The HEP-dependent confirmatory protocols are 1, 5 and 7; Protocol 4 carries secondary HEP analyses only, Protocol 3 is affected only through the Pred 0.C insula-mechanism branch, and Protocol 2 (simulation) and Protocol 6 (iEEG) do not use HEP and are unaffected by proxy outcome. These HEP-dependent conclusions are reclassified as exploratory pending proxy revalidation.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Protocol 0-B: Fallback Πⁱ Proxy Matrix (proxy contingency)",
+      "source_start_paragraph_line": 1686,
+      "text": "Because failure of the primary proxy could suspend some HEP-dependent claims, a ranked matrix of fallback Πⁱ proxies is pre-registered here, each with an independent Protocol-0-style validation criterion. Promotion of a fallback proxy is a pre-registered gated decision, not a post-hoc analyst choice; the ranking, criteria and decision rule below are fixed before any Protocol 0 unblinding.\n\n(1) Gastric myoelectric–cortical coupling (EGG). Coherence between the electrogastrogram (normogastric ~0.05 Hz) and spontaneous cortical activity indexes the gastric-interoceptive axis independently of the cardiac axis (Rebollo et al., 2018; Richter et al., 2017). Validation (Pred 0-B.1): EGG–cortical coupling correlates with orthogonal interoceptive d′ at r > 0.30 (p < 0.01) across two independent samples, with cholinergic-challenge sensitivity ≥ 10% (BF₁₀ ≥ 100).\n\n(2) Respiratory-sinus-arrhythmia-gated pupillometry (RSA-P). Task-evoked pupil dilation conditioned on respiratory phase provides an autonomic-interoceptive index; Respiration and R-R intervals, already recorded in Protocol 1, allow RSA to be derived; RSA-gated pupillometry is here promoted to a candidate Πⁱ proxy. Validation (Pred 0-B.2): the phase-gated pupil response correlates with interoceptive d′ at r > 0.25 (p < 0.01), with peripheral muscarinic blockade (glycopyrrolate) testing vagal specificity; any pharmacological validation arm requires its own regulatory approval and registration.\n\n(3) Anterior-insula multivoxel pattern analysis (aINS-MVPA). Where 3T fMRI is available (Protocol 3 infrastructure), a within-subject classifier on anterior-insula BOLD discriminates high- vs. low-interoceptive-precision states. Validation (Pred 0-B.3): cross-validated AUC ≥ 0.70 against the within-participant interoceptive-focus vs. exteroceptive-focus block contrast, with the decoded state predicting near-threshold ignition above stimulus intensity (ΔAUC ≥ 0.03). The MVPA class label is attentional condition (interoceptive-focus versus exteroceptive-focus), not a behavioral-accuracy tertile. Classifier validation does not independently establish decoded precision. The companion Protocols definition must use the same label; any change to a high-/low-gain state label requires an independently validated measurement definition and a prospective amendment.\n\nDecision rule. If the HEP proxy is insufficiently validated (≥ 2 of Pred 0.A–0.C not met), candidate fallback proxies are assessed strictly in the registered order (1) → (2) → (3) before any dependent outcome is unblinded; a proxy that fails its validation criterion may not be revisited. Passing a fallback criterion does not retain a specifically HEP prediction. The replacement manifest lists each transferable gain-dependent prediction with its new observation model, threshold, multiplicity and status, and each nontransferable HEP-amplitude or HEP-coupling prediction, which remains deferred or exploratory. No exteroceptive-only confirmatory target is promoted automatically after proxy failure; any such target requires a prospectively locked criterion and amendment. Pred 0-B.1–0-B.3 are evaluated under the Statistical Discordance Resolution Protocol (§3.5.2, Scenarios A–F).",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Primary analyses by prediction:",
+      "source_start_paragraph_line": 1700,
+      "text": "Pred 0.A — Pearson correlation between HEP amplitude and interoceptive d′, with non-parametric Spearman correlation as a pre-specified robustness check.\n\nPred 0.B — Paired t-test (physostigmine vs. placebo) with Bayesian paired t-test (Cauchy prior, r = 0.707). Confirmation requires d ≥ 0.50 and BF₁₀ ≥ 100, jointly. This single criterion authorizes no rounding up of a BF₁₀ below threshold.\n\nPred 0.C — Trial-level HEP amplitude regressed against trial-level aINS BOLD using linear mixed-effects models (random intercept and random HEP slope by participant; HRV, respiration rate, and global signal as fixed-effect nuisance covariates). Inference on the HEP fixed-effect slope.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    }
+  ],
+  "provenance": {
+    "source_files": [
+      {
+        "file": "OSF-Preregistration.docx",
+        "sha256": "ec17e6fcbe4a61d278baba42984734255e1b7b53607b30450b7d6e2334d26cd9"
+      },
+      {
+        "file": "Protocols.docx",
+        "sha256": "09a9d6c6d3827b4f8e320898f9cf0ba5fee0f85ae4198d783a5811cf9f6ff6d4"
+      },
+      {
+        "file": "Mathematical-Specification.docx",
+        "sha256": "6de4017113b2653c0d0b73ae22775f2cd32f3e8ca5c14d3d64da4130ea32f2fa"
+      },
+      {
+        "file": "Notation-Appendix.docx",
+        "sha256": "37f74a40313fb76210d43238429eb371d606996f0b758212b21db1f837ad4a82"
+      }
+    ],
+    "input_file": "protocol_0_hep_proxy_validation.json",
+    "input_sha256": "34dee2bcc93586f68c5fc8c3c296975d5f1fb7ea4bd88b420e3669dc4ff25e9b",
+    "input_version": "1.0.0",
+    "precedence": "OSF governs empirical design and statistical decisions; Mathematical Specification governs equations; Notation Appendix governs symbols. Detailed decision rules supersede shorthand summaries; unresolved conflicts are flagged.",
+    "legacy_policy": "Reconstructed from current specifications; unsupported apparatus, approvals, counts and numerical defaults are not silently carried forward.",
+    "source_excerpt_policy": "Specification sections preserve source context; structured decision rules and listed conflict resolutions govern this export. Editorial requests embedded in documents are not executed.",
+    "input_schema_sha256": "6696a50371fd1b695b03cba5d071dcd2d9c89f92642084de500f6bfdd2499070"
   },
   "eeg_analysis_pipeline": {
-    "bandpass_filter_hz": [
+    "sample_rate_hz": 1000,
+    "channels": 64,
+    "offline_reference": "average after RANSAC bad-channel interpolation",
+    "bandpass_hz": [
       0.1,
-      40
+      100
     ],
-    "epoch_window_ms": [
+    "stimulus_epoch_ms": [
       -200,
-      800
+      1000
     ],
-    "baseline_correction_ms": [
+    "stimulus_baseline_ms": [
       -200,
       0
     ],
-    "artifact_rejection_threshold_uv": 100,
+    "hep_epoch_ms": [
+      -200,
+      600
+    ],
     "hep_window_ms": [
       250,
       400
@@ -146,121 +386,127 @@
       "FCz",
       "Fz"
     ],
-    "ica_components": "Automated rejection of cardiac and ocular ICA components (EEGLAB ADJUST)",
-    "minimum_clean_epochs": 40,
-    "arousal_covariates": [
-      "HRV (RMSSD)",
-      "pupil diameter (z-scored per session)"
-    ]
+    "p3b_window_ms": [
+      250,
+      500
+    ],
+    "p3b_channels": [
+      "Pz",
+      "P3",
+      "P4"
+    ],
+    "artifact_peak_to_peak_uv": 150,
+    "maximum_rejected_fraction": 0.3,
+    "ica": "extended Infomax; ICLabel eye/muscle probability >0.80",
+    "cardiac_template_rejection_r": 0.8,
+    "residual_qrs_check": "> +/-2 uV at 0–80 ms triggers second ICA pass",
+    "hep_confirmation_conjuncts": [
+      "Surrogate-R-peak permutation p < applicable alpha",
+      "Effect survives ECG-amplitude covariate",
+      "Respiratory-phase covariate and registered respiratory exclusion applied"
+    ],
+    "respiratory_extrema_exclusion_ms": 100,
+    "rr_interval_ms": [
+      500,
+      1500
+    ],
+    "ectopic_rr_relative_deviation_maximum": 0.2,
+    "later_hep_robustness_window_ms": [
+      455,
+      595
+    ],
+    "complete_pipeline_source": "OSF §§4.1.1, 4.2.1; Appendix A"
   },
-  "fmri_analysis_pipeline_pred_0c": {
-    "preprocessing_software": "fMRIPrep 23.2 (BIDS-compatible)",
-    "spatial_smoothing_fwhm_mm": 6,
-    "motion_correction": "ICA-AROMA denoising; scrubbing at FD > 0.5 mm",
-    "GLM_regressor": "Single-trial HEP amplitude (250–400 ms, Cz) as parametric modulator of BOLD signal",
-    "roi": "Anterior insula (aINS): anatomical mask from AAL2 atlas",
-    "nuisance_regressors": "6 motion parameters, CSF signal, WM signal, cardiac noise (RETROICOR)",
-    "arousal_covariate": "Mean pupil diameter per TR, RMSSD per 30-s window"
+  "fmri_analysis_pipeline": {
+    "software": "fMRIPrep 23.2.3",
+    "tr_ms": 1000,
+    "te_ms": 30,
+    "flip_angle_degrees": 78,
+    "voxel_mm": [
+      2,
+      2,
+      2
+    ],
+    "multiband_factor": 4,
+    "smoothing_fwhm_mm": {
+      "roi": 5,
+      "whole_brain": 8
+    },
+    "highpass_seconds": 128,
+    "motion_parameters": 24,
+    "physiological_noise": "RETROICOR",
+    "aINS_roi": "5 mm sphere at MNI +/-34,14,0; Protocol 5 right only",
+    "source": "OSF §§4.1.3, 4.2.2"
   },
-  "dependent_variables": [
-    "Heartbeat discrimination d′ per participant (Pred 0.A)",
-    "HEP mean amplitude (250–400 ms) at Cz, FCz, Fz (all predictions)",
-    "r(HEP amplitude, heartbeat discrimination d′) — primary sample",
-    "r(HEP amplitude, heartbeat discrimination d′) — validation subsample (N ≥ 30)",
-    "HEP amplitude change: physostigmine vs. placebo, % and Cohen's d (Pred 0.B)",
-    "BF₁₀ for physostigmine HEP effect (Pred 0.B)",
-    "Pupil constriction onset time and magnitude: physostigmine vs. placebo (engagement check)",
-    "r(HEP amplitude, aINS BOLD) within participants after arousal covariate control (Pred 0.C)"
-  ],
-  "primary_hypothesis": "HEP amplitude in the 250–400 ms window serves as a valid proxy for interoceptive precision Πⁱ, evidenced by (1) correlation with orthogonal heartbeat discrimination d′ > 0.35 replicated across two independent samples, (2) significant increase under physostigmine-induced ACh elevation confirmed by pupillometry, and (3) within-participant tracking of anterior insula BOLD signal after arousal covariate control.",
-  "primary_analysis": "Pred 0.A: Pearson r between HEP amplitude and heartbeat d′; two-tailed test with pre-specified threshold r > 0.35 at p < 0.01; replicated in subsample. Pred 0.B: paired t-test (physostigmine vs. placebo) on HEP amplitude; Bayes Factor via JZS prior (r = 0.707). Pred 0.C: first-level GLM with single-trial HEP as parametric modulator; second-level t-test on aINS beta estimates; partial correlation controlling for pupil diameter and RMSSD.",
-  "power_analysis": {
-    "primary_test": "Pearson correlation r(HEP, interoceptive d′) — Pred 0.A",
-    "effect_size_r": 0.35,
-    "alpha": 0.01,
-    "tails": "two-tailed",
-    "power": 0.9,
-    "n_required": 114,
-    "n_target": 115,
-    "method": "Fisher-z transformation",
-    "software": "G*Power 3.1",
-    "secondary_test_pred_0b": "Physostigmine vs. placebo paired contrast, Cohen's d ≥ 0.50, BF₁₀ ≥ 100",
-    "based_on": "Canales-Johnson et al. (2020) HEP–interoception correlation r ≈ 0.38; Filippetti et al. (2022) physostigmine HEP effects d ≈ 0.55"
+  "proxy_gate": {
+    "full_retention": "All 0.A–0.C pass",
+    "A_only_not_met": "State/manipulation marker only; between-participant HEP claims exploratory, including 7.G.",
+    "B_only_not_met": "Interoceptive attention proxy only; neuromodulator mapping claims removed; retain eligible Protocol 1/5 uses.",
+    "C_only_not_met": "Insula-mediated interpretation unvalidated; affected mechanistic claims in 3/5 exploratory; eligible 1/7 retained.",
+    "two_or_more_not_met": "HEP-dependent claims in 1/5/7 exploratory; secondary HEP in 4 and insula interpretation in 3 affected; 2/6 unaffected.",
+    "inadmissible_data": "Do not count as failed tests or assign A–F.",
+    "indeterminate": "Proxy unvalidated is distinct from evidence of invalidity.",
+    "fallbacks": [
+      "EGG",
+      "RSA-gated pupillometry",
+      "aINS-MVPA"
+    ],
+    "fallback_rule": "Prospectively validate in ranked order; new observation model, thresholds and multiplicity required. HEP-specific predictions, including 7.G, cannot transfer."
   },
-  "pre_registration": {
-    "platform": "OSF",
-    "url": "https://osf.io/t5hcq",
-    "date": "2026-07-30",
-    "zenodo_doi": "10.5281/zenodo.21632264",
-    "orcid": "https://orcid.org/0009-0005-0328-2896"
+  "data_lock": {
+    "dependent_protocol": "APGI-P01",
+    "encryption": "AES-256",
+    "shamir_threshold": 2,
+    "custodians": 3,
+    "release_condition": "OSF-timestamped Protocol 0 final report, with applicable claim reclassification; not simply an all-pass requirement.",
+    "early_access": "Critical deviation; notify custodians and ethics committee, record in deviation register."
   },
-  "apgi_parameters": {
-    "kappa": 100,
-    "alpha": 0.3,
-    "beta_initial_estimate": 0.7,
-    "hep_pi_i_mapping": "HEP₂₅₀₋₄₀₀ = a₀ + a₁·Πⁱ + ε_HEP; a₁ > 0 required for proxy validity",
-    "pi_i_resting_estimate": 1.0
-  },
-  "ethics": {
-    "committee": "Institutional Review Board (includes pharmacology sub-board for physostigmine arm)",
-    "protocol_number": "IRB-2026-HEP-PROXY-XXX",
-    "approval_date": "2026-06-04",
-    "physostigmine_ind": "Physostigmine administered under IND or equivalent local regulatory approval; physician present during infusion"
-  },
-  "submission_blocking_issues": [],
-  "caveats": [
-    "Pred 0.B requires a separate pharmacological sub-session; if physostigmine arm cannot be completed (regulatory or safety reasons), Pred 0.B is downgraded to 'deferred' and does not block submission provided Pred 0.A and 0.C both pass.",
-    "Pred 0.C requires simultaneous EEG-fMRI, which introduces MRI gradient artifacts in EEG; ICA-based artifact removal is mandatory before HEP computation in scanner.",
-    "Heartbeat discrimination d′ is subject to demand characteristics; task instructions must avoid mentioning heartbeats to prevent voluntary respiratory synchronisation."
-  ],
-  "fallback_proxy_matrix": {
-    "protocol_id": "APGI-P00-B",
-    "title": "Protocol 0-B (Proxy Contingency): Fallback Πⁱ Proxy Matrix",
-    "trigger": "≥ 2 of Pred 0.A–0.C not met",
-    "decision_rule": "The highest-ranked fallback proxy whose infrastructure is available is elevated to primary Πⁱ proxy and its Protocol 0-B validation is executed before any confirmatory unblinding. Protocols 1, 4, 5 and 7 retain confirmatory status only if the substitute proxy passes. If no fallback proxy passes, interoceptive-precision predictions are reported as exploratory and the exteroceptive-only reduction of the ignition model (Πⁱ_eff omitted) becomes the pre-registered confirmatory target.",
-    "ranked_fallbacks": [
-      {
-        "rank": 1,
-        "id": "Pred 0-B.1",
-        "proxy": "Gastric myoelectric–cortical coupling (EGG)",
-        "validation": "EGG–cortical coupling correlates with orthogonal interoceptive d′ at r > 0.30 (p < 0.01) across two independent samples, with cholinergic-challenge sensitivity ≥ 10% (BF₁₀ ≥ 30)",
-        "references": "Rebollo et al., 2018; Richter et al., 2017"
-      },
-      {
-        "rank": 2,
-        "id": "Pred 0-B.2",
-        "proxy": "Respiratory-sinus-arrhythmia-gated pupillometry (RSA-P)",
-        "validation": "Phase-gated pupil response correlates with interoceptive d′ at r > 0.25 (p < 0.01), with beta-adrenergic blockade (propranolol) confirming autonomic specificity"
-      },
-      {
-        "rank": 3,
-        "id": "Pred 0-B.3",
-        "proxy": "Anterior-insula multivoxel pattern analysis (aINS-MVPA)",
-        "validation": "Cross-validated AUC ≥ 0.70 against the behavioural interoceptive-precision tertile, with the decoded state predicting near-threshold ignition above stimulus intensity (ΔAUC ≥ 0.03)"
-      }
-    ]
-  },
-  "reclassification_decision_tree": [
+  "methods_source_sections": [
     {
-      "failure_pattern": "Pred 0.A fails (r < 0.20); 0.B and 0.C pass",
-      "action": "HEP reclassified as a state marker (manipulation check), not a trait Πⁱ index; all between-subject HEP predictions become exploratory; within-manipulation HEP contrasts retain confirmatory status"
+      "heading": "Outliers and influence",
+      "text": "4.3.2 Outlier and influential-observation policy\n\nAll rules below are fixed pre-collection and apply to every protocol unless a protocol body specifies otherwise; no post-hoc outlier rule may be introduced. (a) Trial level. Scalp-EEG trials exceeding the 150 µV peak-to-peak criterion (§4.2.1) are rejected; iEEG trials follow the interictal-discharge and |z| > 6 rule of §Protocol 6; behavioral trials in speeded detection tasks with RT < 150 ms or > 3 s are rejected as anticipations or lapses (Protocol 2 IGT and Protocol 7 bedside tasks use the rules in their protocol bodies). No further trial-level trimming is permitted. (b) Participant level. A participant is excluded only for a pre-registered admissibility failure (> 30% trial rejection, Data-Admissibility Gate; failed manipulation check; protocol violation). Statistical outlyingness is never itself an exclusion ground. (c) Observation level in models. Continuous predictors and outcomes are winsorized at ±3 SD within participant before entry into any confirmatory model; the untrimmed analysis is reported alongside as a mandatory sensitivity analysis, and a discrepancy in the confirmatory decision between the two is reported as an instability flag. (d) Influence. For every confirmatory regression or mixed model, Cook's distance is computed and observations with D > 4/n are reported; the model is refit without them as a sensitivity analysis. The trimmed refit is never the confirmatory result. (e) Model diagnostics and fallback. Gaussian models use the registered residual diagnostics; binary/ordinal generalized models use distribution-appropriate simulation or predictive diagnostics, not a Shapiro–Wilk residual gate. Appendix C must identify the exact estimator, tuning constants, inferential test and Bayesian evidence computation for each permitted fallback before lock. A fallback not so specified is a sensitivity analysis and cannot replace the primary confirmatory estimator."
     },
     {
-      "failure_pattern": "Pred 0.B fails; 0.A and 0.C pass",
-      "action": "HEP reclassified as an interoceptive-attention proxy only; removed from neuromodulator mapping claims in Protocol 5; retained for Protocols 1 and 4"
+      "heading": "Bayesian prior sensitivity",
+      "text": "Sensitivity analyses\n\nAll confirmatory Bayesian conclusions are re-run under fixed prior transformations. Normal and HalfNormal priors: scale multiplied by 2 and by ½, location and support unchanged. Beta(2, 5) prior on η_RL: mean (2/7) preserved and concentration (sum of shape parameters, 7) multiplied by 2 and by ½, giving Beta(4, 10) and Beta(1, 2.5). Fixed parameters remain fixed or vary over a separately registered grid. Every evidence and interval criterion is recomputed under each sensitivity prior; if a conclusion crosses a §3.5.2 decision boundary (BF₁₀ = 3 or 100, BF₀₁ = 6), it is reported as prior-sensitive and reclassified as exploratory."
     },
     {
-      "failure_pattern": "Pred 0.C fails; 0.A and 0.B pass",
-      "action": "HEP reclassified as a peripheral cardiac-cortical index; claims requiring the insula–HEP mechanistic chain (Protocols 5 and 3) become exploratory; Protocols 1 and 7 retain confirmatory status"
+      "heading": "Scalp EEG acquisition",
+      "text": "4.1.1 Scalp EEG (Protocols 0, 1, 4, 5, 7)\n\nEEG will be acquired at 1000 Hz (TMS-EEG in Protocol 5: ≥ 5000 Hz on a TMS-compatible amplifier) using a 64-channel active electrode system (BrainProducts actiCHamp or equivalent). Electrode positions will be digitized using 3D photogrammetry (EGI Geodesic or equivalent). Online reference (all protocols): single physical reference at FCz (or the amplifier's default), with A1/A2 or TP9/TP10 recorded as separate channels. Post-acquisition re-referencing (all protocols): average reference after RANSAC bad-channel interpolation (correlation threshold < 0.85 with neighbors). Sites using mastoid-referenced amplifiers must apply offline average-reference conversion before any cross-protocol pooling. The acquisition target is impedance < 10 kΩ. For 10–20 kΩ, the technician attempts correction and records the affected electrodes; data remain admissible only if the registered signal-quality and bad-channel criteria pass. Impedance > 20 kΩ invokes the registered corrective/admissibility procedure. Impedance alone does not override the trial-quality gate.\n\nECG will be simultaneously recorded for HEP analysis (Lead II configuration). Skin conductance (SCR/EDA) will be acquired at 100 Hz from the thenar and hypothenar eminences of the non-dominant hand. Respiration will be recorded via respiratory inductance plethysmography or nasal thermistor (§4.2.1). All auxiliary channels will be synchronized with EEG via trigger pulses with sub-millisecond accuracy.\n\nHeartbeat-evoked potential (HEP) analysis: epochs from −200 to +600 ms relative to the R-peak will be extracted after artifact rejection; the HEP analysis window is 250–400 ms post-R-peak (Appendix A). Ectopic beats are excluded when the R-R interval deviates by > 20% from the median of the five preceding intervals, and R-R intervals outside 500–1500 ms (40–120 bpm) are excluded. Exclusion counts are reported per condition, and differential exclusion between the drug and placebo arms of Protocol 0 is tested. HEP amplitude will be quantified as mean amplitude in the 250–400 ms window over frontocentral electrodes (Fz, FCz, Cz)."
     },
     {
-      "failure_pattern": "≥ 2 of Pred 0.A–0.C fail",
-      "action": "HEP-dependent confirmatory protocols (1, 4, 5, 7) relegate HEP to a secondary descriptive measure pending revalidation via the Protocol 0-B fallback matrix. Protocols 2 (simulation) and 6 (iEEG) do not use HEP and are unaffected"
+      "heading": "EEG preprocessing and mandatory HEP controls",
+      "text": "4.2.1 EEG Pre-Processing\n\nEEG preprocessing will follow the PREP pipeline (Bigdely-Shamlo et al., 2015) supplemented by custom APGI-specific steps:\n\nRe-reference to average reference (all electrodes except those flagged as bad) after RANSAC bad channel interpolation (threshold: correlation < 0.85 with neighboring channels). This is the binding cross-protocol standard; protocol-specific mastoid references noted in companion documents are superseded for all pooled analyses.\nBandpass filter: 0.1–100 Hz (zero-phase FIR, Hamming window); notch filter at the local mains frequency (50 or 60 Hz) and harmonics. The 0.1–100 Hz pipeline applies to standard ERP analyses only. Infraslow/PAC analyses use a separately frozen branch: DC-coupled (or hardware high-pass ≤ 0.005 Hz) acquisition, a 0.005–100 Hz zero-phase FIR passband, continuous segments of ≥ 30 min for Pred 7.E (≥ 500 s for the MS-H1 infraslow test; §Spectral Fitting Parameters), and removal of the first and last 60 s of each segment to exclude filter transients. Frequencies removed by acquisition or filtering are not reconstructed; a dataset not meeting the DC/≤ 0.005 Hz requirement has its infraslow test deferred\nIndependent Component Analysis (ICA): extended Infomax (MNE-Python); components classified using ICLabel (threshold: eye artifact > 0.80, muscle artifact > 0.80, reject)\nHEP-specific artifact control (binding for all HEP measurement in Protocols 0, 1, 4, 5 and 7). The following supersede the generic ICLabel step for any analysis in which HEP amplitude is a dependent or independent variable, and are mandatory rather than advisory.\nCardiac field artifact — three-stage removal pipeline, applied in sequence. (a) ICA decomposition with cardiac component identification via template matching to simultaneously recorded ECG; a correlation of r > 0.80 with the ECG template is required for rejection. (b) Residual artifact inspection via visual review of the grand-average HEP time-locked to the QRS peak; any deflection exceeding ±2 µV in the 0–80 ms window indicates insufficient cardiac removal and triggers a second ICA pass. (c) HEP analysis restricted to the 250–400 ms post-R-peak window, which lies outside the QRS complex but overlaps the T-wave / cardiac field artifact (CFA, peaking ≈ 300 ms post-R); a surrogate-R-peak control (HEP recomputed on R-peaks shuffled within the participant's R-R distribution) and an ECG-amplitude covariate are confirmatory conjuncts: a primary HEP effect is confirmed only if it exceeds the surrogate distribution (permutation p < α) and survives the ECG covariate. The later window (455–595 ms) is reported as a robustness check. The 250–400 ms window is canonical; deviation requires explicit justification and artifact-check documentation filed as a protocol amendment.\nRespiratory phase. Continuous respiratory monitoring via respiratory inductance plethysmography or nasal thermistor throughout all HEP recording sessions. Any trial in which the R-peak falls within 100 ms of a respiratory peak or trough — defined as the extrema of the bandpass-filtered (0.1–0.5 Hz) respiratory signal — is excluded from HEP analysis. Respiratory phase is additionally included as a nuisance covariate in all HEP general linear models, and reported HEP effects must survive this covariate. If the respiratory covariate absorbs more than 30% of the HEP variance in the primary contrast (partial η² > 0.30), the result is flagged as potentially confounded and reported with a confound-warning label pending replication under paced breathing.\nArousal. Pupil diameter (baseline-corrected, 200–500 ms post-R-peak) is recorded on all trials via high-speed eyetracking (≥ 500 Hz, constant luminance). Any primary HEP–P3b association is reported both uncorrected and as a partial correlation controlling for trial-level pupil diameter; see Pred 1.D for the binding thresholds.\nNon-compliance. An analysis that omits any stage of this pipeline is automatically exploratory under §3.5.3 and carries no framework-level weight.\nEpoch extraction: −200 to +1000 ms relative to stimulus onset; baseline correction −200 to 0 ms\nArtifact rejection: trial-level peak-to-peak amplitude threshold of 150 µV (series-canonical): a trial is rejected when max(x) − min(x) > 150 µV within the analysis epoch on any scalp channel; peak-to-peak amplitudes are nonnegative; the ±200 µV online monitor threshold is a technician alert, not a rejection criterion; linear detrending; muscle artifact detection via high-frequency power (> 3 SD from mean)\nParticipants with > 30% rejected trials fail the registered admissibility gate. Report enrolled, excluded and analyzable counts separately. Replacement recruitment is permitted only within the protocol’s preregistered enrollment cap and stopping rules; exceeding that cap requires an amendment before additional recruitment. Excluded participants remain in the recruitment and adverse-event accounting."
     },
     {
-      "failure_pattern": "Any prediction inconclusive (p ≥ α with 1/3 < BF₁₀ < 3)",
-      "action": "Protocol 0 extended to the pre-registered maximum N; if exhausted, affected downstream claims are labelled 'proxy-unvalidated' (neither confirmatory nor reclassified) and Stage 2 reporting states that the gate did not resolve"
+      "heading": "Protocol-specific ethics and regulatory source",
+      "text": "Protocol 0 (HEP Proxy Validation) — Pharmacological Study with IV Physostigmine\n\nStatus: Ethics approval pending at time of registration lock.\nRegulatory requirements: Intravenous physostigmine (1 mg) administered in double-blind, placebo-controlled crossover to healthy volunteers (N = 115) in a clinical research suite outside the scanner, under continuous ECG, HR and BP monitoring with a physician present constitutes an investigational medicinal product (IMP) in most jurisdictions, requiring an IND (US) or a Clinical Trial Application under EU Regulation 536/2014 (UK: CTIMP authorization), sponsor designation, pharmacovigilance, prospective trial registration and IRB/Ethics Committee oversight.\nCommittee: Protocol is registered as a planned study and the registration will be amended with committee name, institution, approval number and date before any participant is approached.\nExclusions: Asthma, severe bradycardia (< 50 bpm resting), cardiac arrhythmia, uncontrolled hypertension, pregnancy.\nInformed consent: Full written consent with specific disclosure of physostigmine pharmacokinetics, cholinergic side effects, and MRI-related risks. Consent instrument to be deposited on OSF before data collection.\nAdverse event monitoring: Real-time heart-rate and BP monitoring; stopping criteria: systolic BP > 160 mmHg, HR < 45 or > 120 bpm, chest pain, dyspnea, bronchospasm or SpO₂ < 94%; atropine and resuscitation equipment immediately available; adverse events graded by CTCAE v5.0 and reported on ICH E2A timelines. Protocol 0 pharmacology is incomplete pending the physician-approved infusion rate, duration, co-medication schedule, eligibility and stopping specification, and applicable regulatory authorization. The approved protocol identifier/version and complete administration specification must be incorporated before registration lock or recruitment; this draft does not authorize drug administration."
     }
   ],
-  "source_of_truth": "APGI-Protocols.md (Protocols & Prediction Registry) and APGI-OSF-Preregistration.md. Where the two disagree with stored values, the documents govern. Deposited on OSF (osf.io/t5hcq) and archived at Zenodo (DOI 10.5281/zenodo.21632264)."
+  "readiness": {
+    "status": "specification_updated_lock_requirements_pending",
+    "empirical_validation_performed": false,
+    "registration_verified": false,
+    "note": "JSON validation checks file structure, not scientific validity, regulatory approval or analysis-lock completion."
+  },
+  "safety_monitoring": {
+    "source": "OSF §3.4.1; physician-authorized complete protocol still pending",
+    "monitoring": [
+      "ECG",
+      "HR",
+      "BP",
+      "SpO2"
+    ],
+    "physician_present": true,
+    "stop": [
+      "Systolic BP>160 mmHg",
+      "HR<45 or >120 bpm",
+      "Chest pain",
+      "Dyspnea",
+      "Bronchospasm",
+      "SpO2<94%"
+    ],
+    "emergency_readiness": "Atropine and resuscitation equipment immediately available",
+    "administration_authorized_by_export": false
+  }
 }

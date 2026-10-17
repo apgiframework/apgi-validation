@@ -3168,6 +3168,7 @@ except ImportError:
 
 try:
     from utils.protocol_loader import load_protocol as _load_protocol
+    from utils.protocol_loader import spec_prediction_results
 
     _PROTOCOL_SPEC = _load_protocol("APGI-P01")
 except Exception:
@@ -3190,19 +3191,12 @@ def run_protocol_main(config=None):
             status=(PredictionStatus.PASSED if pred_data.get("passed", False) else PredictionStatus.FAILED),
         )
 
-    # Add JSON protocol sub-predictions (P1a, P1b, P1c from APGI-P01)
-    if _PROTOCOL_SPEC is not None:
-        _pred_map = {"P1a": "V9.1", "P1b": "V9.2", "P1c": "V9.3"}
-        for sub_pred in _PROTOCOL_SPEC.sub_predictions:
-            linked_v = _pred_map.get(sub_pred.id)
-            passed = named_predictions[linked_v].passed if linked_v in named_predictions else False
-            named_predictions[sub_pred.id] = PredictionResult(
-                passed=passed,
-                status=PredictionStatus.PASSED if passed else PredictionStatus.FAILED,
-                name=sub_pred.claim,
-                evidence=[sub_pred.confirming_evidence],
-                sources=["APGI-P01", "VP_09_NeuralSignaturesEmpiricalPriority1"],
-            )
+    # Registered APGI-P01 predictions (Pred 1.A–1.F). V9.1–V9.3 test clinical
+    # symptom, treatment and biomarker prediction, none of which is a Protocol 1
+    # test, so every registered prediction is reported INDETERMINATE.
+    named_predictions.update(
+        spec_prediction_results(_PROTOCOL_SPEC, named_predictions, {}, ["VP_09_NeuralSignaturesEmpiricalPriority1"])
+    )
 
     spec_params = _PROTOCOL_SPEC.apgi_parameters if _PROTOCOL_SPEC else {}
     return ProtocolResult(

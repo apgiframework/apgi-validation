@@ -55,6 +55,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Schema, cross-field and MANIFEST checks for protocols/ (release 1.1.0),
+      # the same gate apgi-framework runs on its copy of the specification.
+      - name: Validate protocol specification
+        run: python scripts/validate_protocols.py
+
       # The full suite, with the coverage gate from pytest.ini enforced.
       # No `|| true`: a failing test fails the build.
       - name: Run test suite

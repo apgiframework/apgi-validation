@@ -1174,7 +1174,7 @@ def main(**kwargs: Any) -> Dict[str, Any]:
 
 
 class SomaticMarkerModule:
-    """TheoryModuleInterface implementation — linked to APGI-P03.
+    """TheoryModuleInterface implementation — linked to APGI-P02.
 
     Wraps APGI_Somatic_Marker_Identifiability for uniform invocation by
     VP/FP aggregators via TheoryModuleInterface.
@@ -1212,7 +1212,7 @@ class SomaticMarkerModule:
             named[key] = PredictionResult(
                 passed=passed,
                 status=PredictionStatus.PASSED if passed else PredictionStatus.NOT_EVALUATED,
-                sources=[protocol_id, "APGI-P03"],
+                sources=[protocol_id, "APGI-P02"],
                 metadata=spec,
             )
         return ProtocolResult(
@@ -1220,7 +1220,7 @@ class SomaticMarkerModule:
             named_predictions=named,
             completion_percentage=100 if raw.get("passed") is not None else 0,
             methodology=self.MODULE_LEVEL,
-            metadata={"module_level": self.MODULE_LEVEL, "linked_spec": "APGI-P03"},
+            metadata={"module_level": self.MODULE_LEVEL, "linked_spec": "APGI-P02"},
         ).to_dict()
 
 

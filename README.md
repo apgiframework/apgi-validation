@@ -2,7 +2,7 @@
 
 A computational framework for validating and falsifying Active Inference and Predictive Processing models through systematic experimentation.
 
-This repository contains all code needed to reproduce the validation protocols, falsification tests, and computational benchmarks presented in our work on the Active Perception and Global Ignition (APGI) theory framework.
+This repository contains all code needed to reproduce the validation protocols, falsification tests, and computational benchmarks presented in our work on the Allostatic Precision-Gated Ignition (APGI) theory framework.
 
 ---
 
@@ -140,6 +140,51 @@ The theoretical foundation of APGI is implemented in the `Theory/` directory:
 - **`APGI_Turing_Machine.py`** - Turing-complete APGI computation model
 
 All theory modules can be run independently or through the unified CLI in `main.py`.
+
+---
+
+## Protocol Specification (v1.1.0)
+
+`protocols/` holds the eight registered experimental protocols (Protocol 0–7) at
+specification release **1.1.0**, byte-identical to the copy in
+[apgi-framework](https://github.com/apgiframework/apgi-framework/tree/main/protocols).
+`protocols/CHANGELOG.md` lists every change from 1.0 and the source-lock
+requirements that remain open; `protocols/MANIFEST.json` pins each file's SHA-256.
+
+| ID | File | Registered predictions |
+|----|------|------------------------|
+| APGI-P00 | `protocol_0_hep_proxy_validation.json` | Pred 0.A–0.C |
+| APGI-P01 | `protocol_1_cardiac_eeg.json` | Pred 1.A–1.F |
+| APGI-P02 | `protocol_2_somatic_agent_sim.json` | Pred 2.A–2.G |
+| APGI-P03 | `protocol_3_anticipation_fmri.json` | Pred 3.A–3.D |
+| APGI-P04 | `protocol_4_metabolic_crossover.json` | Pred 4.A–4.C |
+| APGI-P05 | `protocol_5_causal_tms.json` | Pred 5.A–5.E |
+| APGI-P06 | `protocol_6_ignition_ieeg.json` | Pred 6.A–6.E |
+| APGI-P07 | `protocol_7_doc_biomarker.json` | Pred 7.A–7.G (7.G primary) |
+
+Validate the release (schema, cross-field arithmetic, exact Protocol 0–7
+membership and manifest checksums); CI runs the same check:
+
+```bash
+make protocols-check   # python3 scripts/validate_protocols.py
+```
+
+Rules the validation code follows under 1.1.0:
+
+- **Three-way verdicts.** Each registered prediction is CONFIRMED, FALSIFIED or
+  INDETERMINATE (`utils.protocol_loader.classify_prediction`). A failure to confirm
+  is not falsification. The simulations here never apply a registered falsifying
+  rule to empirical data, so they report a registered prediction as confirmed
+  (synthetic) or INDETERMINATE, never as falsified.
+- **κ is uncalibrated.** `apgi_parameters.kappa.value` is `null`; it is the ATP/bit
+  energy–information bridge, never the ignition steepness (`gamma_sig`).
+- **No legacy defaults.** `KAPPA = 100`, `ALPHA = 0.3` and `BETA = 0.7` are not
+  registered values; read thresholds and cohort sizes from the protocol JSON.
+- **Status, not validation.** Every protocol is `pre_collection`; passing the
+  validator checks structure, not scientific validity or regulatory approval.
+
+The pre-1.1 typed-benchmark template now lives at
+`config/apgi_protocol_template.json` for reference only.
 
 ---
 
@@ -289,6 +334,8 @@ apgi-validation/
 │   ├── cache_manager.py       # Cache governance
 │   ├── data_protection.py     # Data protection workflows
 │   └── ...
+├── protocols/                 # Protocol specification release 1.1.0 (JSON + schema)
+├── scripts/                   # validate_protocols.py
 ├── config/                    # Configuration files
 ├── data_repository/           # Data storage
 │   ├── empirical_data/

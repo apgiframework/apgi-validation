@@ -1,323 +1,475 @@
 {
+  "$schema": "schemas/protocol.schema.json",
+  "schema_version": "1.1.0",
   "protocol_id": "APGI-P02",
   "registry_ep": "EP-2",
   "registry_protocol_label": "Protocol 2 — Somatic-AgentSim",
   "title": "Active Inference Agent Simulations: Adaptive Advantages of Somatic Markers",
   "paper": "APGI Paper 1",
   "osf_url": "https://osf.io/t5hcq",
-  "zenodo_doi": "10.5281/zenodo.21632264",
-  "zenodo_url": "https://doi.org/10.5281/zenodo.21632264",
-  "code_repository": "https://github.com/apgiframework/apgi-implementation",
-  "code_repository_org": "https://github.com/apgiframework",
-  "orcid": "https://orcid.org/0009-0005-0328-2896",
-  "version": "2.1.0",
-  "last_updated": "2026-07-30",
-  "description": "Computational agent simulations test whether somatic marker integration M̂(c,a) = γ_V·V(c,a) + γ_A·A(c,a) confers measurable adaptive advantages over APGI agents lacking somatic marker function. Agents are evaluated on embodied decision tasks under volatility conditions where rapid threshold adaptation is required. Five sub-predictions are tested: (Pred 2.a) full APGI agents converge within 50–80 trials matching human IGT performance and outperform both GNWT-only and Standard PP agents in cumulative reward — all three pairwise comparisons significant; (Pred 2.b) post-ignition action selection entropy increases versus pre-ignition baseline, with 70–85% of ignition events satisfying Πⁱ·|zⁱ| > Πᵉ·|zᵉ|; (Pred 2.c) somatic marker retrieval M̂ temporally precedes threshold crossing θₜ; (Pred 2.d) β_SM lesion specifically degrades performance more than other single-parameter lesions, with the deficit largest in high-volatility blocks (σ_env = 0.6); and (Pred 2.e) the full APGI generative model achieves lower BIC than Standard PP and GNWT-only when fit to human IGT trial-by-trial choice sequences. Fully validated via APGI_Somatic_Marker_Identifiability.py.",
-  "prediction_cluster": "Pred 2.A–2.E",
-  "prediction_cluster_label": "Adaptive Advantages of Somatic Markers (Simulation + Model Comparison)",
+  "version": "1.1.0",
+  "last_updated": "2026-10-16",
+  "specification_date": "2026-10-16",
+  "study_status": "pre_collection",
+  "description": "Seven-architecture active-inference simulation benchmark with separate held-out human IGT model comparison; CP-3a calibration and identifiability are prerequisites. Pred 2.F–2.G are exploratory.",
+  "prediction_cluster": "Pred 2.A–G",
   "sub_predictions": [
     {
       "id": "Pred 2.A",
-      "claim": "Full APGI agents converge within 50–80 trials matching human IGT performance. APGI > GNWT-only > Standard PP in cumulative reward ranking (all three pairwise comparisons).",
-      "confirming_evidence": "APGI convergence within 50–80 trials; reward ratio APGI/β_SM-lesion > 1.15; APGI > GNWT-only > Pure PP in cumulative reward (all pairwise permutation p < 0.05). Advantage must emerge within 80 trials not just cumulatively.",
-      "falsifying_evidence": "No significant pairwise performance advantage across all volatility conditions; or APGI fails convergence within 80 trials even when cumulative reward advantage present.",
+      "status": "confirmatory",
+      "claim": "Full APGI agents converge within 50–80 trials (matching human IGT)",
+      "confirming_evidence": "APGI convergence within 50–80 trials (necessary) and reward ratio APGI/β_SM-lesion > 1.15 (permutation p < 0.01)",
+      "falsifying_evidence": "Convergence outside 50–80 trials, or not significantly faster than GNWT-only (Mann–Whitney p ≥ 0.01)",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "convergence_trials_window": [
+        "convergence_trials": [
           50,
           80
         ],
-        "reward_ratio_apgi_lesion_minimum": 1.15,
-        "pairwise_comparisons": [
-          "APGI > GNWT-only",
-          "APGI > Standard_PP",
-          "GNWT-only > Standard_PP"
-        ],
-        "permutation_p_threshold": 0.05,
-        "advantage_emergence_trial_cap": 80,
-        "reward_advantage_percent_range": [
-          15,
-          25
-        ],
-        "comparator_convergence": {
-          "beta_SM_lesion_trials_minimum": 150,
-          "GNWT_only_trials_range": [
-            100,
-            120
-          ]
-        }
-      },
-      "falsifying_thresholds": {
-        "condition_1": "No significant pairwise performance advantage across all volatility conditions",
-        "condition_2": "All agent types converge within equivalent trial windows (difference < 5%)"
+        "reward_ratio_strict_minimum": 1.15,
+        "permutation_alpha": 0.01
       }
     },
     {
       "id": "Pred 2.B",
-      "claim": "Interoceptive dominance at ignition: ≥ 70–85% of ignition events satisfy Πⁱ·|zⁱ| > Πᵉ·|zᵉ| — the interoceptive precision-weighted prediction error exceeds the exteroceptive one at the moment of threshold crossing. Mechanistic (composition of the trigger), not consequential.",
-      "confirming_evidence": "≥ 70–85% of ignition events satisfy Πⁱ·|zⁱ| > Πᵉ·|zᵉ|; the proportion exceeds the pre-registered 60% floor (binomial p < 0.05)",
-      "falsifying_evidence": "< 60% of ignition events interoceptively dominant (Πⁱ·|zⁱ| ≤ Πᵉ·|zᵉ| in the majority of events)",
+      "status": "confirmatory",
+      "claim": "70–85% of ignition events show interoceptive dominance (Πⁱ·|zⁱ| > Πᵉ·|zᵉ|)",
+      "confirming_evidence": "70–85% of ignition events satisfy Πⁱ·|zⁱ| > Πᵉ·|zᵉ| (interoceptive dominance); proportion exceeds the pre-registered 60% floor (binomial p < 0.01)",
+      "falsifying_evidence": "<60% of ignition events interoceptively dominant",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "interoceptive_dominance_proportion_range": [
+        "dominance_fraction_range": [
           0.7,
           0.85
         ],
-        "interoceptive_dominance_floor": 0.6,
-        "binomial_p_threshold": 0.05,
-        "criterion": "Πⁱ·|zⁱ| > Πᵉ·|zᵉ|"
+        "floor": 0.6,
+        "binomial_alpha": 0.01
       },
-      "falsifying_thresholds": {
-        "interoceptive_dominance_proportion_threshold": 0.6,
-        "condition": "< 60% of ignition events satisfy criterion — independently falsified"
-      },
-      "note": "Post-ignition action-selection entropy was moved to Pred 2.F-flex (exploratory), per APGI-Protocols.md Protocol 2 sub-prediction table."
+      "interpretation": "Property of implemented model under frozen environment; not independent empirical confirmation."
     },
     {
       "id": "Pred 2.C",
-      "claim": "Somatic marker retrieval M̂ temporally precedes threshold crossing θₜ (cross-correlation peak at negative lag).",
-      "confirming_evidence": "Cross-correlation analysis (lag −5 to +5 trials): M̂ leads θₜ crossing by ≥ 1 trial in ≥ 75% of ignition events; Kendall τ > 0.3 at negative lag.",
-      "falsifying_evidence": "M̂ activation simultaneous with or lagging threshold crossing; cross-correlation peak at lag 0 or positive.",
+      "status": "confirmatory",
+      "claim": "Somatic marker retrieval (M̂) temporally precedes threshold crossing (θₜ)",
+      "confirming_evidence": "Cross-correlation peak at negative lag; M_hat leads by >=1 trial in >=75% of ignition events, with Kendall tau >0.3. The confirmatory statistic is median within-seed tau across independent seeds, with a seed-level bootstrap 95% CI.",
+      "falsifying_evidence": "M̂ activation simultaneous with or lagging threshold crossing",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "cross_correlation_lag_range": [
-          -5,
-          5
-        ],
-        "m_hat_lead_trials_minimum": 1,
-        "proportion_ignition_events_minimum": 0.75,
-        "kendall_tau_threshold": 0.3,
-        "lag_direction": "negative (M̂ leads)"
+        "lead_trials_minimum": 1,
+        "events_fraction_minimum": 0.75,
+        "kendall_tau_strict_minimum": 0.3
       },
-      "falsifying_thresholds": {
-        "condition": "Cross-correlation peak at lag 0 or positive lag"
-      }
+      "analysis": "Within each seed, cross-correlate M_hat(c,a) and ignition signal B_t over +/-5 trials; take the peak extremum and compute within-seed Kendall tau at that lag. Aggregate across seeds; events are not independent replications. OSF Table 6 and Protocol 2 Pred 2.C."
     },
     {
       "id": "Pred 2.D",
-      "claim": "β_SM lesion specifically degrades performance more than other single-parameter lesions; deficit largest in high-volatility blocks (σ_env = 0.6).",
-      "confirming_evidence": "β_SM agent reward significantly lower than Πⁱ-constant and α-lesion agents under matched volatility (permutation p < 0.05); β_SM vs. Πⁱ-lesion contrast significant specifically at high volatility σ_env = 0.6.",
-      "falsifying_evidence": "β_SM produces equivalent or lesser deficit compared to Πⁱ-lesion under all volatility conditions; or pathway specificity not demonstrated at high volatility.",
+      "status": "confirmatory",
+      "claim": "β_SM lesion specifically degrades performance more than other lesions",
+      "confirming_evidence": "β_SM agent reward significantly lower than Πⁱ and α_M-lesion agents under matched volatility",
+      "falsifying_evidence": "β_SM produces equivalent or lesser deficit compared to Πⁱ",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "permutation_p_threshold": 0.05,
-        "high_volatility_sigma": 0.6,
-        "comparison_lesions": [
-          "Πⁱ-lesion (Πⁱ_eff = constant)",
-          "α-lesion (α = 0)"
-        ],
-        "specificity_required": "β_SM vs. Πⁱ-lesion contrast significant at σ_env = 0.6"
-      },
-      "falsifying_thresholds": {
-        "condition_1": "β_SM produces equivalent or lesser deficit compared to Πⁱ-lesion under all volatility conditions",
-        "condition_2": "No pathway specificity at high volatility (σ_env = 0.6)"
+        "permutation_alpha": 0.01,
+        "permutations": 10000,
+        "high_volatility": 0.6
       }
     },
     {
       "id": "Pred 2.E",
-      "claim": "Full APGI generative model achieves lower BIC than Standard PP and GNWT-only when fit to human IGT trial-by-trial choice sequences (model parsimony test, distinct from simulation performance).",
-      "confirming_evidence": "APGI BIC lower than Standard PP by ΔBIC ≥ 10; APGI BIC lower than GNWT-only by ΔBIC ≥ 10; cross-validated on held-out trials (log-likelihood improvement p < 0.01 via LRT).",
-      "falsifying_evidence": "APGI BIC ≥ any alternative model's BIC on pre-registered dataset; or ΔBIC < 3 against GNWT-only (interoceptive and somatic parameters add no explanatory value).",
+      "status": "confirmatory",
+      "claim": "APGI model BIC lower than Standard PP and GNWT-only on human IGT data",
+      "confirming_evidence": "ΔBIC ≥ 10 vs. each alternative; cross-validation log-likelihood improvement p < 0.01",
+      "falsifying_evidence": "APGI BIC ≥ any alternative's BIC on pre-registered dataset",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "delta_bic_vs_standard_pp_minimum": 10,
-        "delta_bic_vs_gnwt_only_minimum": 10,
-        "lrt_p_threshold": 0.01,
-        "cross_validation": "held-out trials",
-        "dataset": "human IGT trial-by-trial choice sequences (pre-registered dataset)"
+        "delta_bic_minimum_vs_each": 10,
+        "cross_validation_alpha": 0.01
       },
-      "falsifying_thresholds": {
-        "condition_1": "APGI BIC ≥ any alternative model BIC on pre-registered dataset",
-        "condition_2": "ΔBIC < 3 against GNWT-only"
-      }
+      "framework_falsifier": "F2: deltaBIC<=0 versus best alternative across all registered datasets; single-dataset failure is not automatically F2."
     },
     {
-      "id": "Pred 2.F-flex",
-      "claim": "Post-ignition behavioural flexibility: action-selection entropy increases relative to the pre-ignition baseline, and post-ignition strategy change (win-stay/lose-shift switching) rises, indexing the adaptive flexibility conferred by ignition.",
-      "confirming_evidence": "Post-ignition action-selection entropy > pre-ignition baseline (Wilcoxon signed-rank, p < 0.05); post-ignition strategy-change rate elevated relative to pre-ignition",
-      "falsifying_evidence": "Ignition uncorrelated with post-ignition adaptation; no post-ignition entropy increase (d < 0.20)",
-      "confirming_thresholds": {
-        "entropy_test": "Wilcoxon signed-rank, p < 0.05",
-        "entropy_direction": "post-ignition > pre-ignition baseline",
-        "strategy_change_metric": "win-stay/lose-shift switching rate"
-      },
-      "falsifying_thresholds": {
-        "cohens_d_threshold": 0.2,
-        "condition": "No post-ignition entropy increase; ignition uncorrelated with post-ignition adaptation"
-      },
-      "epistemic_status": "Exploratory — relative to the confirmatory Pred 2.A–2.E"
+      "id": "Pred 2.F",
+      "status": "exploratory",
+      "claim": "Exploratory: ignition predicts deliberate strategy change beyond |ε|",
+      "confirming_evidence": "Ignition coefficient p < 0.01 in P(strategy_change) ~ ignition + |ε| + controls",
+      "falsifying_evidence": "None registered (exploratory; no falsifying weight)",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below."
+    },
+    {
+      "id": "Pred 2.G",
+      "status": "exploratory",
+      "claim": "Exploratory computational critical-slowing proxy for Pred 6.C",
+      "confirming_evidence": "Across-seed median τ reported descriptively",
+      "falsifying_evidence": "None registered (cannot adjudicate Pred 6.C)",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below."
     }
   ],
-  "validation_status": "validated",
-  "validation_notes": "Fully validated. The APGI_Somatic_Marker_Identifiability.py script is built, integrated, and passes all benchmarks for two-session parameter estimation, Fisher Information Matrix (FIM) block-diagonal verification (condition number < 100), and pathological free-β collinearity demonstration, achieving r > 0.75 across all simulated subjects. Pred 2.e (BIC model comparison) and three-way agent comparison (Pred 2.a) added to match registry EP-2 requirements.",
   "participants": {
     "n_target": 1000,
     "n_minimum": 500,
+    "unit": "simulation_seeds_per_condition",
+    "human_igt_test_n_target": 80,
+    "independent_calibration_n_minimum": 60,
+    "human_data_separation": "CP-3a published calibration dataset is disjoint from the N=80 in-vivo Pred 2.E test cohort.",
     "inclusion_criteria": [
-      "Synthetic agent: computational simulation only — no human participants",
-      "Agent initialised with APGI parameters within physiologically plausible bounds",
-      "Environment: stochastic multi-armed bandit with volatility schedule (σ_env ∈ {0.1, 0.3, 0.6})"
+      "Independent deterministic simulation seeds",
+      "Published calibration dataset N>=60, disjoint from N=80 human IGT test sample"
     ],
     "exclusion_criteria": [
-      "Simulation runs with numerical instability (S_t > 1e6 or NaN values) excluded",
-      "Runs where convergence not achieved within 500 trials excluded from analysis"
-    ],
-    "human_igt_dataset": {
-      "description": "Human IGT trial-by-trial choice sequences used for the Pred 2.E BIC model comparison",
-      "n_target": 80,
-      "n_minimum": 80,
-      "source": "Pre-registered open dataset (Ahn et al. 2014 or equivalent); exact dataset locked in the OSF pre-registration"
-    },
-    "seed_policy": "seed = condition_index × 1000 + replicate_index (NumPy default_rng), replicate_index 0–999 per condition, so every run is independently reproducible from the released code."
+      "Calibration/test overlap",
+      "Failed registered identifiability pre-check",
+      "Pre-existing pilot data in confirmatory tests"
+    ]
   },
   "apparatus": {
-    "simulation_language": "Python 3.11 with NumPy 1.26, SciPy 1.13",
-    "agent_framework": "Custom APGI active inference agent (src/apgi/core.py + somatic marker extension)",
-    "required_script": "APGI_Somatic_Marker_Identifiability.py",
-    "environment": "Stochastic multi-armed bandit (3 arms) with hidden state volatility; reversal probability ∈ {0.02, 0.05, 0.10} per trial",
-    "comparison_conditions": [
-      "Full APGI agent (with somatic marker M̂, β ∈ [0.3, 0.8])",
-      "GNWT-only agent (global workspace ignition, no interoceptive precision weighting)",
-      "Standard PP agent (continuous prediction error, no ignition threshold)",
-      "β_SM-lesion agent (β = 0, somatic channel disabled)",
-      "Πⁱ-lesion agent (Πⁱ_eff = constant, no metabolic gating)",
-      "α-lesion agent (α = 0, metabolic weighting disabled)",
-      "Random baseline agent"
+    "runtime": "Pinned Python 3.11, NumPy 1.26, SciPy 1.13 container",
+    "architectures": [
+      "APGI_full",
+      "beta_SM_lesion",
+      "Pi_i_constant",
+      "alpha_M_c_theta_lesion",
+      "random_baseline",
+      "Standard_PP",
+      "GNWT_only"
     ],
-    "random_seeds": "1000 independent seeds per condition for bootstrapped confidence intervals"
+    "IIT_agent_implemented": false
   },
   "trial_structure": {
-    "isi_ms": null,
     "target": {
-      "type": "Computational trial: agent selects action from {1, 2, 3}, receives stochastic reward signal",
-      "duration_ms": 0
+      "type": "IGT, volatile foraging and threat–reward environments; 500 trials per environment/condition/seed",
+      "duration_ms": null
     },
-    "response": "Agent selects action via softmax policy over precision-weighted prediction errors"
+    "response": "Agent choices, rewards, convergence trials, ignition events and somatic-marker timing",
+    "simulation_step_ms": 10
   },
   "blocks": {
     "practice_trials": 0,
     "experimental_blocks": 5,
     "trials_per_block": 100,
     "total_experimental_trials": 500,
-    "volatility_schedule": "Block-wise: σ_env = [0.1, 0.3, 0.6, 0.3, 0.1]; reversal schedule pseudorandom within block",
-    "high_volatility_block": "Block 3 (σ_env = 0.6) is the primary test block for Pred 2.d pathway specificity"
-  },
-  "somatic_marker_model": {
-    "formula": "M̂(c,a) = γ_V·V(c,a) + γ_A·A(c,a)",
-    "V_ca": "Anticipated value of action a in context c (learned via temporal difference)",
-    "A_ca": "Anticipated arousal signal associated with action a in context c (proxy for SCR/heart rate)",
-    "gamma_V_range": [
-      0.3,
-      0.8
-    ],
-    "gamma_A_range": [
+    "count_scope": "per seed, condition and environment",
+    "volatility_schedule": [
       0.1,
-      0.5
-    ],
-    "modulation_formula": "Πⁱ_eff = Πⁱ_baseline · exp(β · M̂(c,a))",
-    "identifiability_requirement": "Block-diagonal Fisher Information Matrix; M̂ must be orthogonal to raw Πⁱ in fitting procedure — requires APGI_Somatic_Marker_Identifiability.py"
-  },
-  "model_comparison_pred_2e": {
-    "models": [
-      {
-        "name": "Full APGI",
-        "free_parameters": [
-          "θₜ",
-          "Πⁱ",
-          "Πᵉ",
-          "β_SM",
-          "α",
-          "κ"
-        ],
-        "description": "Full model with somatic marker modulation and ignition threshold"
-      },
-      {
-        "name": "GNWT-only",
-        "free_parameters": [
-          "θₜ",
-          "Πᵉ",
-          "α",
-          "κ"
-        ],
-        "description": "Global workspace ignition without interoceptive precision weighting (β_SM = 0, Πⁱ = 0)"
-      },
-      {
-        "name": "Standard PP",
-        "free_parameters": [
-          "Πⁱ",
-          "Πᵉ",
-          "α",
-          "κ"
-        ],
-        "description": "Continuous prediction error model without ignition threshold (θₜ → 0)"
-      }
-    ],
-    "fitting_method": "Maximum likelihood estimation on trial-by-trial choice sequences",
-    "model_selection_criterion": "Bayesian Information Criterion (BIC); lower is better",
-    "cross_validation": "5-fold cross-validation on held-out trials; LRT for nested model comparison"
+      0.3,
+      0.6,
+      0.3,
+      0.1
+    ]
   },
   "dependent_variables": [
-    "Cumulative reward per agent type over 500 trials (primary outcome — Pred 2.a)",
-    "Convergence trial (first trial where running mean reward exceeds 70% optimal) per agent — Pred 2.a",
-    "Pairwise reward comparisons: APGI vs. GNWT-only, APGI vs. Standard PP, GNWT-only vs. Standard PP — Pred 2.a",
-    "Action selection entropy post-ignition vs. pre-ignition (bits) — Pred 2.b",
-    "Proportion of ignition events satisfying Πⁱ·|zⁱ| > Πᵉ·|zᵉ| — Pred 2.b",
-    "Cross-correlation lag: M̂ activation vs. θₜ crossing (lag −5 to +5 trials) — Pred 2.c",
-    "Proportion of ignition events where M̂ leads by ≥ 1 trial — Pred 2.c",
-    "Reward: β_SM-lesion vs. Πⁱ-lesion vs. α-lesion, per volatility block — Pred 2.d",
-    "Reward contrast: β_SM-lesion vs. Πⁱ-lesion specifically at σ_env = 0.6 — Pred 2.d",
-    "BIC: Full APGI vs. GNWT-only vs. Standard PP on human IGT dataset — Pred 2.e",
-    "ΔBIC: Full APGI vs. each alternative — Pred 2.e",
-    "LRT log-likelihood improvement on held-out trials — Pred 2.e",
-    "Ignition rate per agent type per volatility condition",
-    "Threshold adaptation speed (trials to re-optimise after reversal) per agent type"
+    "Trials to convergence",
+    "Cumulative reward and APGI/beta_SM-lesion reward ratio",
+    "Interoceptive-dominant ignition fraction",
+    "Somatic-marker-to-ignition lag",
+    "Lesion deficits across fixed volatility blocks",
+    "Human IGT held-out log likelihood and BIC",
+    "Exploratory strategy-change and pre-crossing AC1 summaries"
   ],
-  "primary_hypothesis": "Full APGI agents converge within 50–80 trials and achieve higher cumulative reward than both GNWT-only and Standard PP agents (all pairwise permutation p < 0.05), with the β_SM lesion deficit largest in high-volatility blocks (σ_env = 0.6), and the full APGI generative model achieving ΔBIC ≥ 10 over GNWT-only when fit to human IGT data.",
-  "primary_analysis": "Pred 2.a: three-way permutation test (10,000 permutations) on cumulative reward; convergence trial comparison. Pred 2.b: Wilcoxon signed-rank for entropy; proportion test for 70–85% interoceptive dominance. Pred 2.c: cross-correlation analysis (lag −5 to +5). Pred 2.d: permutation test for β_SM-lesion deficit specificity at σ_env = 0.6. Pred 2.e: BIC comparison on human IGT dataset; 5-fold cross-validation LRT.",
+  "primary_hypothesis": "Calibrated APGI converges in the 50–80-trial human benchmark, exhibits registered interoceptive dominance and somatic temporal precedence, shows lesion specificity, and improves held-out human-data fit over Standard PP and GNWT-only.",
+  "primary_analysis": "Pred 2.A–2.E registered simulation/lesion and human-model comparisons; permutation and Mann–Whitney alpha=0.01, 10,000 permutations. Human choice MLE BIC is separate from forward simulations (no simulation BIC). Framework F2 requires deltaBIC<=0 versus best alternative across all preregistered datasets.",
   "power_analysis": {
-    "effect_size_d": 0.3,
-    "alpha": 0.05,
-    "power": 0.95,
-    "n_required": 500,
-    "software": "Custom bootstrap power simulation",
-    "based_on": "Damasio somatic marker advantage estimates; active inference agent benchmarks from Friston et al. (2017)"
+    "design_type": "simulation",
+    "n_target": 1000,
+    "n_minimum": 500,
+    "unit": "seeds per condition",
+    "human_igt_n": 80,
+    "calibration_n_minimum": 60,
+    "classical_power": null,
+    "decision_basis": "Pred 2.E delta BIC >=10 versus each alternative and cross-validation improvement p<0.01; forward simulations do not use BIC."
   },
   "pre_registration": {
     "platform": "OSF",
-    "url": "https://osf.io/t5hcq",
-    "date": "2026-07-30",
-    "zenodo_doi": "10.5281/zenodo.21632264",
-    "orcid": "https://orcid.org/0009-0005-0328-2896"
+    "project_url": "https://osf.io/t5hcq",
+    "base_registration_url": "https://osf.io/yk29g",
+    "base_registration_date": "2026-08-24",
+    "amendment": {
+      "number": 1,
+      "document_stated_date": "2026-10-16",
+      "identifier": null,
+      "verification_status": "Not independently verified; source date is after export date."
+    }
   },
   "apgi_parameters": {
-    "kappa": 100,
-    "alpha": 0.3,
-    "beta_initial_estimate": 0.5,
-    "gamma_V": 0.6,
-    "gamma_A": 0.3,
-    "pi_i_baseline": 1.0
+    "model": "Reduced empirical specification: seven core quantities plus somatic modulation; not eight freely fitted parameters in every dataset.",
+    "reduced_quantities": [
+      "theta_0",
+      "eta",
+      "tau_theta",
+      "gamma_sig",
+      "rho",
+      "Pi_i",
+      "Pi_e",
+      "beta_SM"
+    ],
+    "theta_0": {
+      "prior": "Normal(0.35, 0.2)",
+      "unit": "AU",
+      "registered_band": [
+        0.25,
+        0.85
+      ]
+    },
+    "gamma_sig": {
+      "range": [
+        2,
+        7.5
+      ],
+      "unit": "AU^-1",
+      "role": "population-fixed model sigmoid steepness; distinct from alpha_psy"
+    },
+    "tau_theta": {
+      "range_seconds": [
+        10,
+        30
+      ]
+    },
+    "tau_S": {
+      "range_seconds": [
+        0.2,
+        0.5
+      ]
+    },
+    "beta_SM": {
+      "typical_range": [
+        0.3,
+        0.7
+      ],
+      "role": "somatic modulation gain; not independently identifiable from Pi_i using behavior alone"
+    },
+    "kappa": {
+      "value": null,
+      "unit": "ATP/bit",
+      "status": "uncalibrated",
+      "role": "energy-information bridge only; never ignition steepness"
+    },
+    "gain_interpretation": "Pi_i in the reduced confirmatory model is salience-weighted gain; HEP is a candidate indicator, not a direct inverse-variance measurement.",
+    "accumulation": "S_next=(1-a_S)*S+a_S*u; a_S=1-exp(-dt/tau_S); u uses calibration-fixed relative gains and excess magnitudes abs(z)-sqrt(2/pi).",
+    "threshold": "dtheta/dt=-(theta-theta_0)/tau_theta+c_theta*C-Delta_info*V_info+gamma_NE*NE",
+    "somatic_modulation": "Pi_i_eff=Pi_i_baseline*exp(beta_SM*M_hat)",
+    "precision_adaptation": "dPi_i/dt=eta*(abs(epsilon_i)-Pi_i)+rho*(Pi_i_opt-Pi_i)",
+    "ignition": "p_k=1-exp(-r_max*sigmoid(gamma_sig*(S-theta))*dt); single trial-window sigmoid sampling is a distinct convention, never interchanged within a protocol.",
+    "time_step": "dt=0.01 s reduced reference; dt<=min(tau_S,tau_theta,tau_Pi)/10; active reservoir additionally requires dt<=tau_res/10.",
+    "parameter_manifest_status": "Required before confirmatory fitting; no unspecified coefficient is assigned a legacy default.",
+    "source": "OSF §§1.5–1.5.1; Mathematical Specification; Notation Appendix"
   },
   "ethics": {
-    "committee": "N/A — computational simulation study",
-    "protocol_number": "EXEMPT",
-    "approval_date": "2026-05-18",
-    "exempt_reason": "No human participants. All simulation data are synthetic; agents are computational simulations only. Human subjects ethics approval is not required. Human IGT dataset (Pred 2.e) is used from publicly available anonymised repository only."
+    "committee": "IRB / Ethics Committee",
+    "approval_status": "not_yet_submitted",
+    "protocol_number": null,
+    "approval_date": null,
+    "sponsoring_institution": null,
+    "source": "Protocols Table 1; OSF §3.4.1",
+    "enrollment_authorized": false,
+    "scope": "Simulation does not require human-subject approval; N=80 in-vivo IGT component does, and is not yet submitted."
   },
-  "submission_blocking_issues": [],
-  "caveats": [
-    "Somatic marker model M̂(c,a) = γ_V·V(c,a) + γ_A·A(c,a) is one formalisation among several; Damasio's original account does not specify γ_V and γ_A uniquely. Values used here are motivated by interoceptive salience literature but require empirical calibration.",
-    "Agent performance advantages depend on volatility magnitude; effect may not replicate in stationary environments.",
-    "Pred 2.a requires a GNWT-only agent implementation that exactly parallels Full APGI except for removal of Πⁱ and β_SM; the architecture difference must be documented precisely to avoid confounding by parameter count.",
-    "Pred 2.e (BIC comparison on human IGT data) requires the specific dataset to be pre-registered before analysis; post-hoc dataset selection would not satisfy the registry criterion."
-  ],
-  "m_hat_calibration_sub_protocol": {
-    "id": "CP-3a",
-    "status": "Mandatory before any confirmatory simulation",
-    "procedure": "Fit M̂(c,a) = γ_V·V(c,a) + γ_A^SM·A(c,a) to a published human Iowa Gambling Task dataset (minimum N = 60) and estimate γ_V and γ_A by maximum likelihood.",
-    "theoretical_defaults": {
-      "gamma_V": 0.6,
-      "gamma_A_SM": 0.3
+  "quality_and_decision_rules": {
+    "data_admissibility": "Apply registered quality gates before inference. Inadmissible data are exploratory, receive no Scenario A–F, and carry no framework vote.",
+    "scenarios": {
+      "A": "Scenario A — Confirmed. p < α and BF₁₀ ≥ 100. Both streams converge on H₁. Counted toward framework-level BY-FDR confirmation and toward the joint Bayesian meta-analysis. No additional replication is required before the claim is filed.",
+      "B": "Scenario B — Tentative confirmation. p < α and 3 ≤ BF₁₀ < 100. The frequentist threshold is met but Bayesian evidence is moderate rather than strong; reported as \"frequentist-significant, Bayesian moderate.\" One pre-registered independent replication is required before the result is elevated to confirmatory status, and that replication is registered before the primary result is published.",
+      "C": "Scenario C — Discordant (frequentist-positive, Bayesian-null). p < α and BF₁₀ < 3. The frequentist threshold is met but the Bayes factor provides less than moderate evidence for H₁ and may favor H₀. Classified as equivocal: the result neither confirms nor falsifies the prediction. It is flagged as equivocal in the results and recorded in the analysis log (not in the protocol-deviation register, which is reserved for departures from registered procedure). Independent replication at ≥ 90% power is required before any interpretation is made.",
+      "D": "Scenario D — Bayesian positive (without frequentist significance). p ≥ α and BF₁₀ ≥ 100. Strong probabilistic support for H₁ while the NHST threshold is missed. Not counted toward BY-FDR (which operates on the frequentist p-values). The original study plus one pre-registered replication are required for elevation to confirmatory status.",
+      "E": "Scenario E — Bayesian falsification. p ≥ α and BF₀₁ ≥ 6. The frequentist result is nonsignificant and the Bayesian analysis supports H₀. Classified as provisional falsification of the specific sub-prediction and reported as such in the primary manuscript. A single Scenario E result triggers independent replication at ≥ 90% power before the sub-prediction is declared definitively falsified, and triggers review of whether the framework-level falsification threshold has been reached (two or more Scenario E results across primary protocols; framework-level decision rule).",
+      "F": "Scenario F — Indeterminate. p ≥ α and 1/6 < BF₁₀ < 100 (i.e., neither BF₁₀ ≥ 100 nor BF₀₁ ≥ 6). Neither stream reaches a decision threshold. Classified as inconclusive: it carries no confirmatory or falsifying weight and is reported transparently as indeterminate. It may motivate a pre-registered replication but does not by itself trigger one, and it is never counted toward BY-FDR confirmation or framework-level falsification."
     },
-    "recalibration_rule": "If the 95% CI for γ_V excludes 0.6, or for γ_A excludes 0.3, by more than 0.15, recalibrate and amend the OSF pre-registration before confirmatory analysis; calibrated γ values then replace the theoretical defaults in all reported analyses.",
-    "n_minimum": 60
+    "exceptions": [
+      "Pred 1.E interval/model comparison",
+      "Pred 5.E interval equivalence",
+      "Pred 7.A cross-validated incremental prediction"
+    ],
+    "framework_family": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "framework_by_fdr_q": 0.05,
+    "framework_confirmation": "At least 4/5 primary protocols, combined hierarchical BF10>=100, and at most one Scenario E protocol. Protocol 0 is a gate; 2 contributes F2; 6 is CE.",
+    "protocol_alpha_specification": "Protocol 2 (Somatic-AgentSim): Permutation Go/No-Go tests α = 0.01, two-tailed, 10,000 permutations. Model comparison is adjudicated on ΔBIC, not Bayes factors: Pred 2.E requires ΔBIC ≥ 10 in favor of APGI-full against each of Standard PP and GNWT-only, with cross-validation log-likelihood improvement p < 0.01. Framework-falsifier F2 is triggered at ΔBIC ≤ 0 versus the best alternative across all pre-registered Protocol 2 datasets. The BF₁₀ ≥ 100 entry in Table 3 (§3.1.2) is a target for the hierarchical Bayesian human-IGT fit and is not the Pred 2.E or F2 decision criterion.",
+    "decision_precedence": "Prediction-specific estimands, interval/evidence rules and admissibility gates govern over abbreviated source summaries. The A–F matrix applies only where both frequentist and Bayesian hypotheses are explicitly defined; do not invent a point-null Bayes factor. Nonsignificance or a point estimate alone does not establish equivalence or falsification; specificity requires a direct contrast. Unresolved interval bounds or multiplicity allocations require prospective analysis lock."
   },
-  "multiple_comparisons": {
-    "volatility_comparisons": "Benjamini–Hochberg FDR at q = 0.05 across the three volatility conditions (σ_env ∈ {0.1, 0.3, 0.6})"
+  "submission_blocking_issues": [
+    "CP-3a calibration, scaled information-matrix pre-check and parameter/observation manifest must pass before confirmatory simulation.",
+    "Pilot convergence archive unverified; pilot data cannot enter confirmatory tests.",
+    "Final site-specific eligibility, approvals, roles, observation model and executable analysis manifest must be prospectively locked; source specification is not a completed operational study authorization."
+  ],
+  "specification_sections": [
+    {
+      "heading": "Somatic Marker Adaptive Advantage and Ignition-Enabled Flexibility",
+      "source_start_paragraph_line": 1854,
+      "text": "Protocol 2 (Somatic-AgentSim) tests whether somatic markers (M) and precision-weighted ignition confer genuine adaptive advantages over architectures that lack them. The benchmark is convergence speed on the Iowa Gambling Task (IGT; Bechara et al., 1997): a human-calibrated standard that competing computational architectures — pure predictive processing and GNWT-only agents — must be measured against on equal footing.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Agent Architecture",
+      "source_start_paragraph_line": 1862,
+      "text": "The computational protocol implements a hierarchical active inference agent with: separate interoceptive and exteroceptive generative models (both 3-level hierarchies); dynamic precision-weighting (Πᵉ and Πⁱ updated online); somatic marker learning where M(c,a) updates via reward prediction errors; a global workspace layer governed by the ignition equation (Sₜ > θₜ); and threshold adaptation following the Euler discretization of the canonical threshold equation (§1.5): θₜ₊₁ = θₜ + Δt·[−(θₜ − θ₀)/τ_θ + c_θ·Cₜ − Δ_info·V_info,t + γ_NE·NE(t)].",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Comparison Architectures",
+      "source_start_paragraph_line": 1866,
+      "text": "Standard PP (Pure Predictive Processing): no global ignition layer; continuous processing. Expected convergence: 150+ trials.\n\nGNWT-only: ignition without somatic markers or precision-weighting. Expected convergence: 100–120 trials.\n\nAPGI-full: full architecture as specified. Predicted convergence: 50–80 trials.\n\nβ_SM agent: Full APGI architecture with somatic gain pathway disabled (β_SM = 0). Tests pathway specificity of the somatic marker channel (Pred 2.D).\n\nΠⁱ-constant agent: Interoceptive precision held at baseline throughout (Πⁱ = constant). Tests adaptive value of precision updating.\n\nα_M agent: metabolic-cost weighting disabled (α_M ≡ c_θ = 0, removing the cost term from dθ/dt). Tests dissociability of metabolic vs. interoceptive contributions.\n\nRandom-baseline agent: uniformly random action selection, providing the chance-performance floor and completing the five-agent lesion set (full APGI, β_SM-lesion, Πⁱ-lesion, α_M-lesion, random baseline) specified in the Protocols master; Standard PP and GNWT-only serve as BIC/convergence reference architectures, not lesion agents.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "M̂ Calibration Sub-Protocol CP-3a (required before confirmatory simulation)",
+      "source_start_paragraph_line": 1876,
+      "text": "The theoretical somatic marker weights γ_V = 0.6 and γ_A^SM = 0.3 in M̂(c,a) = γ_V·V(c,a) + γ_A^SM·A(c,a) must be empirically calibrated before Protocol 2 (Somatic-AgentSim) confirmatory analysis proceeds. Note: γ_A^SM (somatic-marker arousal weight, used only inside M̂(c,a)) is a distinct parameter from any general allostatic coupling weight elsewhere in the framework and must not be conflated with it; all references to this parameter in this document use the γ_A^SM notation, never bare γ_A.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Procedure",
+      "source_start_paragraph_line": 1880,
+      "text": "(1) Fit M̂(c,a) to human Iowa Gambling Task data from at least one published dataset (minimum N = 60; recommended: the open 'many labs' IGT dataset, N = 617; Steingroever et al., 2015). The in-vivo N = 80 sample (Table 3) is reserved for Pred 2.E and is not used for CP-3a, so calibration and test data never overlap. (2) Estimate γ_V and γ_A^SM via maximum likelihood. (3) If the 95% CI for γ_V lies entirely more than 0.15 from 0.6, or that for γ_A^SM entirely more than 0.15 from 0.3, recalibrate and amend the OSF pre-registration before confirmatory analysis. Calibrated γ values replace theoretical defaults in all reported analyses.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Task Environments",
+      "source_start_paragraph_line": 1884,
+      "text": "Three task environments are simulated: (1) an Iowa Gambling Task variant with four decks carrying physiological penalties through simulated interoceptive costs; (2) volatile foraging in which reward statistics shift unpredictably and homeostatic costs vary by location; (3) threat–reward trade-offs in which high-reward options produce aversive interoceptive consequences.\n\nFixed task parameters (binding). Each environment comprises five experimental blocks of 100 trials (500 trials total), with the environmental volatility schedule σ_env = [0.1, 0.3, 0.6, 0.3, 0.1] across blocks 1–5. Pred 2.D's high-volatility contrast is evaluated on block 3 (σ_env = 0.6) against blocks 1 and 5 (σ_env = 0.1).\n\nSeeds. N = 1,000 independent seeds per condition (minimum admissible N = 500) supply the bootstrapped confidence intervals. Seeds are assigned deterministically as seed = condition_index × 1000 + replicate_index (NumPy default_rng), replicate_index 0–999 per condition, so that every run is independently reproducible from the released code. This per-condition scheme supersedes the single-integer entry P2 = 20202 in the Analysis Manifest, which applies only to Protocol 2's human-IGT model-fitting MCMC, not to the simulation sweep.\n\nIdentifiability. The somatic-marker model operates via Πⁱ_eff = Πⁱ_baseline · exp(β_SM · M̂(c,a)), where M̂ integrates anticipated value V(c,a) and anticipated arousal A(c,a). In simulation, where M̂(c,a) is known, identifiability of β_SM and Πⁱ is checked with the Fisher Information Matrix (condition number < 100; dimensionless normalized cross-information R_ij = I_ij/√(I_ii I_jj), with max |R_ij| < 0.1 for the named parameter block and condition number < 100 on the same scaled matrix. This is distinct from covariance correlation computed from I⁻¹. The locked implementation states the parameter scaling, evaluation grid and chosen diagnostic; a local FIM check does not prove global structural identifiability. This does not contradict Table 1: in human behavioral data M̂ is latent, and the two parameters remain non-identifiable without the Protocol 0/5 manipulations. Failure of this pre-check halts confirmatory simulation and triggers a pre-registered amendment.\n\nEnvironment. Python 3.11 (NumPy 1.26, SciPy 1.13).",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Computational Reproducibility",
+      "source_start_paragraph_line": 1896,
+      "text": "All simulations will use fixed random seeds; parameter sweeps will be logged; code will be containerized with Docker for exact environment replication. Simulations run in the pinned container (Python 3.11, NumPy 1.26, SciPy 1.13) on macOS, Windows or Linux hosts; requirements.txt and environment.yml committed to GitHub.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 2.A — Human-matching convergence benchmark",
+      "source_start_paragraph_line": 1902,
+      "text": "APGI agents learn to avoid long-term negative somatic outcomes within 50–80 trials, matching human Iowa Gambling Task performance (Bechara et al., 1997). This benchmark is the minimum criterion for claiming Functional Isomorphism. Convergence outside the 50–80 trial window — even with superior cumulative reward — does not satisfy Pred 2.A, because temporal matching to human performance is the operationalized claim, not reward maximization. Pure PP agents require 150+ trials; GNWT-only agents require 100–120 trials. Cumulative reward over 200 trials shows expected APGI advantage of 15–25% over GNWT-only, which in turn outperforms Pure PP. A reward ratio merely exceeding 1.15 at permutation p < 0.05 is insufficient without the temporal constraint — APGI must reach criterion within the human performance window.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 2.B — Interoceptive trigger composition (mechanistic, not consequential)",
+      "source_start_paragraph_line": 1906,
+      "text": "Ignition events (Sₜ > θₜ) are triggered specifically when Πⁱ·|zⁱ| crosses the threshold. 70–85% of all ignition events must satisfy the interoceptive dominance criterion Πⁱ·|zⁱ| > Πᵉ·|zᵉ| because homeostatic threats prioritize ignition. This tests the triggering condition (somatic gating) rather than merely the downstream consequence (post-ignition action entropy) — the latter supports the computational advantage claim but does not validate the core somatic suppression mechanism that defines APGI's uniqueness.\n\nBecause the dominance proportion depends on the simulated environment's interoceptive-cost schedule, all environment parameters are fixed in the released configuration before any simulation is run, and Pred 2.B is interpreted as a property of the implemented model under those parameters, not as independent empirical evidence.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 2.C — Somatic-marker retrieval leads threshold crossing",
+      "source_start_paragraph_line": 1912,
+      "text": "Somatic-marker retrieval M̂ temporally precedes threshold crossing θₜ: the cross-correlation between M̂ activation and the ignition signal Bₜ peaks at negative lag, with M̂ leading by ≥ 1 trial in ≥ 75% of ignition events (Kendall τ > 0.3 with n = 1,000 seeds; τ = 0.3 is well above the detection floor at this n). Falsified if M̂ activation is simultaneous with or lags threshold crossing (cross-correlation peak at lag 0 or positive).",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 2.D — β_SM specificity",
+      "source_start_paragraph_line": 1916,
+      "text": "The β_SM lesion degrades performance more than any other single-parameter lesion (Πⁱ, α_M), with the deficit largest in high-volatility blocks (σ_env = 0.6). Confirming: β_SM-agent reward significantly lower than Πⁱ- and α_M-lesion agents under matched volatility (permutation p < 0.01, 10,000 permutations). Falsified if β_SM produces an equivalent or lesser deficit than Πⁱ under all volatility conditions.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 2.E — Model parsimony on human data",
+      "source_start_paragraph_line": 1920,
+      "text": "APGI-full achieves ΔBIC ≥ 10 versus both Standard PP and GNWT-only when fit to human IGT trial-by-trial choice sequences, with cross-validated log-likelihood improvement p < 0.01. Falsified if APGI BIC ≥ any alternative's BIC on any pre-registered dataset.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 2.F — Ignition enables deliberate strategy change",
+      "source_start_paragraph_line": 1924,
+      "text": "Exploratory (not part of the confirmatory Pred 2.A–2.E set). Post-ignition action-selection entropy increases relative to the pre-ignition baseline, and adaptive behavioral shifts correlate with ignition events beyond prediction-error magnitude alone. In the logistic regression P(strategy_change) ~ ignition + |ε| + controls, the ignition coefficient remains significant (p < 0.01) even when controlling for |ε|, indexing the behavioral-flexibility readout of ignition. This supports the computational-advantage claim but does not validate the core somatic triggering mechanism (Pred 2.B), and is therefore reported as exploratory.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 2.G — Computational critical-slowing proxy (exploratory)",
+      "source_start_paragraph_line": 1928,
+      "text": "Exploratory (not part of the confirmatory Pred 2.A–2.E set). If clinical iEEG is unavailable, Protocol 2 supplies a computational proxy for the critical-slowing signature of Pred 6.C (PREREQUISITE, §2.1). Signal: the simulated ignition margin Δ(t) = S(t) − θ(t) of the full APGI agent in the three task environments, under the fixed task parameters and per-condition seeds above (N = 1,000 seeds per condition). Estimator: lag-1 autocorrelation (AC1) of Δ(t) in five consecutive non-overlapping 100-ms windows (10 steps each at Δt = 10 ms) spanning the 500 ms before each threshold crossing, and in matched windows before non-crossing epochs; no window spans a crossing or a post-ignition reset. Comparison: within each seed, Kendall τ between AC1 and window position, for crossing versus non-crossing epochs; the across-seed median τ is reported with a seed-level bootstrap 95% CI. Reporting rule: descriptive only. No confirmatory threshold applies, the Protocol 6 criterion (τ ≥ 0.40) is not imported, and no Pred 2.G result confirms, falsifies or substitutes for Pred 6.C.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Exploratory analysis — Volatility adaptation advantage (not a registered prediction)",
+      "source_start_paragraph_line": 1932,
+      "text": "Exploratory (not part of the confirmatory Pred 2.A–2.E set). APGI agents adapt 20–30% faster than GNWT-only agents in volatile foraging environments with shifting homeostatic costs, measured as trials to criterion after contingency shifts. This was a confirmatory prediction in prior drafts and is demoted here because it is not separable from Pred 2.A's convergence-speed criterion; it is reported alongside Pred 2.A and carries no framework-level weight.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Model Comparison",
+      "source_start_paragraph_line": 1944,
+      "text": "Bayesian Information Criterion (BIC) for model fit to human data; cross-validation on held-out trials; sensitivity analysis across parameter ranges (η, β_SM, θ₀). The reported 10,000-trial pilot-convergence result remains unverified until its configuration, seeds, code revision, convergence criterion and results are archived. Record whether pilot inspection informed these predictions; such pilot data are excluded from confirmatory evaluation. Without that archive, stable convergence is a working assumption rather than an established simulation finding.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "BIC application",
+      "source_start_paragraph_line": 1948,
+      "text": "BIC in Protocol 2 (Somatic-AgentSim) is computed in two distinct modes that must not be conflated: (1) Fit to human IGT data — all three agent architectures (APGI-full, GNWT-only, Standard PP) are fit to human participant trial-by-trial choice sequences using maximum likelihood estimation; BIC penalizes free parameter count and the architecture with the lowest group-level BIC is preferred. This is the primary model comparison (Pred 2.E). (2) Simulation benchmark — agents are run in forward-simulation mode on the task environment with fixed parameters to generate convergence and adaptation-speed curves (Pred 2.A and the exploratory volatility-adaptation analysis) and lesion comparisons (Pred 2.D); no BIC is computed here. These two analyses are complementary but distinct: superior simulation performance (Pred 2.A) demonstrates computational sufficiency; superior BIC fit to human data (Pred 2.E) demonstrates that APGI's additional parameters are warranted by the empirical signal. Both are required; neither alone constitutes validation.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    }
+  ],
+  "provenance": {
+    "source_files": [
+      {
+        "file": "OSF-Preregistration.docx",
+        "sha256": "ec17e6fcbe4a61d278baba42984734255e1b7b53607b30450b7d6e2334d26cd9"
+      },
+      {
+        "file": "Protocols.docx",
+        "sha256": "09a9d6c6d3827b4f8e320898f9cf0ba5fee0f85ae4198d783a5811cf9f6ff6d4"
+      },
+      {
+        "file": "Mathematical-Specification.docx",
+        "sha256": "6de4017113b2653c0d0b73ae22775f2cd32f3e8ca5c14d3d64da4130ea32f2fa"
+      },
+      {
+        "file": "Notation-Appendix.docx",
+        "sha256": "37f74a40313fb76210d43238429eb371d606996f0b758212b21db1f837ad4a82"
+      }
+    ],
+    "input_file": "protocol_2_somatic_agent_sim.json",
+    "input_sha256": "573eae7588f2a509a8699179b642858e3a2928a901d49ea2cc5800b3cb900ec7",
+    "input_version": "2.0.0",
+    "precedence": "OSF governs empirical design and statistical decisions; Mathematical Specification governs equations; Notation Appendix governs symbols. Detailed decision rules supersede shorthand summaries; unresolved conflicts are flagged.",
+    "legacy_policy": "Reconstructed from current specifications; unsupported apparatus, approvals, counts and numerical defaults are not silently carried forward.",
+    "source_excerpt_policy": "Specification sections preserve source context; structured decision rules and listed conflict resolutions govern this export. Editorial requests embedded in documents are not executed.",
+    "input_schema_sha256": "6696a50371fd1b695b03cba5d071dcd2d9c89f92642084de500f6bfdd2499070"
   },
-  "source_of_truth": "APGI-Protocols.md (Protocols & Prediction Registry) and APGI-OSF-Preregistration.md. Where the two disagree with stored values, the documents govern. Deposited on OSF (osf.io/t5hcq) and archived at Zenodo (DOI 10.5281/zenodo.21632264)."
+  "reproducibility": {
+    "seed_formula": "condition_index * 1000 + replicate_index",
+    "replicate_index_range": [
+      0,
+      999
+    ],
+    "rng": "NumPy default_rng",
+    "human_mcmc_seed": 20202,
+    "identifiability": {
+      "normalized_information": "R_ij=I_ij/sqrt(I_ii*I_jj)",
+      "maximum_absolute_off_diagonal": 0.1,
+      "scaled_condition_number_maximum": 100,
+      "scope": "Named beta_SM/Pi_i parameter block; local check, not proof of global structural identifiability."
+    },
+    "cp3a": {
+      "gamma_V_theoretical": 0.6,
+      "gamma_A_SM_theoretical": 0.3,
+      "recalibration_rule": "95% CI entirely more than 0.15 from corresponding default triggers recalibration and prospective amendment; use calibrated values."
+    }
+  },
+  "methods_source_sections": [
+    {
+      "heading": "Outliers and influence",
+      "text": "4.3.2 Outlier and influential-observation policy\n\nAll rules below are fixed pre-collection and apply to every protocol unless a protocol body specifies otherwise; no post-hoc outlier rule may be introduced. (a) Trial level. Scalp-EEG trials exceeding the 150 µV peak-to-peak criterion (§4.2.1) are rejected; iEEG trials follow the interictal-discharge and |z| > 6 rule of §Protocol 6; behavioral trials in speeded detection tasks with RT < 150 ms or > 3 s are rejected as anticipations or lapses (Protocol 2 IGT and Protocol 7 bedside tasks use the rules in their protocol bodies). No further trial-level trimming is permitted. (b) Participant level. A participant is excluded only for a pre-registered admissibility failure (> 30% trial rejection, Data-Admissibility Gate; failed manipulation check; protocol violation). Statistical outlyingness is never itself an exclusion ground. (c) Observation level in models. Continuous predictors and outcomes are winsorized at ±3 SD within participant before entry into any confirmatory model; the untrimmed analysis is reported alongside as a mandatory sensitivity analysis, and a discrepancy in the confirmatory decision between the two is reported as an instability flag. (d) Influence. For every confirmatory regression or mixed model, Cook's distance is computed and observations with D > 4/n are reported; the model is refit without them as a sensitivity analysis. The trimmed refit is never the confirmatory result. (e) Model diagnostics and fallback. Gaussian models use the registered residual diagnostics; binary/ordinal generalized models use distribution-appropriate simulation or predictive diagnostics, not a Shapiro–Wilk residual gate. Appendix C must identify the exact estimator, tuning constants, inferential test and Bayesian evidence computation for each permitted fallback before lock. A fallback not so specified is a sensitivity analysis and cannot replace the primary confirmatory estimator."
+    },
+    {
+      "heading": "Bayesian prior sensitivity",
+      "text": "Sensitivity analyses\n\nAll confirmatory Bayesian conclusions are re-run under fixed prior transformations. Normal and HalfNormal priors: scale multiplied by 2 and by ½, location and support unchanged. Beta(2, 5) prior on η_RL: mean (2/7) preserved and concentration (sum of shape parameters, 7) multiplied by 2 and by ½, giving Beta(4, 10) and Beta(1, 2.5). Fixed parameters remain fixed or vary over a separately registered grid. Every evidence and interval criterion is recomputed under each sensitivity prior; if a conclusion crosses a §3.5.2 decision boundary (BF₁₀ = 3 or 100, BF₀₁ = 6), it is reported as prior-sensitive and reclassified as exploratory."
+    },
+    {
+      "heading": "Protocol-specific ethics and regulatory source",
+      "text": "Protocol 2 (Somatic-AgentSim)\n\nStatus: In-silico arm requires no ethics approval. In-vivo human IGT calibration sample (N = 80) requires full IRB/Ethics Committee approval.\nCommittee: Registered as a planned study; the registration will be amended with committee name, institution, approval number and date before any participant is approached.\nInformed consent: Written consent covering behavioral testing, remuneration, and anonymized data archival on OSF."
+    }
+  ],
+  "readiness": {
+    "status": "specification_updated_lock_requirements_pending",
+    "empirical_validation_performed": false,
+    "registration_verified": false,
+    "note": "JSON validation checks file structure, not scientific validity, regulatory approval or analysis-lock completion."
+  }
 }

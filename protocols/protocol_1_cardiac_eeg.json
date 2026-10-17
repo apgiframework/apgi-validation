@@ -1,241 +1,514 @@
 {
+  "$schema": "schemas/protocol.schema.json",
+  "schema_version": "1.1.0",
   "protocol_id": "APGI-P01",
   "registry_ep": "EP-1",
   "registry_protocol_label": "Protocol 1 — Cardiac-EEG",
   "title": "EEG Study of Interoceptive Precision Gating",
   "paper": "APGI Paper 1",
   "osf_url": "https://osf.io/t5hcq",
-  "zenodo_doi": "10.5281/zenodo.21632264",
-  "zenodo_url": "https://doi.org/10.5281/zenodo.21632264",
-  "code_repository": "https://github.com/apgiframework/apgi-implementation",
-  "code_repository_org": "https://github.com/apgiframework",
-  "orcid": "https://orcid.org/0009-0005-0328-2896",
-  "version": "2.1.0",
-  "last_updated": "2026-07-30",
-  "description": "This protocol examines whether interoceptive precision (Πⁱ), indexed by the heartbeat-evoked potential (HEP, 250–400 ms window), modulates conscious detection thresholds (θₜ). Stimuli are time-locked to cardiac phase to test four sub-predictions: (Pred 1.a) that state-level Πⁱ_eff produces greater P3b amplitude for near-threshold stimuli under interoceptive focus than exteroceptive focus or dual-task control — with the effect absent or reversed for suprathreshold stimuli; (Pred 1.a-trait) that trait-level Πⁱ_baseline, indexed by interoceptive accuracy (IA), predicts greater perceptual sensitivity (d′) in the interoceptive condition but not the exteroceptive condition; (Pred 1.b) that cardiac-phase-locked detection advantage exists at diastole versus systole; and (Pred 1.c) that top-tertile IA participants show the strongest state-level P3b condition effects and cardiac-phase detection advantages. Near-threshold contrast titration is mandatory; suprathreshold control blocks are required to confirm specificity.",
-  "prediction_cluster": "Pred 1.A–1.E (Pred 1.A-trait and Pred 1.F reported separately)",
-  "prediction_cluster_label": "Interoceptive Precision Modulates Detection Threshold",
+  "version": "1.1.0",
+  "last_updated": "2026-10-16",
+  "specification_date": "2026-10-16",
+  "study_status": "pre_collection",
+  "description": "Within-participant attention-by-cardiac-phase detection study, with continuous interoceptive-accuracy moderation, HEP–P3b coupling and a separately specified Weibull psychometric-steepness test.",
+  "prediction_cluster": "Pred 1.A–F",
   "sub_predictions": [
     {
       "id": "Pred 1.A",
-      "claim": "State-level Πⁱ_eff → P3b: interoceptive focus produces greater P3b for near-threshold stimuli than exteroceptive focus or dual-task control. Near-threshold titration mandatory; effect must be absent or reversed for suprathreshold stimuli.",
-      "confirming_evidence": "P3b amplitude: interoceptive > exteroceptive > dual-task (p < 0.05 FWE; ηₚ² ≥ 0.06). Effect absent or reversed in suprathreshold matched control block. HEP predicts P3b (partial r > 0.4 surviving RMSSD and pupil diameter covariate control).",
-      "falsifying_evidence": "No significant P3b condition main effect (all p > 0.10) across N ≥ 30 in preregistered contrast; or HEP–P3b partial correlation < r = 0.20 after arousal covariate control.",
+      "status": "confirmatory",
+      "claim": "Interoceptive focus produces greater P3b for near-threshold stimuli",
+      "confirming_evidence": "Ordered condition effect on P3b: interoceptive > exteroceptive > dual-task (omnibus and ordered pairwise contrasts p < 0.0125; ηₚ² ≥ 0.06 and interoceptive − exteroceptive |Δ| ≥ 0.3 µV; 250–500 ms, Pz/P3/P4)",
+      "falsifying_evidence": "ηₚ² < 0.02, or |Δ| < 0.3 µV with BF₀₁ ≥ 6",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "p_threshold_fwe": 0.05,
+        "alpha": 0.0125,
         "eta_p_squared_minimum": 0.06,
-        "hep_p3b_partial_r_minimum": 0.4,
-        "hep_p3b_covariates": [
-          "RMSSD",
-          "pupil diameter"
-        ],
-        "suprathreshold_control": "required — effect must be absent or reversed",
-        "condition_order": "interoceptive > exteroceptive > dual-task"
-      },
-      "falsifying_thresholds": {
-        "p_minimum_all_conditions": 0.1,
-        "n_minimum": 30,
-        "hep_p3b_partial_r_threshold": 0.2
-      }
-    },
-    {
-      "id": "Pred 1.A-trait",
-      "claim": "Trait-level Πⁱ_baseline → d′: high-IA (top tertile) shows greater perceptual sensitivity (d′) than low-IA (bottom tertile), specific to interoceptive detection condition. Group × modality dissociation control required.",
-      "confirming_evidence": "High-IA d′ > Low-IA d′ (independent-samples t or Mann–Whitney, p < 0.05; Cohen's d ≥ 0.5); group difference specific to interoceptive condition, absent in matched exteroceptive condition (group × modality interaction p < 0.05).",
-      "falsifying_evidence": "High-IA and Low-IA do not differ on interoceptive d′ (d < 0.3 across N ≥ 30 per group); or d′ group difference replicates equally in the exteroceptive condition, eliminating interoceptive specificity.",
-      "confirming_thresholds": {
-        "p_group_comparison": 0.05,
-        "cohens_d_minimum": 0.4,
-        "specificity_test": "group × modality interaction p < 0.05",
-        "tertile_grouping": "top vs. bottom tertile on IA (heartbeat counting accuracy)",
-        "n_minimum_per_group": 30,
-        "cohens_d_expected_range": [
-          0.4,
-          0.6
+        "absolute_intero_minus_extero_uv_minimum": 0.3,
+        "order": [
+          "interoceptive",
+          "exteroceptive",
+          "dual_task"
         ]
-      },
-      "falsifying_thresholds": {
-        "cohens_d_threshold": 0.3,
-        "n_minimum_per_group": 30,
-        "condition": "Group difference replicates equally in exteroceptive condition (no interaction)"
       }
     },
     {
       "id": "Pred 1.B",
-      "claim": "Cardiac-phase-locked detection advantage at diastole (300–500 ms post-R-peak) vs. systole (0–150 ms post-R-peak).",
-      "confirming_evidence": "Logistic mixed-effects model: detection ~ cardiac_phase × contrast + cardiac_phase | participant; significant cardiac_phase × contrast interaction (p < 0.05). d′ higher at diastole than systole.",
-      "falsifying_evidence": "Diastole vs. systole hit rate advantage < 5% across two independent samples (interaction p > 0.15); no d′ difference between cardiac phases.",
+      "status": "confirmatory",
+      "claim": "Cardiac-phase-locked detection advantage at diastole",
+      "confirming_evidence": "Diastole vs. systole hit-rate advantage ≥ 5% (interaction p < 0.0125); d′ higher at diastole.",
+      "falsifying_evidence": "Positive evidence for a negligible cardiac-phase effect under the registered interval/null-support rule, or evidence against the direct condition-specificity contrast. Nonsignificance alone is indeterminate.",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "interaction_p_threshold": 0.05,
-        "d_prime_direction": "diastole > systole",
-        "cardiac_phase_windows_ms": {
-          "diastole": [
-            300,
-            500
-          ],
-          "systole": [
-            0,
-            150
-          ]
-        }
-      },
-      "falsifying_thresholds": {
-        "hit_rate_advantage_threshold_percent": 5,
-        "interaction_p_minimum": 0.15
+        "alpha": 0.0125,
+        "hit_rate_advantage_percentage_points_minimum": 5,
+        "interaction": "CardiacPhase x Condition"
       }
     },
     {
       "id": "Pred 1.C",
-      "claim": "Top-tertile IA participants show strongest Pred 1.A (state P3b condition effect) and Pred 1.B (cardiac-phase detection advantage) effects.",
-      "confirming_evidence": "Accuracy × condition interaction on P3b amplitude significant (p < 0.05, ηₚ² ≥ 0.08); high-accuracy group shows larger P3b condition difference than low-accuracy group. Accuracy × cardiac-phase interaction on detection rate also significant (p < 0.05).",
-      "falsifying_evidence": "Accuracy × condition interaction p > 0.10; tertile groups do not differ in cardiac-phase detection advantage.",
+      "status": "confirmatory",
+      "claim": "Interoceptive accuracy (continuous) moderates the Pred 1.A / 1.B effects",
+      "confirming_evidence": "IA_z × condition on P3b, β_std ≥ 0.30, p < 0.0125",
+      "falsifying_evidence": "β_std < 0.10 with BF₀₁ ≥ 6",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "interaction_p_threshold": 0.05,
-        "eta_p_squared_minimum": 0.08,
-        "tertile_grouping": "top vs. bottom tertile on IA",
-        "secondary_cardiac_phase_interaction_p": 0.05
+        "alpha": 0.0125,
+        "continuous_ia_interaction_beta_std_minimum": 0.3
       },
-      "falsifying_thresholds": {
-        "interaction_p_minimum": 0.1
-      }
+      "analysis": "Continuous IA_z x condition; tertile ANOVA descriptive only."
     },
     {
       "id": "Pred 1.D",
-      "claim": "HEP amplitude predicts trial-by-trial P3b independently of arousal (partial r > 0.40 after pupil/HRV control).",
-      "confirming_evidence": "Partial r(HEP, P3b | pupil diameter, HRV) > 0.40; p < 0.017 (Bonferroni corrected across three predictions).",
-      "falsifying_evidence": "Partial r < 0.20 after arousal control; or partial correlation indistinguishable from exteroceptive focus condition.",
+      "status": "confirmatory",
+      "claim": "HEP predicts P3b independently of arousal (partial r > 0.40 after pupil/HRV control)",
+      "confirming_evidence": "Partial r(HEP, P3b | pupil, HRV) > 0.40, p < 0.0125.",
+      "falsifying_evidence": "Partial r < 0.20 after arousal control",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "partial_r_minimum": 0.4,
+        "alpha": 0.0125,
+        "partial_r_strict_minimum": 0.4,
         "covariates": [
-          "pupil diameter",
-          "HRV (RMSSD)"
-        ],
-        "p_threshold_bonferroni": 0.0125,
-        "arousal_reclassification_rule": "Confirmed only if partial r(HEP–P3b | pupil diameter) remains > 0.25 at p < 0.05; if the partial correlation drops below r = 0.15 after the pupil covariate the result is reclassified as an arousal confound"
-      },
-      "falsifying_thresholds": {
-        "partial_r_threshold": 0.2,
-        "condition": "Partial r < 0.20 after arousal control"
+          "pupil",
+          "HRV",
+          "session state",
+          "mandatory HEP artifact controls"
+        ]
       }
     },
     {
       "id": "Pred 1.E",
-      "claim": "Near-threshold psychometric steepness: the near-threshold psychometric function is steep (α_psy ≥ 10), a discrete phase-transition signature sharper than graded drift-diffusion accumulation (α_psy ≈ 2–6). Estimated on the full six-level contrast grid (0.25–2.0 × c₅₀); evaluated by parameter estimation and model comparison, not NHST.",
-      "confirming_evidence": "Best-fitting α_psy ≥ 10 in near-threshold psychometric fits; sharper than the best graded-accumulation alternative",
-      "falsifying_evidence": "Best-fitting α_psy < 5 across all paradigms, or a graded-accumulation model wins by formal comparison (ΔAIC > 10)",
+      "status": "estimation",
+      "claim": "Near-threshold psychometric steepness: Weibull shape k (≡ α_psy) on linear contrast ≥ 10 (discrete-transition signature; estimation test, no α)",
+      "confirming_evidence": "Lower bound of the 95% interval on group α_psy ≥ 10; graded-accumulation model loses by ΔAIC > 10 on identical choice data",
+      "falsifying_evidence": "95% interval upper bound < 5, or graded model wins by ΔAIC > 10",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
       "confirming_thresholds": {
-        "alpha_psy_minimum": 10,
-        "graded_accumulation_reference_range": [
-          2,
-          6
+        "population_shape_hdi_lower_minimum": 10,
+        "hdi_level": 0.95,
+        "delta_aic_strict_minimum": 10,
+        "participants_minimum": 40
+      },
+      "decision_rule": "Confirm only if both HDI lower>=10 and deltaAIC=AIC_graded-AIC_Weibull>10. Evidence against: HDI upper<5 or deltaAIC<-10, provided results do not conflict. Conflicts and intermediate regions indeterminate; insufficient participants/trials means not evaluated.",
+      "psychometric_model": {
+        "formula": "psi(c)=g+(1-g-lambda)*(1-exp(-(c/c0)^k))",
+        "contrast_scale": "linear",
+        "alpha_psy": "k, Weibull shape; not gamma_sig",
+        "g": "empirical catch false-alarm rate",
+        "lapse_range": [
+          0,
+          0.05
         ],
-        "estimation_grid": "six fixed contrast levels spaced geometrically about c₅₀ (0.25–2.0 × c₅₀), ≥ 60 trials per level",
-        "inference_mode": "parameter estimation and formal model comparison — carries no α, excluded from the Bonferroni family"
+        "lapse_fitted": true,
+        "constraint": "g+lambda<1",
+        "likelihood": "hierarchical beta-binomial",
+        "comparison": "Maximum-likelihood fits on identical eligible choices and observation likelihood; no RT-derived parameter substitution."
+      }
+    },
+    {
+      "id": "Pred 1.F",
+      "status": "secondary",
+      "claim": "Trait-level: interoceptive accuracy (heartbeat-discrimination d′, continuous) moderates detection sensitivity d′ in the interoceptive condition",
+      "confirming_evidence": "IA_z × Condition standardized slope β_std ≥ 0.36 (α = 0.05), interoceptive-specific",
+      "falsifying_evidence": "β_std < 0.10 with BF₀₁ ≥ 6, or equivalent exteroceptive effect",
+      "indeterminate_rule": "Failure to confirm alone is not evidence of falsification. Apply the registered interval/evidence rule and admissibility gate.",
+      "source": "OSF Table 19, supplemented by detailed protocol decision rules below.",
+      "confirming_thresholds": {
+        "alpha": 0.05,
+        "continuous_ia_interaction_beta_std_minimum": 0.36
       },
-      "falsifying_thresholds": {
-        "alpha_psy_threshold": 5,
-        "delta_aic_graded_model_wins": 10
-      },
-      "epistemic_status": "Primary confirmatory (estimation-based)"
+      "analysis": "d_prime ~ IA_z * Condition + (1 + Condition | Participant); tertiles descriptive only."
     }
   ],
-  "depends_on": [
-    "EP-0"
-  ],
-  "validation_status": "specified",
-  "validation_notes": "Formally specified. Parameter identifiability confirmed via simulation (Appendix A.4). Identifiability of Πⁱ from HEP confirmed via block-diagonal Fisher Information Matrix. Pred 1.A-trait, Pred 1.C, and Pred 1.D added to match registry EP-1 requirements; suprathreshold control blocks added as mandatory. P3b canonical window standardised to 250–500 ms per global ERP Window Lookup Table.",
   "participants": {
     "n_target": 62,
     "n_minimum": 48,
-    "n_per_tertile_group": 20,
+    "n_analyzable_target": 59,
+    "unit": "human_participants",
+    "minimum_condition": "48 admissible only under BF10 >= 100 efficacy stop; scheduled efficacy looks at 50 or 60. N=30 monitoring only. Final N<59 falls short of 80% power.",
     "inclusion_criteria": [
-      "Age 18–45 years",
-      "Normal or corrected-to-normal vision",
-      "Resting heart rate 50–100 BPM with regular sinus rhythm",
-      "No psychoactive medication within 30 days",
-      "No history of cardiac arrhythmia or autonomic neuropathy"
+      "Adults meeting prospectively registered EEG/ECG and detection-task eligibility."
     ],
     "exclusion_criteria": [
-      "Irregular ECG rhythm (assessed by study nurse at screening)",
-      "Resting heart rate < 50 or > 100 BPM",
-      "History of neurological or psychiatric disorder (DSM-5 criteria)",
-      "Use of beta-blockers or other HR-modifying medication",
-      "Inability to maintain fixation for 30-minute EEG blocks"
-    ],
-    "sample_size_rationale": "N = 62 target / N = 48 minimum. Powered on a within-subject HEP amplitude difference of d = 0.45 (conservative lower bound of published interoceptive effects; Pollatos et al., 2007) at α = 0.05, power = 0.80, which also yields ≈ 94% power for the primary HEP–P3b correlation. Target enrolment reflects the expected final N after Bayesian sequential stopping; 15% attrition allowed. Effect-size anchors: Garfinkel et al. (2014) cardiac-phase detection; Canales-Johnson et al. (2020) HEP–P3b coupling."
+      "More than 30% trials rejected",
+      "Prediction-specific usable-trial minima not met; exclude affected fit/analysis."
+    ]
   },
   "apparatus": {
-    "EEG": "64-channel BrainAmp DC (Brain Products GmbH) at 1000 Hz, referenced to FCz, re-referenced offline to average mastoids",
-    "ECG": "BrainAmp ExG bipolar lead-II at 1000 Hz, synchronised to EEG clock",
-    "display": "VPixx ProPixx at 120 Hz, viewing distance 57 cm, gamma-corrected",
-    "stimulus_delivery": "Psychtoolbox-3 (MATLAB R2024b) with photodiode verification of onset timing",
-    "pupillometry": "Eyelink 1000 Plus (monocular, 500 Hz) for arousal covariate control (Pred 1.a)",
-    "cardiac_phase_algorithm": "R-peak detection via Pan-Tompkins (real-time), diastole window 300–500 ms post R-peak, systole window 0–150 ms post R-peak",
-    "ia_measure": "Heartbeat counting task (Schandry 1981) administered pre-scan: 6 intervals × 2 conditions; d′ computed as IA index for tertile grouping (Pred 1.a-trait, 1.C)"
+    "stimulus": "Foveal Gabor patches, individually QUEST calibrated",
+    "ECG": "Real-time Pan–Tompkins R-peak detection; trigger jitter +/-10 ms",
+    "EEG": "64 channels, 1000 Hz",
+    "pupillometry": "At least 500 Hz",
+    "respiration": "Continuous respiratory monitoring"
   },
   "trial_structure": {
-    "isi_ms": [
-      1200,
-      1600
-    ],
-    "fixation_duration_ms": 500,
-    "cardiac_phase_window_ms": {
-      "systole": [
-        0,
-        150
-      ],
-      "diastole": [
-        300,
-        500
-      ]
-    },
-    "jitter_tolerance_ms": 10,
     "target": {
-      "type": "Gabor patch, vertical orientation",
-      "spatial_frequency_cpd": 3,
-      "contrast_levels_near_threshold": [
-        0.02,
-        0.04,
-        0.08,
-        0.16
-      ],
-      "contrast_levels_suprathreshold": [
-        0.64,
-        0.8
-      ],
-      "duration_ms": 33,
-      "background_luminance_cd_m2": 50
+      "type": "Gabor detection across six fixed multiples of c50; cardiac phase prospectively balanced 50/50",
+      "duration_ms": null
     },
+    "response": "Detection and behavioral SDT sensitivity/criterion reported separately.",
     "conditions": [
-      "interoceptive_focus (attend to heartbeat while detecting stimulus)",
-      "exteroceptive_focus (attend to external tone while detecting stimulus)",
-      "dual_task_control (attend to both heartbeat and tone simultaneously)"
+      "interoceptive_focus",
+      "exteroceptive_focus",
+      "dual_task"
     ],
-    "response": "2AFC (seen / not seen), response window 1500 ms, response-locked to keypress"
+    "cardiac_phase": {
+      "systole": "R+250 ms to participant-specific T-wave end (typically R+250–400 ms)",
+      "diastole": "T-wave end+100 ms to next predicted R−100 ms (typically R+550–800 ms)",
+      "allocation": "Prospective trigger, balanced within block; no post-hoc phase binning"
+    },
+    "near_threshold_analysis_levels_c50": [
+      0.85,
+      0.95,
+      1.05,
+      1.15
+    ]
   },
   "blocks": {
-    "practice_trials": 20,
-    "experimental_blocks": 8,
-    "trials_per_block": 60,
-    "total_experimental_trials": 480,
-    "suprathreshold_control_block": "2 additional blocks (60 trials each) at suprathreshold contrast for Pred 1.a specificity test",
-    "break_duration_s": 60,
-    "condition_counterbalancing": "Cardiac phase pseudo-randomised across trials within block; attention condition (interoceptive/exteroceptive/dual-task) counterbalanced across blocks"
+    "practice_trials": 50,
+    "experimental_blocks": 3,
+    "trials_per_block": 480,
+    "total_experimental_trials": 1440,
+    "main_signal_trials_per_session": 360,
+    "main_catch_trials_per_session": 120,
+    "additional_miniblock_trials_per_session": 80,
+    "contrast_multipliers_c50": [
+      0.5,
+      0.85,
+      0.95,
+      1.05,
+      1.15,
+      1.5
+    ],
+    "usable_signal_minimum_per_level": 40,
+    "usable_catch_minimum": 80,
+    "session_quest_topup_trials": null,
+    "count_status": "Source also states 50 QUEST trials and 610 total per main session; unresolved. Main 480 and separate 80 mini-block counts are unambiguous.",
+    "session_quest_topup_candidates": [
+      30,
+      50
+    ],
+    "usable_trial_minima_status": "Proposed in source; prospective lock required before acquisition."
+  },
+  "dependent_variables": [
+    "P3b mean amplitude at Pz/P3/P4, 250–500 ms",
+    "P3b 50% fractional-area latency within 250–500 ms",
+    "HEP amplitude, 250–400 ms post-R",
+    "Detection d-prime and criterion c separately",
+    "Continuous heartbeat-discrimination d-prime (IA_z)",
+    "Population Weibull shape alpha_psy and 95% HDI",
+    "VAN 150–250 ms, secondary"
+  ],
+  "primary_hypothesis": "Pred 1.A–1.D jointly test state P3b ordering, interoceptive-specific cardiac-phase detection advantage, continuous IA moderation and HEP–P3b coupling beyond arousal.",
+  "primary_analysis": "Mixed-effects attention/phase analyses with continuous IA_z moderator; alpha=0.0125 for 1.A–1.D. Partial within-participant HEP–P3b correlation pooled with locked Fisher-z weights. Include time of day, hours since waking and session-onset RMSSD in all models. Pred 1.E uses hierarchical beta-binomial Weibull estimation and choice-only matched-likelihood AIC comparison; Pred 1.F continuous IA_z x Condition on d-prime is secondary at alpha=0.05.",
+  "power_analysis": {
+    "design_type": "sequential",
+    "effect_size_d": 0.45,
+    "alpha": 0.0125,
+    "power": 0.8,
+    "n_required": 59,
+    "n_target": 62,
+    "n_minimum": 48,
+    "power_at_minimum": 0.7,
+    "pred_1d_power_corrected_alpha": 0.76,
+    "pred_1f": {
+      "standardized_slope": 0.36,
+      "alpha": 0.05,
+      "power": 0.8,
+      "n": 62
+    }
+  },
+  "pre_registration": {
+    "platform": "OSF",
+    "project_url": "https://osf.io/t5hcq",
+    "base_registration_url": "https://osf.io/yk29g",
+    "base_registration_date": "2026-08-24",
+    "amendment": {
+      "number": 1,
+      "document_stated_date": "2026-10-16",
+      "identifier": null,
+      "verification_status": "Not independently verified; source date is after export date."
+    }
+  },
+  "apgi_parameters": {
+    "model": "Reduced empirical specification: seven core quantities plus somatic modulation; not eight freely fitted parameters in every dataset.",
+    "reduced_quantities": [
+      "theta_0",
+      "eta",
+      "tau_theta",
+      "gamma_sig",
+      "rho",
+      "Pi_i",
+      "Pi_e",
+      "beta_SM"
+    ],
+    "theta_0": {
+      "prior": "Normal(0.35, 0.2)",
+      "unit": "AU",
+      "registered_band": [
+        0.25,
+        0.85
+      ]
+    },
+    "gamma_sig": {
+      "range": [
+        2,
+        7.5
+      ],
+      "unit": "AU^-1",
+      "role": "population-fixed model sigmoid steepness; distinct from alpha_psy"
+    },
+    "tau_theta": {
+      "range_seconds": [
+        10,
+        30
+      ]
+    },
+    "tau_S": {
+      "range_seconds": [
+        0.2,
+        0.5
+      ]
+    },
+    "beta_SM": {
+      "typical_range": [
+        0.3,
+        0.7
+      ],
+      "role": "somatic modulation gain; not independently identifiable from Pi_i using behavior alone"
+    },
+    "kappa": {
+      "value": null,
+      "unit": "ATP/bit",
+      "status": "uncalibrated",
+      "role": "energy-information bridge only; never ignition steepness"
+    },
+    "gain_interpretation": "Pi_i in the reduced confirmatory model is salience-weighted gain; HEP is a candidate indicator, not a direct inverse-variance measurement.",
+    "accumulation": "S_next=(1-a_S)*S+a_S*u; a_S=1-exp(-dt/tau_S); u uses calibration-fixed relative gains and excess magnitudes abs(z)-sqrt(2/pi).",
+    "threshold": "dtheta/dt=-(theta-theta_0)/tau_theta+c_theta*C-Delta_info*V_info+gamma_NE*NE",
+    "somatic_modulation": "Pi_i_eff=Pi_i_baseline*exp(beta_SM*M_hat)",
+    "precision_adaptation": "dPi_i/dt=eta*(abs(epsilon_i)-Pi_i)+rho*(Pi_i_opt-Pi_i)",
+    "ignition": "p_k=1-exp(-r_max*sigmoid(gamma_sig*(S-theta))*dt); single trial-window sigmoid sampling is a distinct convention, never interchanged within a protocol.",
+    "time_step": "dt=0.01 s reduced reference; dt<=min(tau_S,tau_theta,tau_Pi)/10; active reservoir additionally requires dt<=tau_res/10.",
+    "parameter_manifest_status": "Required before confirmatory fitting; no unspecified coefficient is assigned a legacy default.",
+    "source": "OSF §§1.5–1.5.1; Mathematical Specification; Notation Appendix"
+  },
+  "ethics": {
+    "committee": "IRB / Ethics Committee",
+    "approval_status": "not_yet_submitted",
+    "protocol_number": null,
+    "approval_date": null,
+    "sponsoring_institution": null,
+    "source": "Protocols Table 1; OSF §3.4.1",
+    "enrollment_authorized": false
+  },
+  "quality_and_decision_rules": {
+    "data_admissibility": "Apply registered quality gates before inference. Inadmissible data are exploratory, receive no Scenario A–F, and carry no framework vote.",
+    "scenarios": {
+      "A": "Scenario A — Confirmed. p < α and BF₁₀ ≥ 100. Both streams converge on H₁. Counted toward framework-level BY-FDR confirmation and toward the joint Bayesian meta-analysis. No additional replication is required before the claim is filed.",
+      "B": "Scenario B — Tentative confirmation. p < α and 3 ≤ BF₁₀ < 100. The frequentist threshold is met but Bayesian evidence is moderate rather than strong; reported as \"frequentist-significant, Bayesian moderate.\" One pre-registered independent replication is required before the result is elevated to confirmatory status, and that replication is registered before the primary result is published.",
+      "C": "Scenario C — Discordant (frequentist-positive, Bayesian-null). p < α and BF₁₀ < 3. The frequentist threshold is met but the Bayes factor provides less than moderate evidence for H₁ and may favor H₀. Classified as equivocal: the result neither confirms nor falsifies the prediction. It is flagged as equivocal in the results and recorded in the analysis log (not in the protocol-deviation register, which is reserved for departures from registered procedure). Independent replication at ≥ 90% power is required before any interpretation is made.",
+      "D": "Scenario D — Bayesian positive (without frequentist significance). p ≥ α and BF₁₀ ≥ 100. Strong probabilistic support for H₁ while the NHST threshold is missed. Not counted toward BY-FDR (which operates on the frequentist p-values). The original study plus one pre-registered replication are required for elevation to confirmatory status.",
+      "E": "Scenario E — Bayesian falsification. p ≥ α and BF₀₁ ≥ 6. The frequentist result is nonsignificant and the Bayesian analysis supports H₀. Classified as provisional falsification of the specific sub-prediction and reported as such in the primary manuscript. A single Scenario E result triggers independent replication at ≥ 90% power before the sub-prediction is declared definitively falsified, and triggers review of whether the framework-level falsification threshold has been reached (two or more Scenario E results across primary protocols; framework-level decision rule).",
+      "F": "Scenario F — Indeterminate. p ≥ α and 1/6 < BF₁₀ < 100 (i.e., neither BF₁₀ ≥ 100 nor BF₀₁ ≥ 6). Neither stream reaches a decision threshold. Classified as inconclusive: it carries no confirmatory or falsifying weight and is reported transparently as indeterminate. It may motivate a pre-registered replication but does not by itself trigger one, and it is never counted toward BY-FDR confirmation or framework-level falsification."
+    },
+    "exceptions": [
+      "Pred 1.E interval/model comparison",
+      "Pred 5.E interval equivalence",
+      "Pred 7.A cross-validated incremental prediction"
+    ],
+    "framework_family": [
+      1,
+      3,
+      4,
+      5,
+      7
+    ],
+    "framework_by_fdr_q": 0.05,
+    "framework_confirmation": "At least 4/5 primary protocols, combined hierarchical BF10>=100, and at most one Scenario E protocol. Protocol 0 is a gate; 2 contributes F2; 6 is CE.",
+    "protocol_alpha_specification": "Protocol 1 (Cardiac-EEG): Protocol 1 targets N = 62 with the stated admissible floor. The current Pred 1.A–1.D primary family and its correction govern unless a prospective amendment specifies a revised primary hypothesis, secondary family, correction, sample-size rationale and effect on the five-protocol framework family before outcome access. No undefined across-Protocols-1–7 BH family is introduced by enrollment shortfall.",
+    "decision_precedence": "Prediction-specific estimands, interval/evidence rules and admissibility gates govern over abbreviated source summaries. The A–F matrix applies only where both frequentist and Bayesian hypotheses are explicitly defined; do not invent a point-null Bayes factor. Nonsignificance or a point estimate alone does not establish equivalence or falsification; specificity requires a direct contrast. Unresolved interval bounds or multiplicity allocations require prospective analysis lock."
+  },
+  "submission_blocking_issues": [
+    "Main-session QUEST top-up is 30 in Data phases but 50 in session-total paragraph (590 vs 610 including mini-blocks); resolve before acquisition lock.",
+    "Usable-trial minima are explicitly labeled proposals in source; require prospective lock.",
+    "Pred 1.E hierarchical priors, comparator parameterization, observation likelihood and acquisition rules require archived lock.",
+    "Final site-specific eligibility, approvals, roles, observation model and executable analysis manifest must be prospectively locked; source specification is not a completed operational study authorization."
+  ],
+  "specification_sections": [
+    {
+      "heading": "Interoceptive Precision Modulates Detection Threshold",
+      "source_start_paragraph_line": 1710,
+      "text": "Protocol 1 (Cardiac-EEG) tests the core link between interoceptive precision (Πⁱ) and ignition threshold (θₜ) via HEP-P3b coupling.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Design",
+      "source_start_paragraph_line": 1718,
+      "text": "Protocol 1 (Cardiac-EEG) uses a within-subject design with three counterbalanced attention conditions crossed with cardiac phase (systole, diastole). Participants complete: (1) interoceptive focus — attending to heartbeat while detecting visual stimuli, with ECG-based R-peak synchronization. Stimulus onset is prospectively triggered on the R-peak using real-time Pan–Tompkins detection (jitter tolerance ±10 ms), with systole defined per participant from the resting ECG as R + 250 ms to the end of the T-wave (typically R + 250–400 ms, when arterial baroreceptors fire) and diastole as T-wave end + 100 ms to the next predicted R − 100 ms (typically R + 550–800 ms) (cf. Al et al., 2020; Garfinkel et al., 2014); trials are allocated to cardiac phase by the trigger, not binned post hoc, and allocation is balanced 50/50 by design within each block; (2) exteroceptive focus — attending to visual clarity with matched attentional load; and (3) dual-task control — counting tones while detecting visual stimuli, to assess attention division without interoceptive engagement. Visual stimuli are Gabor patches presented at individually calibrated perceptual thresholds, maintaining a 50% detection rate across participants.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Trial counts",
+      "source_start_paragraph_line": 1722,
+      "text": "A 50-trial pre-session adaptive QUEST staircase (50% detection criterion) establishes each participant's individual threshold c₅₀. The main session then presents stimuli at six fixed contrast levels concentrated about c₅₀ (0.50, 0.85, 0.95, 1.05, 1.15, 1.50 × c₅₀), ≥ 60 trials per level, plus 25% blank catch trials. The multi-level grid is required for Pred 1.E: a staircase converging on the 50% point estimates threshold, not slope, and cannot identify α_psy. Pred 1.A–1.D are analyzed on the c₅₀-adjacent levels (0.85–1.15 × c₅₀) so that the added levels do not alter the near-threshold titration those predictions depend on. Each main recording session (Phase 2; one condition per session) comprises 480 trials: the six contrast levels × 60 trials (360) plus 120 blank catch trials (25%). The four near-threshold levels used for Pred 1.A–1.D yield ≈ 240 trials (≈ 120 hits and 120 misses) per condition, sufficient for the Pred 1.D HEP–P3b analysis; all 360 signal trials per session enter the Pred 1.E fit. The 480 main-session trials are planned presentations, not usable-trial counts: at the permitted 30% rejection they yield at most 336 usable trials. The admissibility minima are ≥ 40 usable trials at each of the six signal levels and ≥ 80 usable catch trials per session. A participant or fit failing these minima is inadmissible for the affected prediction, and no trials are added after outcome inspection.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Data phases",
+      "source_start_paragraph_line": 1726,
+      "text": "Phase 1 — Calibration (session 1, ~30 min): Individual perceptual thresholds are established by the 50-trial QUEST procedure (p = 0.5) and re-estimated by a 30-trial QUEST top-up at the start of each main session; heartbeat-discrimination d′ is measured as the continuous IA moderator (tertiles for description only).\n\nPhase 2 — Main recording (sessions 2–4, counterbalanced, one condition per session, ~90 min each): EEG recorded during all three conditions; HEP and P3b analysis windows extracted from these sessions only. Phase 1 data inform participant classification but are not included in primary hypothesis tests.\n\nBecause condition is manipulated between sessions, condition is confounded with session-level state — a material threat for an HEP-based dependent variable. Three mitigations are pre-registered: (i) Latin-square counterbalancing of condition order; (ii) session-level covariates (time of day, hours since waking, resting RMSSD at session onset) entered in all models; (iii) a within-session interoceptive/exteroceptive mini-block (40 trials each) at the end of every session, providing a within-session replication of Pred 1.A that is reported alongside the between-session primary test. These 80 mini-block trials are additional to the 480 main trials and 50 QUEST trials, yielding 610 presented trials per session before any permitted additional acquisition. Mini-block results are a separately identified within-session replication and are not pooled into the primary condition data. Session duration includes all 610 trials, transitions and breaks; the schedule must report their allocated time.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "The study measures three electrophysiological indices and one behavioral index:",
+      "source_start_paragraph_line": 1736,
+      "text": "Visual Awareness Negativity (VAN), 150–250 ms — an early correlate of visual awareness (Koivisto & Revonsuo, 2010), reported as a secondary measure to test whether interoceptive focus modulates early (VAN) or only late (P3b) awareness-related activity",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Heartbeat-Evoked Potential (HEP), 250–400 ms post-R-wave — primary analysis window indexing Πⁱ",
+      "source_start_paragraph_line": 1740,
+      "text": "Perceptual detection sensitivity (d′); baseline interoceptive accuracy is the separately measured moderator (Garfinkel et al., 2015)",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Competing theory predictions for Protocol 1 (Cardiac-EEG) measures",
+      "source_start_paragraph_line": 1743,
+      "text": "GNWT predicts a late P3b signature for conscious access but assigns no role to cardiac phase or HEP amplitude — HEP-P3b coupling should be null or purely arousal-mediated under GNWT. IIT makes no direct prediction about P3b, which it treats as a correlate of report rather than of experience; a pure IIT account therefore offers no reason for interoceptive focus to modulate P3b. APGI uniquely predicts that HEP amplitude (indexing Πⁱ) will predict P3b beyond arousal, and that interoceptive focus will produce greater P3b than exteroceptive focus even at matched attentional load. The planned analyses are designed so that each pattern of results differentially adjudicates among these three predictions.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Data-Admissibility Gate (EEG Trial Rejection Threshold)",
+      "source_start_paragraph_line": 1747,
+      "text": "Trials exceeding the 150 µV peak-to-peak criterion, or containing muscle components (ICLabel muscle probability > 0.80), in the MNE-Python pipeline (§4.2.1) are excluded; the ±200 µV online value is a technician alert only. Participants with > 30% of trials rejected fail the Data-Admissibility Gate; this 30% participant-level threshold is applied uniformly across all EEG-dependent protocols and is pre-specified here to prevent analyst degrees of freedom during preprocessing. Trials rejected at the artifact-detection stage are not reconstructed and do not contribute to trial counts or statistical analysis.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 1.A — State-level condition effect on P3b",
+      "source_start_paragraph_line": 1753,
+      "text": "When target stimuli are individually titrated to near-threshold intensity (d-prime 0.8–1.2 at baseline), interoceptive focus produces greater P3b amplitude than either exteroceptive focus (matched for task difficulty) or dual-task control (matched for attention division), because interoceptive focus transiently elevates Πⁱ_eff and lowers θₜ. The predicted P3b increase is 2–3 µV (Cohen's d = 0.5–0.7; a model-derived APGI expectation, not a published estimate for this contrast); the power analysis conservatively assumes d = 0.45, and the confirmatory floor is |Δ| ≥ 0.3 µV with ηₚ² ≥ 0.06 (Table 5). Near-threshold titration of target stimuli is a mandatory procedural constraint: without it, the condition effect cannot be attributed to Πⁱ-mediated ignition modulation rather than task-relevance differences. P3b is treated as a proxy for post-perceptual global broadcast under report conditions, not as a necessary and sufficient signature of phenomenal awareness. Effects falling below d = 0.2, even if statistically significant, do not constitute confirmation.\n\nPower analysis: d = 0.45, α = 0.0125 (Bonferroni-corrected across four primary predictions: Pred 1.A, 1.B, 1.C, 1.D), power = 0.80, yielding N = 59; enrollment targets N = 62 to absorb ~5% unusable datasets, with a minimum of 48. At N = 48 the design retains power 0.70; a final sample of 48 is admissible only under an efficacy stop (BF₁₀ ≥ 100), never under a futility or attrition stop, and any final N < 59 is reported as falling short of the registered 0.80 target. Pred 1.D (partial r = 0.40, two covariates) is powered at 0.89 at α = 0.05 and 0.76 at the Bonferroni-corrected α = 0.0125.\n\nPred 1.A tests state-level precision modulation (Πⁱ_eff via attentional condition; within-subject design; DV: P3b amplitude).\n\nPred 1.F tests trait-level precision baseline (Πⁱ_baseline via the continuous IA moderator; between-subject design; DV: d′). These operationalize distinct APGI parameters and must not be aggregated or substituted for one another in replication reporting.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 1.B — Cardiac-phase detection advantage at diastole (within-subject; DV: hit rate / d′)",
+      "source_start_paragraph_line": 1763,
+      "text": "Within the interoceptive focus condition, near-threshold detection is greater during diastole than systole, because the reduced baroreceptor afference of diastole lowers competing cardiac signal and transiently sharpens Πⁱ-gated perceptual sensitivity.\n\nExpected outcome: hit rate is at least 5 percentage points higher at diastole than at systole, with d′ reported separately, with a significant Cardiac Phase × Condition interaction (p < 0.0125, Bonferroni) confirming that the advantage is specific to interoceptive focus. Classification: Confirmatory.\n\nFalsification: uniform detection across cardiac phases (interaction p > 0.15); or an equivalent diastole–systole advantage in the exteroceptive focus condition, which would eliminate interoceptive specificity.\n\nPred 1.C — Interoceptive-accuracy moderation of the 1.A and 1.B effects (continuous IA × condition interaction; tertile ANOVA descriptive only)\n\nParticipants with higher baseline interoceptive accuracy (heartbeat discrimination) exhibit stronger Pred 1.A and Pred 1.B effects. This is operationalized as the continuous IA_z × condition interaction on P3b in the mixed-effects model (standardized slope β_std ≥ 0.30, α = 0.0125); the tertile ANOVA (expected η² ≈ 0.08–0.12) is descriptive. This interaction directly tests the APGI claim that trait Πⁱ_baseline scales the ignition threshold — it is not reducible to an HRV covariate control, which would only show that the effect is not caused by heart rate variability rather than demonstrating that trait sensitivity modulates it.\n\nExpected outcome: continuous interaction β_std ≥ 0.30 (confirmatory); tertile ANOVA descriptive. Classification: Confirmatory.\n\nFalsification: β_std < 0.10 with BF₀₁ ≥ 6; p > 0.10 with BF₀₁ < 6 is indeterminate.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 1.D — HEP–P3b coupling beyond arousal",
+      "source_start_paragraph_line": 1779,
+      "text": "HEP amplitude during interoceptive focus predicts P3b strength with a moderate-to-strong correlation exceeding r = 0.4. The critical comparison demonstrates that HEP amplitude predicts P3b change beyond general arousal when pupil diameter is controlled as a covariate, reflecting how HEP indexes Πⁱ while high Πⁱ increases Sₜ.\n\nExpected outcome: within-participant partial r(HEP, P3b | pupil, HRV) > 0.40, computed across trials and pooled by the registered Fisher-z procedure; the group test uses p < 0.0125. Session-state covariates specified for all models also apply. Classification: Confirmatory. The pooling weights, trial eligibility and covariate definitions are fixed in the analysis script before lock.\n\nFalsification: r < 0.2 after arousal control.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 1.E — Near-threshold psychometric steepness (between-subject parameter estimate; DV: α_psy)",
+      "source_start_paragraph_line": 1787,
+      "text": "APGI predicts a steep near-threshold psychometric function consistent with discrete threshold crossing. The registered benchmark is α_psy ≥ 10, compared with α_psy ≈ 2–6 for the prespecified graded-accumulation comparator. The latter range is an assumption of the registered comparator implementation, not a universal prediction of drift-diffusion models (Ratcliff & McKoon, 2008). Steepness alone does not establish a discrete neural transition; discrimination between the registered implementations also requires the model comparison specified below.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "ψ(c) = g + (1 − g − λ)[1 − exp(−(c/c₀)^k)],",
+      "source_start_paragraph_line": 1793,
+      "text": "where c is stimulus contrast, c₀ is the Weibull scale parameter, g is the false-alarm asymptote fixed at the participant’s empirical blank catch-trial false-alarm rate, and λ is the lapse parameter estimated within [0, 0.05], subject to g + λ < 1. The scale parameter c₀ is distinguished from the individually calibrated 50% detection threshold c₅₀. The lapse parameter must remain free: fixing it to zero can bias steepness estimates. An estimate at the zero boundary is admissible; imposing λ = 0 throughout fitting is not.\n\nFitting. Participant-level choice counts are modeled using a beta-binomial likelihood to accommodate overdispersion (Schütt et al., 2016). A hierarchical model estimates participant-specific Weibull parameters and the population-level shape parameter. Group-level α_psy is reported as the posterior median of that population parameter, with its 95% highest-density interval (HDI). The hierarchical structure, priors, trial aggregation, parameter bounds, and convergence criteria are specified in the analysis plan before registration lock.\n\nModel comparison. The Weibull model is compared with the prespecified graded-accumulation model using maximum-likelihood fits to exactly the same eligible choice observations. Both models use the same observation likelihood and treatment of overdispersion. The locked specification defines the comparator’s contrast-to-drift mapping, all estimated parameters, parameter bounds, and the parameter count used in AIC. Parameters estimated from reaction-time data are not substituted into the choice-only AIC comparison; reaction-time-informed analyses are reported separately.\n\nDefine ΔAIC = AIC_graded − AIC_Weibull. Thus, ΔAIC > 10 favors the Weibull model, whereas ΔAIC < −10 favors the graded comparator.\n\nConfirmation and falsification. Pred 1.E is confirmed when both conditions are met: the lower bound of the population α_psy 95% HDI is ≥ 10, and ΔAIC > 10 favors the Weibull model. A point estimate ≥ 10 whose interval includes values below 10 does not satisfy the steepness criterion.\n\nEvidence against Pred 1.E is obtained when the upper bound of the population α_psy 95% HDI is < 5, or when ΔAIC < −10 favors the graded comparator, provided the interval and model-comparison results do not conflict. Conflicting evidence is classified as indeterminate and reported separately. All remaining outcomes, including intervals spanning the decision boundaries or insufficient model separation, are indeterminate and require independent replication before confirmation is claimed.\n\nDecision framework. Pred 1.E is a parameter-estimation and model-comparison test rather than a null-hypothesis significance test. It is therefore excluded from the Pred 1.A–1.D Bonferroni family and has no separate frequentist significance level. Its registered HDI and ΔAIC criteria govern adjudication. It contributes evidence to the Protocol 1 assessment but does not constitute an additional protocol-level vote in framework confirmation.\n\nSample and admissibility. Pred 1.E requires at least 40 admissible participants and the usable-trial minima specified separately in the locked analysis plan. The N = 30 interim is monitoring-only and cannot authorize efficacy stopping. Permitted Protocol 1 efficacy stops at N = 50 or N = 60 exceed the participant floor but do not waive trial-level admissibility or model-fitting requirements. Trial shortfalls are resolved only through the prospectively specified acquisition rule or a separately registered replication. If the participant or usable-trial requirements are not met, Pred 1.E is reported as not evaluated.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Pred 1.F — Trait-Level Interoceptive Precision Modulates Detection Sensitivity",
+      "source_start_paragraph_line": 1811,
+      "text": "Baseline interoceptive precision (Πⁱ_baseline), entered as a continuous participant-level moderator (heartbeat-discrimination d′, z-scored), predicts detection sensitivity in the interoceptive condition. Primary test: the IA × condition interaction term in the mixed-effects model d′ ~ IA_z × Condition + (1 + Condition | Participant). N = 62 yields 0.80 power to detect a standardized interaction slope β_std = 0.36 at α = 0.05. The top-versus-bottom-tertile contrast is retained for descriptive reporting only and is not the confirmatory test; it is underpowered by design (power 0.30 at d = 0.45).\n\nConfirming evidence: High-IA > low-IA detection sensitivity, with the effect confined to the interoceptive condition (interoceptive-specific), with a confirmatory continuous IA × condition slope benchmark β_std ≥ 0.36 under the registered interval/evidence rule. High-/low-IA tertile d = 0.40–0.60 is descriptive only; falsification and specificity are assessed on the continuous interaction and its direct condition contrast, with uncertainty.\n\nFalsifying evidence: Positive evidence that the continuous IA × condition slope is negligible under the registered interval rule (the descriptive high-/low-IA tertile d is not a falsifier); OR a group difference that replicates equivalently in the exteroceptive condition — the latter eliminating interoceptive specificity by showing the advantage reflects generalized perceptual or arousal differences rather than interoceptive precision.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Control Analyses",
+      "source_start_paragraph_line": 1826,
+      "text": "Arousal confounds: pupil diameter and alpha power included as covariates. Attention confounds: performance on attention-check trials. Individual differences: random slopes for participants modeled in the mixed-effects structure.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Signal Detection Theory (SDT) Decomposition",
+      "source_start_paragraph_line": 1830,
+      "text": "All cardiac-phase comparisons and condition effects are decomposed into sensitivity (d′) and criterion (c) components using standard SDT. The primary APGI claim is a sensitivity (d′) effect. Lowering θₜ alone would raise both hits and false alarms — a liberal criterion shift — so a d′ increase additionally requires precision-weighted gain on target-evoked S(t); a criterion-only effect is reported as a θₜ effect without precision gain and does not confirm Pred 1.A–1.C. The two measures are reported independently in all tables and figures.\n\nInterpretation rule: If d′ differences are significant but criterion differences are not, this is the predicted APGI pattern (interoceptive precision modulating sensitivity). If criterion shifts are observed without d′ shifts, this is classified as a response bias effect rather than precision gating, and the result is reclassified as exploratory relative to Pred 1.A–Pred 1.C.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Integration Note",
+      "source_start_paragraph_line": 1836,
+      "text": "Pred 1.D result (HEP–P3b coupling beyond arousal) is the single most diagnostic finding for distinguishing APGI from GNWT at the neural correlate level. A confirmed Pred 1.A with a null Pred 1.D would favor an attentional account in which interoceptive focus raises P3b without HEP-indexed precision coupling. A confirmed Pred 1.B with a null Pred 1.A would indicate cardiac-cycle (baroreceptor) gating of detection without attention-driven precision modulation. Full confirmation of Pred 1.A–Pred 1.C jointly is required before Protocol 5 (Insula-TMS)'s causal claims can be interpreted as validating the APGI precision-gating architecture (interpretive dependency only; Protocol 5 data collection is not gated).",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Stopping rule",
+      "source_start_paragraph_line": 1840,
+      "text": "Protocol 1 (Cardiac-EEG) uses a Bayesian sequential design as specified in Section 3.1.3 (interim analyses at N = 30, 50, and 60; early stopping for efficacy at BF₁₀ ≥ 100; futility at BF₁₀ ≤ 1/10 at N = 50). Enrollment targets N = 62 (minimum N = 48); N = 48 is the minimum admissible final sample after early stopping. Actual final N will be determined by the Bayesian stopping criteria. The framework-level falsification criterion (interoceptive d′ explaining < 2% of detection-threshold variance, Scenario E, on a Fisher-z pool with Σ(nᵢ − 3) ≥ 190; the interoceptive-precision falsifier, Table 17, §3.6) is a replication-scale test. Protocol 1 supplies one of the two required samples at its own enrollment — N = 62 target, N = 48 minimum admissible after early stopping — and cannot trigger the falsifier alone: a single sample of N = 62 bounds the 95% interval only at R² = 0.062, three times the falsification threshold. The second sample comes from the pre-registered independent replication, which is sized so that the pooled precision floor is met at Protocol 1's realized final N (N ≥ 134 if Protocol 1 completes at N = 62; N ≥ 148 if it stops early at N = 48). The falsifier is evaluated only after both samples are complete; Protocol 1's own confirmatory outcome is stated at the protocol level (Pred 1.A-1.D), not at framework level. Outside the Bayesian stopping rules above, early termination is permitted only for safety reasons or equipment failure affecting data integrity, and will be reported transparently with available data analyzed.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Real-time data quality checks",
+      "source_start_paragraph_line": 1844,
+      "text": "Electrode impedances checked at < 10 kΩ before each session; sessions paused and re-gelled if any channel exceeds 20 kΩ mid-run. Online artifact monitor flagged for peak-to-peak amplitude > 200 µV; technician notified if > 10% of trials are flagged in a rolling 50-trial window. ECG signal quality checked before each condition block; R-wave detection accuracy confirmed at > 95% by online algorithm before proceeding.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    },
+    {
+      "heading": "Trial rejection threshold",
+      "source_start_paragraph_line": 1848,
+      "text": "Epochs exceeding 150 µV peak-to-peak or containing muscle artifacts detected by automated ICA classification (ICLabel probability > 0.8) will be rejected. Participants with more than 30% trial rejection will be excluded from primary analyses; their data will be retained for sensitivity analyses. This 30% value is the series-canonical threshold defined by the Data-Admissibility Gate (§3.5.2) and is applied identically across all EEG protocols.",
+      "role": "source_context; curated structured decisions govern conflicts"
+    }
+  ],
+  "provenance": {
+    "source_files": [
+      {
+        "file": "OSF-Preregistration.docx",
+        "sha256": "ec17e6fcbe4a61d278baba42984734255e1b7b53607b30450b7d6e2334d26cd9"
+      },
+      {
+        "file": "Protocols.docx",
+        "sha256": "09a9d6c6d3827b4f8e320898f9cf0ba5fee0f85ae4198d783a5811cf9f6ff6d4"
+      },
+      {
+        "file": "Mathematical-Specification.docx",
+        "sha256": "6de4017113b2653c0d0b73ae22775f2cd32f3e8ca5c14d3d64da4130ea32f2fa"
+      },
+      {
+        "file": "Notation-Appendix.docx",
+        "sha256": "37f74a40313fb76210d43238429eb371d606996f0b758212b21db1f837ad4a82"
+      }
+    ],
+    "input_file": "protocol_1_cardiac_eeg.json",
+    "input_sha256": "a21f491f624ddb6d206233cee8283954bbc577dacd4d91b774e74d26292927c0",
+    "input_version": "2.0.0",
+    "precedence": "OSF governs empirical design and statistical decisions; Mathematical Specification governs equations; Notation Appendix governs symbols. Detailed decision rules supersede shorthand summaries; unresolved conflicts are flagged.",
+    "legacy_policy": "Reconstructed from current specifications; unsupported apparatus, approvals, counts and numerical defaults are not silently carried forward.",
+    "source_excerpt_policy": "Specification sections preserve source context; structured decision rules and listed conflict resolutions govern this export. Editorial requests embedded in documents are not executed.",
+    "input_schema_sha256": "6696a50371fd1b695b03cba5d071dcd2d9c89f92642084de500f6bfdd2499070"
   },
   "eeg_analysis_pipeline": {
-    "bandpass_filter_hz": [
+    "sample_rate_hz": 1000,
+    "channels": 64,
+    "offline_reference": "average after RANSAC bad-channel interpolation",
+    "bandpass_hz": [
       0.1,
-      40
+      100
     ],
-    "epoch_window_ms": [
+    "stimulus_epoch_ms": [
       -200,
-      800
+      1000
     ],
-    "baseline_correction_ms": [
+    "stimulus_baseline_ms": [
       -200,
       0
     ],
-    "artifact_rejection_threshold_uv": 100,
+    "hep_epoch_ms": [
+      -200,
+      600
+    ],
     "hep_window_ms": [
       250,
       400
@@ -254,87 +527,72 @@
       "P3",
       "P4"
     ],
-    "ica_components": "Automated rejection of cardiac and ocular ICA components (EEGLAB ADJUST)",
-    "minimum_clean_epochs_per_condition": 30,
-    "arousal_covariates": [
-      "HRV (RMSSD)",
-      "pupil diameter (z-scored per block)"
-    ]
+    "artifact_peak_to_peak_uv": 150,
+    "maximum_rejected_fraction": 0.3,
+    "ica": "extended Infomax; ICLabel eye/muscle probability >0.80",
+    "cardiac_template_rejection_r": 0.8,
+    "residual_qrs_check": "> +/-2 uV at 0–80 ms triggers second ICA pass",
+    "hep_confirmation_conjuncts": [
+      "Surrogate-R-peak permutation p < applicable alpha",
+      "Effect survives ECG-amplitude covariate",
+      "Respiratory-phase covariate and registered respiratory exclusion applied"
+    ],
+    "respiratory_extrema_exclusion_ms": 100,
+    "rr_interval_ms": [
+      500,
+      1500
+    ],
+    "ectopic_rr_relative_deviation_maximum": 0.2,
+    "later_hep_robustness_window_ms": [
+      455,
+      595
+    ],
+    "complete_pipeline_source": "OSF §§4.1.1, 4.2.1; Appendix A"
   },
-  "dependent_variables": [
-    "P3b amplitude (300–600 ms, Pz) per attention condition (interoceptive / exteroceptive / dual-task) — primary (Pred 1.a)",
-    "P3b amplitude × condition ANOVA: ηₚ² for condition main effect — primary (Pred 1.a)",
-    "HEP amplitude (250–400 ms, Cz) per attention condition",
-    "HEP–P3b partial correlation (r), controlling for RMSSD and pupil diameter — Pred 1.a specificity",
-    "P3b condition effect at suprathreshold contrast — Pred 1.a control block",
-    "d-prime (signal detection theory) per attention condition and IA tertile group — Pred 1.a-trait",
-    "Group × modality interaction on d′ (high-IA vs. low-IA × interoceptive vs. exteroceptive) — Pred 1.a-trait",
-    "Detection rate per cardiac phase (systole vs. diastole) — Pred 1.b",
-    "d-prime per cardiac phase — Pred 1.b",
-    "IA (interoceptive accuracy) score per participant — tertile assignment (Pred 1.c)",
-    "Accuracy × attention-condition interaction on P3b amplitude — Pred 1.c",
-    "Accuracy × cardiac-phase interaction on detection rate — Pred 1.c",
-    "HRV (RMSSD) as arousal covariate"
-  ],
-  "primary_hypothesis": "Interoceptive focus produces greater P3b amplitude for near-threshold stimuli than exteroceptive focus or dual-task control (three-way condition difference, ηₚ² ≥ 0.06), this effect is absent at suprathreshold contrast, and HEP amplitude predicts P3b with partial r > 0.4 surviving arousal covariate control. High-IA participants show larger P3b condition effects and diastolic detection advantages than low-IA participants.",
-  "primary_analysis": "Repeated-measures ANOVA: P3b_amplitude ~ condition (interoceptive/exteroceptive/dual-task) × contrast (near/supra-threshold) × cardiac_phase, with HRV and pupil diameter as covariates. FWE-correction across electrode clusters. HEP–P3b partial correlation via mixed-effects with RMSSD and pupil as fixed covariates. IA tertile × condition interaction for Pred 1.c.",
-  "power_analysis": {
-    "primary_test": "Within-subjects t-test on HEP amplitude (interoceptive vs. exteroceptive focus)",
-    "effect_size_d": 0.45,
-    "alpha": 0.05,
-    "power": 0.8,
-    "n_required": 62,
-    "n_target": 62,
-    "n_minimum": 48,
-    "power_for_hep_p3b_correlation": 0.94,
-    "software": "G*Power 3.1",
-    "based_on": "Pollatos et al. (2007) interoceptive effect lower bound d = 0.45; Garfinkel et al. (2014) cardiac-phase detection effect; Canales-Johnson et al. (2020) HEP–P3b coupling"
-  },
-  "pre_registration": {
-    "platform": "OSF",
-    "url": "https://osf.io/t5hcq",
-    "date": "2026-07-30",
-    "zenodo_doi": "10.5281/zenodo.21632264",
-    "orcid": "https://orcid.org/0009-0005-0328-2896"
-  },
-  "apgi_parameters": {
-    "kappa": 100,
-    "alpha": 0.3,
-    "beta_initial_estimate": 0.7,
-    "pi_i_cardiac_systole": 0.6,
-    "pi_i_cardiac_diastole": 1.2,
-    "pi_i_high_ia_estimate": 1.4,
-    "pi_i_low_ia_estimate": 0.7
-  },
-  "ethics": {
-    "committee": "Institutional Review Board",
-    "protocol_number": "IRB-2026-EEG-XXX",
-    "approval_date": "2026-05-01"
-  },
-  "submission_blocking_issues": [],
-  "caveats": [
-    "Pred 1.a requires three attention conditions; dual-task control condition substantially increases session length — practice blocks must ensure participants understand the dual-task instruction.",
-    "Suprathreshold control blocks are mandatory for Pred 1.a specificity; failure to include them means Pred 1.a cannot be confirmed per registry criteria.",
-    "IA tertile grouping (Pred 1.a-trait, 1.C) requires pre-scan heartbeat counting; this must be administered identically across sites if multi-site."
-  ],
-  "bayesian_sequential_design": {
-    "interim_analysis_n": [
+  "sequential_design": {
+    "interim_n": [
       30,
       50,
       60
     ],
-    "stop_for_efficacy": "BF₁₀ ≥ 30 (decisive evidence) at any interim check",
-    "stop_for_futility": "BF₁₀ ≤ 1/10 at N = 50",
-    "logging": "Stopping decisions logged as timestamped OSF pre-registration addenda before any data are inspected beyond the interim count",
-    "note": "Final N is determined by the Bayesian criteria, not by a fixed ceiling; N = 62 is the expected final N."
+    "n_max": 62,
+    "efficacy": "BF10>=100 for every Pred 1.A–1.D at eligible interim; N=30 monitoring only",
+    "futility": "BF10<=0.1 at N=50",
+    "below_powered_n": "Any final N<59 disclosed as below 80% power target"
   },
-  "multiple_comparisons": {
-    "primary_nhst_family": "Pred 1.A–1.D",
-    "correction": "Bonferroni",
-    "alpha_per_test": 0.0125,
-    "secondary_family_pred_1a_trait_alpha": 0.05,
-    "pred_1e_note": "Pred 1.E is evaluated by parameter estimation and model comparison rather than NHST; it carries no α and is excluded from the Bonferroni family by design.",
-    "pred_1f_note": "Pred 1.F (R_P3b interoceptive-to-exteroceptive ratio) is registered separately as a secondary prediction."
+  "framework_replication_falsifier": {
+    "samples_minimum": 2,
+    "fisher_z_precision_floor": 190,
+    "criterion": "Registered association interval wholly within +/-sqrt(0.02), with applicable null/interval evidence; pooled precision floor is not sufficient by itself.",
+    "replication_n_if_primary_62": 134,
+    "replication_n_if_primary_48": 148
   },
-  "source_of_truth": "APGI-Protocols.md (Protocols & Prediction Registry) and APGI-OSF-Preregistration.md. Where the two disagree with stored values, the documents govern. Deposited on OSF (osf.io/t5hcq) and archived at Zenodo (DOI 10.5281/zenodo.21632264)."
+  "methods_source_sections": [
+    {
+      "heading": "Outliers and influence",
+      "text": "4.3.2 Outlier and influential-observation policy\n\nAll rules below are fixed pre-collection and apply to every protocol unless a protocol body specifies otherwise; no post-hoc outlier rule may be introduced. (a) Trial level. Scalp-EEG trials exceeding the 150 µV peak-to-peak criterion (§4.2.1) are rejected; iEEG trials follow the interictal-discharge and |z| > 6 rule of §Protocol 6; behavioral trials in speeded detection tasks with RT < 150 ms or > 3 s are rejected as anticipations or lapses (Protocol 2 IGT and Protocol 7 bedside tasks use the rules in their protocol bodies). No further trial-level trimming is permitted. (b) Participant level. A participant is excluded only for a pre-registered admissibility failure (> 30% trial rejection, Data-Admissibility Gate; failed manipulation check; protocol violation). Statistical outlyingness is never itself an exclusion ground. (c) Observation level in models. Continuous predictors and outcomes are winsorized at ±3 SD within participant before entry into any confirmatory model; the untrimmed analysis is reported alongside as a mandatory sensitivity analysis, and a discrepancy in the confirmatory decision between the two is reported as an instability flag. (d) Influence. For every confirmatory regression or mixed model, Cook's distance is computed and observations with D > 4/n are reported; the model is refit without them as a sensitivity analysis. The trimmed refit is never the confirmatory result. (e) Model diagnostics and fallback. Gaussian models use the registered residual diagnostics; binary/ordinal generalized models use distribution-appropriate simulation or predictive diagnostics, not a Shapiro–Wilk residual gate. Appendix C must identify the exact estimator, tuning constants, inferential test and Bayesian evidence computation for each permitted fallback before lock. A fallback not so specified is a sensitivity analysis and cannot replace the primary confirmatory estimator."
+    },
+    {
+      "heading": "Bayesian prior sensitivity",
+      "text": "Sensitivity analyses\n\nAll confirmatory Bayesian conclusions are re-run under fixed prior transformations. Normal and HalfNormal priors: scale multiplied by 2 and by ½, location and support unchanged. Beta(2, 5) prior on η_RL: mean (2/7) preserved and concentration (sum of shape parameters, 7) multiplied by 2 and by ½, giving Beta(4, 10) and Beta(1, 2.5). Fixed parameters remain fixed or vary over a separately registered grid. Every evidence and interval criterion is recomputed under each sensitivity prior; if a conclusion crosses a §3.5.2 decision boundary (BF₁₀ = 3 or 100, BF₀₁ = 6), it is reported as prior-sensitive and reclassified as exploratory."
+    },
+    {
+      "heading": "Scalp EEG acquisition",
+      "text": "4.1.1 Scalp EEG (Protocols 0, 1, 4, 5, 7)\n\nEEG will be acquired at 1000 Hz (TMS-EEG in Protocol 5: ≥ 5000 Hz on a TMS-compatible amplifier) using a 64-channel active electrode system (BrainProducts actiCHamp or equivalent). Electrode positions will be digitized using 3D photogrammetry (EGI Geodesic or equivalent). Online reference (all protocols): single physical reference at FCz (or the amplifier's default), with A1/A2 or TP9/TP10 recorded as separate channels. Post-acquisition re-referencing (all protocols): average reference after RANSAC bad-channel interpolation (correlation threshold < 0.85 with neighbors). Sites using mastoid-referenced amplifiers must apply offline average-reference conversion before any cross-protocol pooling. The acquisition target is impedance < 10 kΩ. For 10–20 kΩ, the technician attempts correction and records the affected electrodes; data remain admissible only if the registered signal-quality and bad-channel criteria pass. Impedance > 20 kΩ invokes the registered corrective/admissibility procedure. Impedance alone does not override the trial-quality gate.\n\nECG will be simultaneously recorded for HEP analysis (Lead II configuration). Skin conductance (SCR/EDA) will be acquired at 100 Hz from the thenar and hypothenar eminences of the non-dominant hand. Respiration will be recorded via respiratory inductance plethysmography or nasal thermistor (§4.2.1). All auxiliary channels will be synchronized with EEG via trigger pulses with sub-millisecond accuracy.\n\nHeartbeat-evoked potential (HEP) analysis: epochs from −200 to +600 ms relative to the R-peak will be extracted after artifact rejection; the HEP analysis window is 250–400 ms post-R-peak (Appendix A). Ectopic beats are excluded when the R-R interval deviates by > 20% from the median of the five preceding intervals, and R-R intervals outside 500–1500 ms (40–120 bpm) are excluded. Exclusion counts are reported per condition, and differential exclusion between the drug and placebo arms of Protocol 0 is tested. HEP amplitude will be quantified as mean amplitude in the 250–400 ms window over frontocentral electrodes (Fz, FCz, Cz)."
+    },
+    {
+      "heading": "EEG preprocessing and mandatory HEP controls",
+      "text": "4.2.1 EEG Pre-Processing\n\nEEG preprocessing will follow the PREP pipeline (Bigdely-Shamlo et al., 2015) supplemented by custom APGI-specific steps:\n\nRe-reference to average reference (all electrodes except those flagged as bad) after RANSAC bad channel interpolation (threshold: correlation < 0.85 with neighboring channels). This is the binding cross-protocol standard; protocol-specific mastoid references noted in companion documents are superseded for all pooled analyses.\nBandpass filter: 0.1–100 Hz (zero-phase FIR, Hamming window); notch filter at the local mains frequency (50 or 60 Hz) and harmonics. The 0.1–100 Hz pipeline applies to standard ERP analyses only. Infraslow/PAC analyses use a separately frozen branch: DC-coupled (or hardware high-pass ≤ 0.005 Hz) acquisition, a 0.005–100 Hz zero-phase FIR passband, continuous segments of ≥ 30 min for Pred 7.E (≥ 500 s for the MS-H1 infraslow test; §Spectral Fitting Parameters), and removal of the first and last 60 s of each segment to exclude filter transients. Frequencies removed by acquisition or filtering are not reconstructed; a dataset not meeting the DC/≤ 0.005 Hz requirement has its infraslow test deferred\nIndependent Component Analysis (ICA): extended Infomax (MNE-Python); components classified using ICLabel (threshold: eye artifact > 0.80, muscle artifact > 0.80, reject)\nHEP-specific artifact control (binding for all HEP measurement in Protocols 0, 1, 4, 5 and 7). The following supersede the generic ICLabel step for any analysis in which HEP amplitude is a dependent or independent variable, and are mandatory rather than advisory.\nCardiac field artifact — three-stage removal pipeline, applied in sequence. (a) ICA decomposition with cardiac component identification via template matching to simultaneously recorded ECG; a correlation of r > 0.80 with the ECG template is required for rejection. (b) Residual artifact inspection via visual review of the grand-average HEP time-locked to the QRS peak; any deflection exceeding ±2 µV in the 0–80 ms window indicates insufficient cardiac removal and triggers a second ICA pass. (c) HEP analysis restricted to the 250–400 ms post-R-peak window, which lies outside the QRS complex but overlaps the T-wave / cardiac field artifact (CFA, peaking ≈ 300 ms post-R); a surrogate-R-peak control (HEP recomputed on R-peaks shuffled within the participant's R-R distribution) and an ECG-amplitude covariate are confirmatory conjuncts: a primary HEP effect is confirmed only if it exceeds the surrogate distribution (permutation p < α) and survives the ECG covariate. The later window (455–595 ms) is reported as a robustness check. The 250–400 ms window is canonical; deviation requires explicit justification and artifact-check documentation filed as a protocol amendment.\nRespiratory phase. Continuous respiratory monitoring via respiratory inductance plethysmography or nasal thermistor throughout all HEP recording sessions. Any trial in which the R-peak falls within 100 ms of a respiratory peak or trough — defined as the extrema of the bandpass-filtered (0.1–0.5 Hz) respiratory signal — is excluded from HEP analysis. Respiratory phase is additionally included as a nuisance covariate in all HEP general linear models, and reported HEP effects must survive this covariate. If the respiratory covariate absorbs more than 30% of the HEP variance in the primary contrast (partial η² > 0.30), the result is flagged as potentially confounded and reported with a confound-warning label pending replication under paced breathing.\nArousal. Pupil diameter (baseline-corrected, 200–500 ms post-R-peak) is recorded on all trials via high-speed eyetracking (≥ 500 Hz, constant luminance). Any primary HEP–P3b association is reported both uncorrected and as a partial correlation controlling for trial-level pupil diameter; see Pred 1.D for the binding thresholds.\nNon-compliance. An analysis that omits any stage of this pipeline is automatically exploratory under §3.5.3 and carries no framework-level weight.\nEpoch extraction: −200 to +1000 ms relative to stimulus onset; baseline correction −200 to 0 ms\nArtifact rejection: trial-level peak-to-peak amplitude threshold of 150 µV (series-canonical): a trial is rejected when max(x) − min(x) > 150 µV within the analysis epoch on any scalp channel; peak-to-peak amplitudes are nonnegative; the ±200 µV online monitor threshold is a technician alert, not a rejection criterion; linear detrending; muscle artifact detection via high-frequency power (> 3 SD from mean)\nParticipants with > 30% rejected trials fail the registered admissibility gate. Report enrolled, excluded and analyzable counts separately. Replacement recruitment is permitted only within the protocol’s preregistered enrollment cap and stopping rules; exceeding that cap requires an amendment before additional recruitment. Excluded participants remain in the recruitment and adverse-event accounting."
+    },
+    {
+      "heading": "Protocol-specific ethics and regulatory source",
+      "text": "Protocol 1 (Cardiac-EEG)\n\nStatus: Ethics approval pending at time of registration lock.\nCommittee: Protocol is registered as a planned study and the registration will be amended with committee name, institution, approval number and date before any participant is approached.\nInformed consent: Written consent covering EEG recording, a cross-reference to the Protocol 0 consent for participants co-enrolled in Protocol 0, heart-rate recording, and data archival on OpenNeuro."
+    }
+  ],
+  "readiness": {
+    "status": "specification_updated_lock_requirements_pending",
+    "empirical_validation_performed": false,
+    "registration_verified": false,
+    "note": "JSON validation checks file structure, not scientific validity, regulatory approval or analysis-lock completion."
+  }
 }

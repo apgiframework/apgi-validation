@@ -57,6 +57,7 @@ except ImportError:
 
 try:
     from utils.protocol_loader import load_protocol as _load_protocol_fp04
+    from utils.protocol_loader import spec_prediction_results
 
     _PROTOCOL_SPEC_FP04 = _load_protocol_fp04("APGI-P06")
 except Exception:
@@ -2836,19 +2837,14 @@ def run_protocol_main(config=None):
             metadata=pred_data,
         )
 
-    # Add JSON protocol sub-predictions (P6a–P6d from APGI-P06 bifurcation spec)
-    if _PROTOCOL_SPEC_FP04 is not None:
-        _pred_map = {"P6a": "P4.a", "P6b": "P4.b", "P6c": "P4.c", "P6d": "P4.d"}
-        for sub_pred in _PROTOCOL_SPEC_FP04.sub_predictions:
-            linked = _pred_map.get(sub_pred.id)
-            passed = named_predictions[linked].passed if linked in named_predictions else False
-            named_predictions[sub_pred.id] = PredictionResult(
-                passed=passed,
-                status=PredictionStatus.PASSED if passed else PredictionStatus.FAILED,
-                name=sub_pred.claim,
-                evidence=[sub_pred.confirming_evidence, sub_pred.falsifying_evidence],
-                sources=["APGI-P06", "FP_04_PhaseTransitionEpistemicArchitecture"],
-            )
+    # Registered APGI-P06 predictions. P4.a–P4.d are model-level information and
+    # critical-slowing metrics, not the registered iEEG tests, so every Pred 6.x
+    # is reported INDETERMINATE.
+    named_predictions.update(
+        spec_prediction_results(
+            _PROTOCOL_SPEC_FP04, named_predictions, {}, ["FP_04_PhaseTransitionEpistemicArchitecture"]
+        )
+    )
 
     spec_params = _PROTOCOL_SPEC_FP04.apgi_parameters if _PROTOCOL_SPEC_FP04 else {}
     return ProtocolResult(
