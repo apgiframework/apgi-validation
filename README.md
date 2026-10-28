@@ -319,6 +319,20 @@ Load a specific profile:
 python3 main.py formal-model --params config/profiles/adhd.yaml
 ```
 
+### APGI System API
+
+Like every APGI application, this repository talks to the hosted API at
+`https://api.apgiframework.com`. Use `utils/apgi_api_client.py` rather than hardcoding a URL:
+
+```python
+from utils.apgi_api_client import get_client
+
+client = get_client()          # reads APGI_API_URL / APGI_API_TOKEN
+client.meta()                  # citation, licence and release-state identifiers
+```
+
+Set `APGI_API_URL` only for staging or a local API (plain `http` is accepted for loopback hosts only).
+
 ---
 
 ## Project Structure
