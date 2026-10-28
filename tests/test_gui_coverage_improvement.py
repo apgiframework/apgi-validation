@@ -3,7 +3,7 @@ Tests to improve coverage for GUI-related modules.
 
 Targets:
 - Falsification_GUI.py (31% → higher)
-- OSF_GUI.py (12% → higher) 
+- OSF_GUI.py (12% → higher)
 - Protocols_GUI.py (9% → higher)
 - Tests_GUI.py (52% → higher)
 - Theory_GUI.py (40% → higher)
@@ -14,10 +14,11 @@ Targets:
 - theme.py (36% → higher)
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock, call
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, call, patch
+
+import pytest
 
 
 class TestThemeModule:
@@ -27,6 +28,7 @@ class TestThemeModule:
         """Test that theme module imports successfully."""
         try:
             from gui.theme import THEME_CONFIG, get_theme
+
             assert THEME_CONFIG is not None
         except ImportError:
             pytest.skip("Theme module not available")
@@ -35,6 +37,7 @@ class TestThemeModule:
         """Test get_theme returns a valid theme."""
         try:
             from gui.theme import get_theme
+
             theme = get_theme()
             assert theme is not None
             assert isinstance(theme, dict)
@@ -44,7 +47,8 @@ class TestThemeModule:
     def test_theme_colors(self):
         """Test that theme has color definitions."""
         try:
-            from gui.theme import COLORS, LIGHT_THEME, DARK_THEME
+            from gui.theme import COLORS, DARK_THEME, LIGHT_THEME
+
             assert COLORS is not None or (LIGHT_THEME is not None and DARK_THEME is not None)
         except (ImportError, AttributeError):
             pytest.skip("Color definitions not available")
@@ -57,6 +61,7 @@ class TestHeadlessRunner:
         """Test that headless runner module imports."""
         try:
             from gui.headless_runner import run_headless
+
             assert callable(run_headless)
         except ImportError:
             pytest.skip("Headless runner not available")
@@ -65,8 +70,9 @@ class TestHeadlessRunner:
         """Test basic headless runner execution."""
         try:
             from gui.headless_runner import run_headless
+
             # Mock the actual execution
-            with patch('gui.headless_runner.subprocess.run'):
+            with patch("gui.headless_runner.subprocess.run"):
                 result = run_headless(script="dummy_script.py", args=[])
                 # Should return without error
                 assert result is not None or True  # Allow None or actual result
@@ -81,6 +87,7 @@ class TestScriptRunnerGUI:
         """Test that script runner GUI imports."""
         try:
             from gui.script_runner_gui import ScriptRunnerGUI
+
             assert ScriptRunnerGUI is not None
         except ImportError:
             pytest.skip("Script runner GUI not available")
@@ -89,7 +96,8 @@ class TestScriptRunnerGUI:
         """Test ScriptRunnerGUI can be initialized with mocks."""
         try:
             from gui.script_runner_gui import ScriptRunnerGUI
-            with patch('tkinter.Tk'):
+
+            with patch("tkinter.Tk"):
                 runner = ScriptRunnerGUI()
                 assert runner is not None
         except (ImportError, Exception):
@@ -99,8 +107,9 @@ class TestScriptRunnerGUI:
         """Test that expected methods exist in ScriptRunnerGUI."""
         try:
             from gui.script_runner_gui import ScriptRunnerGUI
+
             # Check for key methods
-            methods = [m for m in dir(ScriptRunnerGUI) if not m.startswith('_')]
+            methods = [m for m in dir(ScriptRunnerGUI) if not m.startswith("_")]
             assert len(methods) > 5  # Should have multiple methods
         except ImportError:
             pytest.skip("Script runner GUI not available")
@@ -113,6 +122,7 @@ class TestGUIUtilities:
         """Test that GUI utilities import."""
         try:
             from gui import utils
+
             assert utils is not None
         except ImportError:
             pytest.skip("GUI utils not available")
@@ -121,6 +131,7 @@ class TestGUIUtilities:
         """Test common GUI utility functions."""
         try:
             from gui.utils_gui import center_window, show_message
+
             # Functions should be callable
             assert callable(center_window) or callable(show_message)
         except (ImportError, AttributeError):
@@ -134,6 +145,7 @@ class TestFalsificationGUI:
         """Test that Falsification_GUI imports."""
         try:
             from Falsification_GUI import FalsificationGUI
+
             assert FalsificationGUI is not None
         except ImportError:
             pytest.skip("Falsification GUI not available")
@@ -142,7 +154,8 @@ class TestFalsificationGUI:
         """Test Falsification_GUI can be created with mocks."""
         try:
             from Falsification_GUI import FalsificationGUI
-            with patch('tkinter.Tk'):
+
+            with patch("tkinter.Tk"):
                 gui = FalsificationGUI()
                 assert gui is not None
         except (ImportError, Exception):
@@ -156,6 +169,7 @@ class TestProtocolsGUI:
         """Test that Protocols_GUI imports."""
         try:
             from Protocols_GUI import ProtocolsGUI
+
             assert ProtocolsGUI is not None
         except ImportError:
             pytest.skip("Protocols GUI not available")
@@ -164,6 +178,7 @@ class TestProtocolsGUI:
         """Test that Protocols GUI has protocol list."""
         try:
             from Protocols_GUI import AVAILABLE_PROTOCOLS
+
             assert AVAILABLE_PROTOCOLS is not None or True
         except (ImportError, AttributeError):
             pytest.skip("Protocol list not available")
@@ -176,6 +191,7 @@ class TestTheoryGUI:
         """Test that Theory_GUI imports."""
         try:
             from Theory_GUI import TheoryGUI
+
             assert TheoryGUI is not None
         except ImportError:
             pytest.skip("Theory GUI not available")
@@ -184,8 +200,9 @@ class TestTheoryGUI:
         """Test that Theory GUI has expected components."""
         try:
             from Theory_GUI import TheoryGUI
+
             # Check for key components/methods
-            methods = [m for m in dir(TheoryGUI) if not m.startswith('_')]
+            methods = [m for m in dir(TheoryGUI) if not m.startswith("_")]
             assert len(methods) > 0
         except ImportError:
             pytest.skip("Theory GUI not available")
@@ -198,6 +215,7 @@ class TestValidationGUI:
         """Test that Validation_GUI imports."""
         try:
             from Validation_GUI import ValidationGUI
+
             assert ValidationGUI is not None
         except ImportError:
             pytest.skip("Validation GUI not available")
@@ -206,7 +224,8 @@ class TestValidationGUI:
         """Test that Validation GUI has expected methods."""
         try:
             from Validation_GUI import ValidationGUI
-            methods = [m for m in dir(ValidationGUI) if not m.startswith('_')]
+
+            methods = [m for m in dir(ValidationGUI) if not m.startswith("_")]
             # Should have multiple methods
             assert len(methods) > 5
         except ImportError:
@@ -220,6 +239,7 @@ class TestOSFGUI:
         """Test that OSF_GUI imports."""
         try:
             from OSF_GUI import OSFGUI
+
             assert OSFGUI is not None
         except ImportError:
             pytest.skip("OSF GUI not available")
@@ -228,7 +248,8 @@ class TestOSFGUI:
         """Test OSF GUI can be initialized."""
         try:
             from OSF_GUI import OSFGUI
-            with patch('tkinter.Tk'):
+
+            with patch("tkinter.Tk"):
                 gui = OSFGUI()
                 assert gui is not None
         except (ImportError, Exception):
@@ -242,6 +263,7 @@ class TestTestsGUI:
         """Test that Tests_GUI imports."""
         try:
             from Tests_GUI import TestsGUI
+
             assert TestsGUI is not None
         except ImportError:
             pytest.skip("Tests GUI not available")
@@ -250,6 +272,7 @@ class TestTestsGUI:
         """Test that Tests GUI has test list."""
         try:
             from Tests_GUI import AVAILABLE_TESTS
+
             assert AVAILABLE_TESTS is not None or True
         except (ImportError, AttributeError):
             pytest.skip("Test list not available")
@@ -258,11 +281,14 @@ class TestTestsGUI:
 class TestGUIIntegration:
     """Integration tests for GUI modules."""
 
-    @pytest.mark.parametrize("module_name", [
-        "gui.theme",
-        "gui.headless_runner",
-        "gui.script_runner_gui",
-    ])
+    @pytest.mark.parametrize(
+        "module_name",
+        [
+            "gui.theme",
+            "gui.headless_runner",
+            "gui.script_runner_gui",
+        ],
+    )
     def test_gui_modules_importable(self, module_name):
         """Test that GUI modules can be imported."""
         try:
@@ -275,8 +301,9 @@ class TestGUIIntegration:
     def test_gui_initialization_doesnt_crash(self):
         """Test that GUI initialization with mocks doesn't crash."""
         try:
-            with patch('tkinter.Tk'):
+            with patch("tkinter.Tk"):
                 from gui.script_runner_gui import ScriptRunnerGUI
+
                 gui = ScriptRunnerGUI()
                 # If we got here without exception, that's success
                 assert True
@@ -296,15 +323,16 @@ class TestCoverageGapAnalysis:
         """Test that main entry points are executed."""
         try:
             import main
+
             # Check that main module has runnable code
-            assert hasattr(main, 'main') or hasattr(main, '__name__')
+            assert hasattr(main, "main") or hasattr(main, "__name__")
         except ImportError:
             pytest.skip("Main module not available")
 
     def test_all_protocol_runners_importable(self):
         """Test that all protocol runners can be imported."""
-        from pathlib import Path
         import importlib
+        from pathlib import Path
 
         validation_dir = Path(__file__).parent.parent / "Validation"
         if validation_dir.exists():
@@ -320,7 +348,7 @@ class TestCoverageGapAnalysis:
         import utils
 
         # Should have major exports
-        expected = ['run_protocol_main', 'ProtocolResult']
+        expected = ["run_protocol_main", "ProtocolResult"]
         for exp in expected:
             # May or may not be directly available, but utils should be coherent
             pass  # Placeholder - this test verifies utils is importable

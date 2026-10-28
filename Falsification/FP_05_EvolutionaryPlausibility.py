@@ -98,16 +98,10 @@ try:
     from utils.falsification_thresholds import F5_2_BINOMIAL_ALPHA_SIMULATION as F5_2_BINOMIAL_ALPHA
     from utils.falsification_thresholds import F5_2_MIN_CORRELATION_SIMULATION as F5_2_MIN_CORRELATION
     from utils.falsification_thresholds import F5_2_MIN_PROPORTION_SIMULATION as F5_2_MIN_PROPORTION
-    from utils.falsification_thresholds import (
-        F5_3_BINOMIAL_ALPHA,
-    )
+    from utils.falsification_thresholds import F5_3_BINOMIAL_ALPHA
     from utils.falsification_thresholds import F5_3_MIN_GAIN_RATIO_SIMULATION as F5_3_MIN_GAIN_RATIO
     from utils.falsification_thresholds import F5_3_MIN_PROPORTION_SIMULATION as F5_3_MIN_PROPORTION
-    from utils.falsification_thresholds import (
-        F5_4_MIN_PEAK_SEPARATION,
-        F5_4_MIN_PROPORTION,
-        F5_5_PCA_MIN_LOADING,
-    )
+    from utils.falsification_thresholds import F5_4_MIN_PEAK_SEPARATION, F5_4_MIN_PROPORTION, F5_5_PCA_MIN_LOADING
     from utils.falsification_thresholds import F5_5_PCA_MIN_VARIANCE_SIMULATION as F5_5_PCA_MIN_VARIANCE
     from utils.falsification_thresholds import (
         F5_6_ALPHA,

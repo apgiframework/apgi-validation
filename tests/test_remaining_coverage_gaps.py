@@ -11,12 +11,13 @@ This file targets modules with specific coverage gaps:
 - utils/error_handler.py (83% → higher)
 """
 
-import pytest
-import numpy as np
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
 import tempfile
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
+
+import numpy as np
+import pandas as pd
+import pytest
 
 
 class TestDataValidationCoverage:
@@ -25,7 +26,8 @@ class TestDataValidationCoverage:
     def test_data_validation_import(self):
         """Test data validation module imports."""
         try:
-            from utils.data_validation import validate_data, DataValidationError
+            from utils.data_validation import DataValidationError, validate_data
+
             assert callable(validate_data)
         except ImportError:
             pytest.skip("Data validation module not available")
@@ -34,6 +36,7 @@ class TestDataValidationCoverage:
         """Test validation of numeric data."""
         try:
             from utils.data_validation import validate_numeric
+
             data = np.array([1.0, 2.0, 3.0])
             result = validate_numeric(data)
             assert result is True or result is None
@@ -44,6 +47,7 @@ class TestDataValidationCoverage:
         """Test detection and handling of missing values."""
         try:
             from utils.data_validation import check_missing_values
+
             data = pd.DataFrame({"a": [1, 2, np.nan], "b": [4, 5, 6]})
             result = check_missing_values(data)
             assert result is not None
@@ -54,6 +58,7 @@ class TestDataValidationCoverage:
         """Test validation with constraints."""
         try:
             from utils.data_validation import validate_data
+
             data = {"value": 0.5}
             constraints = {"value": {"min": 0, "max": 1}}
             result = validate_data(data, constraints)
@@ -69,6 +74,7 @@ class TestPreprocessingPipelinesCoverage:
         """Test preprocessing pipelines module imports."""
         try:
             from utils.preprocessing_pipelines import normalize_signal
+
             assert callable(normalize_signal)
         except ImportError:
             pytest.skip("Preprocessing pipelines not available")
@@ -77,6 +83,7 @@ class TestPreprocessingPipelinesCoverage:
         """Test signal normalization."""
         try:
             from utils.preprocessing_pipelines import normalize_signal
+
             signal = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
             normalized = normalize_signal(signal)
             assert normalized is not None
@@ -88,6 +95,7 @@ class TestPreprocessingPipelinesCoverage:
         """Test pipeline composition."""
         try:
             from utils.preprocessing_pipelines import create_pipeline
+
             pipeline = create_pipeline(steps=["normalize", "filter"])
             assert pipeline is not None
         except Exception as e:
@@ -97,6 +105,7 @@ class TestPreprocessingPipelinesCoverage:
         """Test signal filtering."""
         try:
             from utils.preprocessing_pipelines import filter_signal
+
             signal = np.random.randn(100)
             filtered = filter_signal(signal, cutoff=0.5)
             assert filtered is not None
@@ -111,6 +120,7 @@ class TestStatisticalTestsCoverage:
         """Test statistical tests module imports."""
         try:
             from utils.statistical_tests import compute_cohens_d
+
             assert callable(compute_cohens_d)
         except ImportError:
             pytest.skip("Statistical tests not available")
@@ -119,6 +129,7 @@ class TestStatisticalTestsCoverage:
         """Test Cohen's d calculation."""
         try:
             from utils.statistical_tests import compute_cohens_d
+
             group1 = np.array([1.0, 2.0, 3.0])
             group2 = np.array([4.0, 5.0, 6.0])
             d = compute_cohens_d(group1, group2)
@@ -131,6 +142,7 @@ class TestStatisticalTestsCoverage:
         """Test t-test with effect size."""
         try:
             from utils.statistical_tests import ttest_ind_cohens_d
+
             group1 = np.random.randn(20)
             group2 = np.random.randn(20) + 0.5
             result = ttest_ind_cohens_d(group1, group2)
@@ -142,6 +154,7 @@ class TestStatisticalTestsCoverage:
         """Test correlation analysis."""
         try:
             from utils.statistical_tests import compute_correlation
+
             x = np.random.randn(30)
             y = x + np.random.randn(30) * 0.1
             corr, p_value = compute_correlation(x, y)
@@ -157,6 +170,7 @@ class TestLogAnalysisToolsCoverage:
         """Test log analysis tools import."""
         try:
             from utils.log_analysis_tools import analyze_logs
+
             assert callable(analyze_logs)
         except ImportError:
             pytest.skip("Log analysis tools not available")
@@ -165,11 +179,12 @@ class TestLogAnalysisToolsCoverage:
         """Test log file parsing."""
         try:
             from utils.log_analysis_tools import parse_log
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.log', delete=False) as f:
+
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".log", delete=False) as f:
                 f.write("2026-07-31 10:00:00 INFO test message\n")
                 f.write("2026-07-31 10:00:01 ERROR error message\n")
                 log_file = f.name
-            
+
             try:
                 logs = parse_log(log_file)
                 assert logs is not None or isinstance(logs, list)
@@ -182,6 +197,7 @@ class TestLogAnalysisToolsCoverage:
         """Test statistics extraction from logs."""
         try:
             from utils.log_analysis_tools import extract_statistics
+
             logs = [
                 {"level": "INFO", "timestamp": "2026-07-31 10:00:00"},
                 {"level": "ERROR", "timestamp": "2026-07-31 10:00:01"},
@@ -200,6 +216,7 @@ class TestEEGProcessingCoverage:
         """Test EEG processing module imports."""
         try:
             from utils.eeg_processing import filter_eeg
+
             assert callable(filter_eeg)
         except ImportError:
             pytest.skip("EEG processing not available")
@@ -208,6 +225,7 @@ class TestEEGProcessingCoverage:
         """Test EEG filtering."""
         try:
             from utils.eeg_processing import filter_eeg
+
             # Create synthetic EEG signal (250 Hz for 1 second)
             eeg = np.random.randn(250)
             filtered = filter_eeg(eeg, lowcut=1, highcut=50, fs=250)
@@ -219,6 +237,7 @@ class TestEEGProcessingCoverage:
         """Test spectral power computation."""
         try:
             from utils.eeg_processing import compute_power
+
             eeg = np.random.randn(1000)
             power = compute_power(eeg, fs=250)
             assert power is not None
@@ -229,6 +248,7 @@ class TestEEGProcessingCoverage:
         """Test artifact detection in EEG."""
         try:
             from utils.eeg_processing import detect_artifacts
+
             eeg = np.random.randn(250)
             # Add a spike (potential artifact)
             eeg[50] = 1000
@@ -245,6 +265,7 @@ class TestValidationRunnerCoverage:
         """Test validation runner module imports."""
         try:
             from utils.validation_runner import ValidationRunner
+
             assert ValidationRunner is not None
         except ImportError:
             pytest.skip("Validation runner not available")
@@ -253,6 +274,7 @@ class TestValidationRunnerCoverage:
         """Test validation runner initialization."""
         try:
             from utils.validation_runner import ValidationRunner
+
             runner = ValidationRunner()
             assert runner is not None
         except Exception as e:
@@ -262,6 +284,7 @@ class TestValidationRunnerCoverage:
         """Test running validation."""
         try:
             from utils.validation_runner import ValidationRunner
+
             runner = ValidationRunner()
             result = runner.run(protocol_id="TEST", data={})
             assert result is not None or True
@@ -275,7 +298,8 @@ class TestErrorHandlerCoverage:
     def test_error_handler_import(self):
         """Test error handler imports."""
         try:
-            from utils.error_handler import handle_error, ErrorHandler
+            from utils.error_handler import ErrorHandler, handle_error
+
             assert callable(handle_error)
         except ImportError:
             pytest.skip("Error handler not available")
@@ -284,6 +308,7 @@ class TestErrorHandlerCoverage:
         """Test exception handling."""
         try:
             from utils.error_handler import handle_error
+
             try:
                 raise ValueError("Test error")
             except ValueError as e:
@@ -296,6 +321,7 @@ class TestErrorHandlerCoverage:
         """Test error context management."""
         try:
             from utils.error_handler import ErrorContext
+
             with ErrorContext("test_context"):
                 # Should handle context without error
                 pass
@@ -306,6 +332,7 @@ class TestErrorHandlerCoverage:
         """Test error recovery."""
         try:
             from utils.error_handler import attempt_recovery
+
             result = attempt_recovery(ValueError("test"), {})
             assert result is not None or True
         except Exception as e:
@@ -319,6 +346,7 @@ class TestOutputPathsCoverage:
         """Test output paths module imports."""
         try:
             from utils.output_paths import get_output_dir
+
             assert callable(get_output_dir)
         except ImportError:
             pytest.skip("Output paths not available")
@@ -327,6 +355,7 @@ class TestOutputPathsCoverage:
         """Test getting output directory."""
         try:
             from utils.output_paths import get_output_dir
+
             output_dir = get_output_dir()
             assert output_dir is not None
             assert isinstance(output_dir, (str, Path))
@@ -337,6 +366,7 @@ class TestOutputPathsCoverage:
         """Test creating output directory structure."""
         try:
             from utils.output_paths import create_output_structure
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 structure = create_output_structure(tmpdir)
                 assert structure is not None
@@ -351,6 +381,7 @@ class TestMonitoringSystemCoverage:
         """Test monitoring system imports."""
         try:
             from utils.monitoring_system import Monitor
+
             assert Monitor is not None
         except ImportError:
             pytest.skip("Monitoring system not available")
@@ -359,6 +390,7 @@ class TestMonitoringSystemCoverage:
         """Test metric monitoring."""
         try:
             from utils.monitoring_system import Monitor
+
             monitor = Monitor()
             monitor.record_metric("test_metric", 0.5)
             metrics = monitor.get_metrics()
@@ -370,6 +402,7 @@ class TestMonitoringSystemCoverage:
         """Test performance tracking."""
         try:
             from utils.monitoring_system import track_performance
+
             with track_performance("test_operation"):
                 # Simulate work
                 pass
@@ -381,12 +414,15 @@ class TestMonitoringSystemCoverage:
 class TestCoverageGapIntegration:
     """Integration tests to verify coverage improvements."""
 
-    @pytest.mark.parametrize("module", [
-        "utils.data_validation",
-        "utils.preprocessing_pipelines",
-        "utils.statistical_tests",
-        "utils.error_handler",
-    ])
+    @pytest.mark.parametrize(
+        "module",
+        [
+            "utils.data_validation",
+            "utils.preprocessing_pipelines",
+            "utils.statistical_tests",
+            "utils.error_handler",
+        ],
+    )
     def test_critical_modules_importable(self, module):
         """Test that critical modules are importable."""
         try:
@@ -399,10 +435,10 @@ class TestCoverageGapIntegration:
         try:
             from utils.data_validation import validate_data
             from utils.preprocessing_pipelines import normalize_signal
-            
+
             # Create test data
             data = np.random.randn(100)
-            
+
             # Validate
             is_valid = validate_data(data)
             if is_valid or is_valid is None:

@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt -c requirements.lock
 
       # Schema, cross-field and MANIFEST checks for protocols/ (release 1.1.0),
       # the same gate apgi-framework runs on its copy of the specification.
@@ -89,7 +89,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt -c requirements.lock
 
       # Long-running protocol executions, split out so the main job stays fast.
       - name: Run slow tests
