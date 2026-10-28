@@ -22,6 +22,7 @@ dependencies = [
     "scikit-learn>=1.4.0",
     "click>=8.0.0",
     "pydantic>=2.8.0",
+    "pydantic-settings>=2.4.0",
     "pyyaml>=6.0.1",
     "jsonschema>=4.21.0",
     "rich>=13.7.0",
@@ -97,8 +98,14 @@ exclude = [
 ]
 
 [tool.ruff.lint]
+# Explicit so a newer ruff widening its defaults cannot silently change the gate.
+select = ["E", "F", "W"]
 ignore = [
     "E203", # whitespace before ':' — conflicts with black
+    # Remaining hits are inside SQL/HTML/Markdown string literals, where trailing
+    # whitespace is content (Markdown hard line breaks); autofixing would change runtime strings.
+    "W291",
+    "W293",
     "E501", # line length — enforced by black
     # Protocol and GUI entry points manipulate sys.path before importing
     # project modules, so imports legitimately follow executable statements.

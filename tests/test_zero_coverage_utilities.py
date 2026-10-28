@@ -8,9 +8,10 @@ This test module targets quick wins from utilities that are currently untested:
 - protocol_interface.py
 """
 
-import pytest
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 
 class TestCheckLockfile:
@@ -115,7 +116,7 @@ class TestProtocolContracts:
             version="1.0.0",
             input_schema={"type": "object"},
             output_schema={"type": "object"},
-            required_methods=["run_protocol_main"]
+            required_methods=["run_protocol_main"],
         )
 
         assert contract.protocol_id == "TEST_01"
@@ -123,7 +124,7 @@ class TestProtocolContracts:
 
     def test_contract_validation_error(self):
         """Test that invalid contracts raise errors."""
-        from utils.protocol_contracts import ProtocolContract, ContractViolationError
+        from utils.protocol_contracts import ContractViolationError, ProtocolContract
 
         # Missing required fields should raise error
         with pytest.raises((TypeError, ValueError, ContractViolationError)):
@@ -135,11 +136,12 @@ class TestProtocolInterface:
 
     def test_protocol_interface_definition(self):
         """Test protocol interface can be imported and used."""
-        from utils.protocol_interface import ProtocolInterface
         import inspect
 
+        from utils.protocol_interface import ProtocolInterface
+
         # Should have specific methods defined
-        methods = [m for m in dir(ProtocolInterface) if not m.startswith('_')]
+        methods = [m for m in dir(ProtocolInterface) if not m.startswith("_")]
         assert len(methods) > 0
 
     def test_protocol_interface_abstractness(self):
@@ -156,7 +158,7 @@ class TestConfigSchema:
 
     def test_config_schema_import(self):
         """Test that config schema can be imported and used."""
-        from utils.config_schema import validate_config_schema, CONFIG_SCHEMA
+        from utils.config_schema import CONFIG_SCHEMA, validate_config_schema
 
         # Schema should exist
         assert CONFIG_SCHEMA is not None
@@ -166,10 +168,7 @@ class TestConfigSchema:
         """Test that a minimal valid config passes validation."""
         from utils.config_schema import validate_config_schema
 
-        valid_config = {
-            "version": "1.0.0",
-            "name": "test_config"
-        }
+        valid_config = {"version": "1.0.0", "name": "test_config"}
 
         # Should not raise
         result = validate_config_schema(valid_config)
@@ -204,7 +203,7 @@ class TestParameterBounds:
 
     def test_parameter_bounds_validation(self):
         """Test that parameter bounds are properly validated."""
-        from utils.parameter_bounds import validate_parameter_bounds, PARAMETER_BOUNDS
+        from utils.parameter_bounds import PARAMETER_BOUNDS, validate_parameter_bounds
 
         # Should have defined bounds
         assert PARAMETER_BOUNDS is not None
@@ -224,7 +223,7 @@ class TestPerformanceGates:
 
     def test_performance_gates_import(self):
         """Test that performance gates module imports correctly."""
-        from utils.performance_gates import check_performance_gate, PERFORMANCE_GATES
+        from utils.performance_gates import PERFORMANCE_GATES, check_performance_gate
 
         assert PERFORMANCE_GATES is not None
         assert isinstance(PERFORMANCE_GATES, dict)
@@ -243,7 +242,7 @@ class TestLevelDesignationCompliance:
 
     def test_level_compliance_check(self):
         """Test level designation compliance checking."""
-        from utils.level_designation_compliance import check_level_compliance, LEVEL_DESIGNATIONS
+        from utils.level_designation_compliance import LEVEL_DESIGNATIONS, check_level_compliance
 
         assert LEVEL_DESIGNATIONS is not None
 
@@ -288,7 +287,7 @@ class TestUnifiedOutputManager:
 
         manager = OutputManager()
         # Should have output methods
-        assert hasattr(manager, 'output') or hasattr(manager, 'write')
+        assert hasattr(manager, "output") or hasattr(manager, "write")
 
 
 class TestVerifyFrameworkStatus:
@@ -331,23 +330,26 @@ class TestThresholdLint:
 class TestZeroCoverageFilesIntegration:
     """Integration tests to ensure zero-coverage files are importable."""
 
-    @pytest.mark.parametrize("module_name", [
-        "utils.check_lockfile",
-        "utils.deprecation_manager",
-        "utils.protocol_contracts",
-        "utils.protocol_interface",
-        "utils.config_schema",
-        "utils.data_protection",
-        "utils.parameter_bounds",
-        "utils.performance_gates",
-        "utils.level_designation_compliance",
-        "utils.template_benchmark_validator",
-        "utils.validation_falsification_consistency",
-        "utils.unified_output_manager",
-        "utils.verify_framework_status",
-        "utils.verify_protocol_outputs",
-        "utils.threshold_lint",
-    ])
+    @pytest.mark.parametrize(
+        "module_name",
+        [
+            "utils.check_lockfile",
+            "utils.deprecation_manager",
+            "utils.protocol_contracts",
+            "utils.protocol_interface",
+            "utils.config_schema",
+            "utils.data_protection",
+            "utils.parameter_bounds",
+            "utils.performance_gates",
+            "utils.level_designation_compliance",
+            "utils.template_benchmark_validator",
+            "utils.validation_falsification_consistency",
+            "utils.unified_output_manager",
+            "utils.verify_framework_status",
+            "utils.verify_protocol_outputs",
+            "utils.threshold_lint",
+        ],
+    )
     def test_module_importable(self, module_name):
         """Test that all zero-coverage modules can be imported without errors."""
         try:

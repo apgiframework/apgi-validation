@@ -15,11 +15,12 @@ Targets low-coverage modules that are critical to the system:
 - utils/config_manager.py (44% → higher)
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-import numpy as np
 import tempfile
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
+
+import numpy as np
+import pytest
 
 
 class TestMainModuleCoverage:
@@ -29,6 +30,7 @@ class TestMainModuleCoverage:
         """Test that main module imports without error."""
         try:
             import main
+
             assert main is not None
         except Exception as e:
             pytest.skip(f"Main module not available: {e}")
@@ -37,7 +39,8 @@ class TestMainModuleCoverage:
         """Test that main has callable entry point."""
         try:
             import main
-            assert hasattr(main, 'main') or hasattr(main, 'run')
+
+            assert hasattr(main, "main") or hasattr(main, "run")
         except Exception as e:
             pytest.skip(f"Main entry point check failed: {e}")
 
@@ -49,6 +52,7 @@ class TestAPGICoreEquations:
         """Test equations module imports."""
         try:
             from apgi_core.equations import compute_pi
+
             assert callable(compute_pi)
         except (ImportError, AttributeError):
             pytest.skip("Equations module not available")
@@ -57,6 +61,7 @@ class TestAPGICoreEquations:
         """Test basic equation computation."""
         try:
             from apgi_core.equations import compute_pi
+
             result = compute_pi(0.5, 1.0, 0.1)
             assert isinstance(result, (float, np.ndarray))
         except Exception as e:
@@ -66,6 +71,7 @@ class TestAPGICoreEquations:
         """Test equations with array inputs."""
         try:
             from apgi_core.equations import compute_pi
+
             s = np.array([0.1, 0.5, 0.9])
             result = compute_pi(s, 1.0, 0.1)
             assert result is not None
@@ -80,6 +86,7 @@ class TestAPGICoreFullModel:
         """Test full model imports."""
         try:
             from apgi_core.full_model import APGIFullModel
+
             assert APGIFullModel is not None
         except ImportError:
             pytest.skip("Full model not available")
@@ -88,6 +95,7 @@ class TestAPGICoreFullModel:
         """Test full model can be initialized."""
         try:
             from apgi_core.full_model import APGIFullModel
+
             model = APGIFullModel()
             assert model is not None
         except Exception as e:
@@ -101,6 +109,7 @@ class TestAlgorithmicVerification:
         """Test algorithmic verification imports."""
         try:
             from utils.algorithmic_verification import verify_algorithm
+
             assert callable(verify_algorithm)
         except ImportError:
             pytest.skip("Verification module not available")
@@ -109,10 +118,11 @@ class TestAlgorithmicVerification:
         """Test basic algorithm verification."""
         try:
             from utils.algorithmic_verification import verify_algorithm
+
             # Create mock algorithm
             def mock_algo():
                 return 0.5
-            
+
             result = verify_algorithm(mock_algo, {})
             assert result is not None
         except Exception as e:
@@ -126,6 +136,7 @@ class TestAnalyticalSolutions:
         """Test analytical solutions module imports."""
         try:
             from utils.analytical_solutions import solve_analytically
+
             assert callable(solve_analytically)
         except ImportError:
             pytest.skip("Analytical solutions not available")
@@ -134,6 +145,7 @@ class TestAnalyticalSolutions:
         """Test computation of simple analytical solution."""
         try:
             from utils.analytical_solutions import solve_analytically
+
             result = solve_analytically("pi_dynamics", {"s": 0.5})
             assert result is not None
         except Exception as e:
@@ -147,6 +159,7 @@ class TestBackupManager:
         """Test backup manager imports."""
         try:
             from utils.backup_manager import BackupManager
+
             assert BackupManager is not None
         except ImportError:
             pytest.skip("Backup manager not available")
@@ -155,6 +168,7 @@ class TestBackupManager:
         """Test backup manager can be initialized."""
         try:
             from utils.backup_manager import BackupManager
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 manager = BackupManager(backup_dir=tmpdir)
                 assert manager is not None
@@ -165,12 +179,13 @@ class TestBackupManager:
         """Test creating a backup."""
         try:
             from utils.backup_manager import BackupManager
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 manager = BackupManager(backup_dir=tmpdir)
                 # Create test file to backup
                 test_file = Path(tmpdir) / "test.txt"
                 test_file.write_text("test content")
-                
+
                 backup_path = manager.create_backup(str(test_file))
                 assert backup_path is not None or True
         except Exception as e:
@@ -184,6 +199,7 @@ class TestBatchProcessor:
         """Test batch processor imports."""
         try:
             from utils.batch_processor import BatchProcessor
+
             assert BatchProcessor is not None
         except ImportError:
             pytest.skip("Batch processor not available")
@@ -192,6 +208,7 @@ class TestBatchProcessor:
         """Test batch processor initialization."""
         try:
             from utils.batch_processor import BatchProcessor
+
             processor = BatchProcessor(batch_size=10)
             assert processor is not None
         except Exception as e:
@@ -201,12 +218,13 @@ class TestBatchProcessor:
         """Test simple batch processing."""
         try:
             from utils.batch_processor import BatchProcessor
+
             processor = BatchProcessor(batch_size=2)
             data = [1, 2, 3, 4, 5]
-            
+
             def simple_fn(batch):
                 return sum(batch)
-            
+
             result = processor.process(data, simple_fn)
             assert result is not None or isinstance(result, list)
         except Exception as e:
@@ -220,6 +238,7 @@ class TestBayesianModelComparison:
         """Test Bayesian model comparison imports."""
         try:
             from utils.bayesian_model_comparison import compute_bayes_factor
+
             assert callable(compute_bayes_factor)
         except ImportError:
             pytest.skip("BMC module not available")
@@ -228,10 +247,11 @@ class TestBayesianModelComparison:
         """Test Bayes factor computation."""
         try:
             from utils.bayesian_model_comparison import compute_bayes_factor
+
             # Simple test with mock data
             lls1 = np.array([1.0, 1.1, 0.9])
             lls2 = np.array([0.5, 0.6, 0.4])
-            
+
             bf = compute_bayes_factor(lls1, lls2)
             assert bf is not None
         except Exception as e:
@@ -245,6 +265,7 @@ class TestBIDSDataLoaders:
         """Test BIDS data loaders import."""
         try:
             from utils.bids_data_loaders import load_bids_dataset
+
             assert callable(load_bids_dataset)
         except ImportError:
             pytest.skip("BIDS loaders not available")
@@ -253,7 +274,8 @@ class TestBIDSDataLoaders:
         """Test BIDS loader with mock data."""
         try:
             from utils.bids_data_loaders import load_bids_dataset
-            with patch('utils.bids_data_loaders.os.path.exists', return_value=True):
+
+            with patch("utils.bids_data_loaders.os.path.exists", return_value=True):
                 # Test will likely fail due to mock, but that's okay - we're testing coverage
                 result = load_bids_dataset("/mock/path")
                 assert result is None or isinstance(result, dict)
@@ -268,6 +290,7 @@ class TestCacheManager:
         """Test cache manager imports."""
         try:
             from utils.cache_manager import CacheManager
+
             assert CacheManager is not None
         except ImportError:
             pytest.skip("Cache manager not available")
@@ -276,6 +299,7 @@ class TestCacheManager:
         """Test cache manager initialization."""
         try:
             from utils.cache_manager import CacheManager
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 cache = CacheManager(cache_dir=tmpdir)
                 assert cache is not None
@@ -286,12 +310,13 @@ class TestCacheManager:
         """Test cache set and get operations."""
         try:
             from utils.cache_manager import CacheManager
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 cache = CacheManager(cache_dir=tmpdir)
-                
+
                 # Set a value
                 cache.set("test_key", {"data": "value"})
-                
+
                 # Get the value
                 result = cache.get("test_key")
                 assert result is None or isinstance(result, dict)
@@ -306,6 +331,7 @@ class TestConfigManager:
         """Test config manager imports."""
         try:
             from utils.config_manager import ConfigManager
+
             assert ConfigManager is not None
         except ImportError:
             pytest.skip("Config manager not available")
@@ -314,10 +340,11 @@ class TestConfigManager:
         """Test config manager initialization."""
         try:
             from utils.config_manager import ConfigManager
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 config_file = Path(tmpdir) / "config.yaml"
                 config_file.write_text("test: value\n")
-                
+
                 manager = ConfigManager(config_file=str(config_file))
                 assert manager is not None
         except Exception as e:
@@ -327,10 +354,11 @@ class TestConfigManager:
         """Test getting config values."""
         try:
             from utils.config_manager import ConfigManager
+
             with tempfile.TemporaryDirectory() as tmpdir:
                 config_file = Path(tmpdir) / "config.yaml"
                 config_file.write_text("test_key: test_value\n")
-                
+
                 manager = ConfigManager(config_file=str(config_file))
                 value = manager.get("test_key", "default")
                 assert value is not None
@@ -350,7 +378,7 @@ class TestCoreModulesIntegration:
             "apgi_core.model",
             "apgi_core.equations",
         ]
-        
+
         for module_name in modules:
             try:
                 __import__(module_name)
@@ -361,8 +389,9 @@ class TestCoreModulesIntegration:
         """Test that core utility functions exist."""
         try:
             import utils
+
             # Should have error handling
-            assert hasattr(utils, 'handle_error') or hasattr(utils, 'error_handler')
+            assert hasattr(utils, "handle_error") or hasattr(utils, "error_handler")
         except ImportError:
             pytest.skip("Utils module not available")
 
@@ -374,6 +403,7 @@ class TestErrorHandlingCoverage:
         """Test error handler imports."""
         try:
             from utils.error_handler import handle_error
+
             assert callable(handle_error)
         except ImportError:
             pytest.skip("Error handler not available")
@@ -382,6 +412,7 @@ class TestErrorHandlingCoverage:
         """Test error recovery paths."""
         try:
             from utils.error_recovery import attempt_recovery
+
             # Should handle None without crashing
             result = attempt_recovery(None)
             assert result is not None or True

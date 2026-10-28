@@ -349,6 +349,8 @@ pydantic==2.13.4
     #   dash
 pydantic-core==2.46.4
     # via pydantic
+pydantic-settings==2.16.2
+    # via -r requirements.txt
 pygments==2.20.0
     # via
     #   pytest
@@ -396,7 +398,9 @@ python-discovery==1.5.0
     #   tox
     #   virtualenv
 python-dotenv==1.2.2
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   pydantic-settings
 pytokens==0.4.1
     # via black
 pytz==2026.3.post1
@@ -557,7 +561,9 @@ typing-extensions==4.16.0
     #   torch
     #   typing-inspection
 typing-inspection==0.4.2
-    # via pydantic
+    # via
+    #   pydantic
+    #   pydantic-settings
 urllib3==2.7.0
     # via requests
 virtualenv==21.7.1
