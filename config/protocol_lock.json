@@ -1,0 +1,9 @@
+{
+  "release": "1.1.0",
+  "manifest_path": "protocols/MANIFEST.json",
+  "manifest_sha256": "2713ac609514efab6f61f84427e6269fb09f94dd42e36b9c424fbdc0ced31bc1",
+  "approved_by": "PENDING-OWNER-APPROVAL",
+  "opentimestamps_proof": null,
+  "opentimestamps_status": "PENDING: proof reference to be supplied by the specification authority (AUD-SPEC-01)",
+  "protocol_v1_2_equivalence": "UNRESOLVED: see AUD-SPEC-01 / APGI-PRO-001"
+}

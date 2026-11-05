@@ -331,7 +331,9 @@ def compute_power_analysis_for_correlation(
     try:
         from utils.statistical_tests import compute_required_n
 
-        n_required = compute_required_n(effect_size=expected_r, desired_power=desired_power, alpha=alpha)
+        n_required = compute_required_n(
+            effect_size=expected_r, desired_power=desired_power, alpha=alpha, test_type="pearsonr"
+        )
     except ImportError:
         # Fallback: Use simple power calculation
         # For correlation, required N ≈ ((z_alpha + z_beta) / (0.5 * ln((1+r)/(1-r))))^2 + 3

@@ -9,7 +9,16 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from utils.versioning import APP_VERSION, PROTOCOL_RESULT_SCHEMA_VERSION
+
+#: Fields every exchanged dataset-provenance entry must carry (APGI-DAT-004).
+REQUIRED_DATASET_PROVENANCE_FIELDS = ("source", "version", "sha256", "license", "processing_history")
+
+
+class ResultContractError(ValueError):
+    """A ProtocolResult cannot be exchanged or reported as scientific success."""
 
 
 class PredictionStatus(str, Enum):
@@ -83,6 +92,46 @@ class ProtocolResult(BaseModel):
     methodology: str = "unknown"
     errors: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+    # APGI-INT-001: the three versions every exchanged payload must carry.
+    schema_version: str = PROTOCOL_RESULT_SCHEMA_VERSION
+    protocol_version: Optional[str] = None
+    producer_version: str = APP_VERSION
+    # APGI-DAT-004: source/version/sha256/license/processing_history per dataset.
+    dataset_provenance: List[Dict[str, Any]] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _no_incomplete_success(self) -> "ProtocolResult":
+        """APGI-API-004: an incomplete result can never report scientific success.
+
+        An explicit ``status="success"`` with no predictions or with completion
+        below 100 % is rejected. When status was left at its default it is
+        downgraded to ``partial`` and the reason recorded in ``errors``.
+        """
+        incomplete = not self.named_predictions or self.completion_percentage < 100
+        if self.status == "success" and incomplete:
+            if "status" in self.model_fields_set:
+                raise ValueError("status='success' requires at least one prediction and completion_percentage == 100")
+            object.__setattr__(self, "status", "partial")
+            reason = "incomplete result: not reported as success"
+            if reason not in self.errors:
+                self.errors.append(reason)
+        return self
+
+    def assert_exchangeable(self) -> None:
+        """Raise ResultContractError unless this result may cross a component boundary."""
+        problems: List[str] = []
+        if not self.protocol_version:
+            problems.append("protocol_version is required")
+        if not self.schema_version or not self.producer_version:
+            problems.append("schema_version and producer_version are required")
+        if not self.dataset_provenance:
+            problems.append("dataset_provenance must list every input dataset")
+        for i, entry in enumerate(self.dataset_provenance):
+            missing = [k for k in REQUIRED_DATASET_PROVENANCE_FIELDS if not entry.get(k)]
+            if missing:
+                problems.append(f"dataset_provenance[{i}] missing {missing}")
+        if problems:
+            raise ResultContractError("; ".join(problems))
 
     def model_dump(self, **kwargs: Any) -> dict:
         """Dump to a dict containing only plain JSON types.

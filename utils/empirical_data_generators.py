@@ -110,9 +110,9 @@ def generate_cross_cultural_eeg_data(
         "n_channels": n_channels,
         "sampling_rate": sampling_rate,
         "trial_duration_s": trial_duration,
-        "data_source": "synthetic_realistic",
+        "data_source": "synthetic",
         "preprocessing": "ICA, artifact removal, bandpass 1-50Hz",
-        "empirical_simulation": True,
+        "data_origin": "synthetic",
     }
 
     return combined_data, metadata
@@ -212,9 +212,9 @@ def generate_fmri_vmPFC_data(
         "roi": "vmPFC",
         "roi_coords_mni": (3, 52, -8),
         "roi_radius_mm": 8,
-        "data_source": "synthetic_realistic",
+        "data_source": "synthetic",
         "preprocessing": "Motion correction, normalization, smoothing",
-        "empirical_simulation": True,
+        "data_origin": "synthetic",
     }
 
     return fmri_data, vmpfc_data, behavior, metadata
@@ -223,7 +223,7 @@ def generate_fmri_vmPFC_data(
 def save_cross_cultural_eeg_data(
     data: pd.DataFrame,
     metadata: Dict[str, Any],
-    output_dir: str = "data_repository/empirical_data/",
+    output_dir: str = "data_repository/synthetic_data/",
 ) -> str:
     """Save cross-cultural EEG data to disk."""
     output_path = Path(output_dir)
@@ -248,7 +248,7 @@ def save_fmri_vmPFC_data(
     vmpfc_data: np.ndarray,
     behavior: pd.DataFrame,
     metadata: Dict[str, Any],
-    output_dir: str = "data_repository/empirical_data/",
+    output_dir: str = "data_repository/synthetic_data/",
 ) -> Tuple[str, str, str]:
     """Save fMRI vmPFC data to disk."""
     output_path = Path(output_dir)
@@ -277,7 +277,7 @@ def save_fmri_vmPFC_data(
 
 
 def load_cross_cultural_eeg_data(
-    data_path: str = "data_repository/empirical_data/cross_cultural_eeg.csv",
+    data_path: str = "data_repository/synthetic_data/cross_cultural_eeg.csv",
 ) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     """Load cross-cultural EEG data from disk."""
     import json
@@ -293,8 +293,8 @@ def load_cross_cultural_eeg_data(
 
 
 def load_fmri_vmPFC_data(
-    fmri_path: str = "data_repository/empirical_data/fmri_vmPFC.npz",
-    behavior_path: str = "data_repository/empirical_data/fmri_behavior.csv",
+    fmri_path: str = "data_repository/synthetic_data/fmri_vmPFC.npz",
+    behavior_path: str = "data_repository/synthetic_data/fmri_behavior.csv",
 ) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, Dict[str, Any]]:
     """Load fMRI vmPFC data from disk."""
     import json

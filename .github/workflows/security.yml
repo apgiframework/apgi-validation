@@ -22,12 +22,14 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install bandit semgrep
 
-      # Fails the build on MEDIUM+ severity at MEDIUM+ confidence.
-      # Thresholds, skips and excluded dirs live in .bandit.yml.
+      # Fails the build on MEDIUM+ severity at MEDIUM+ confidence (CI-BANDIT).
+      # Skips and excluded dirs live in .bandit.yml; the severity/confidence
+      # policy must be passed as CLI flags because Bandit's config file does not
+      # support it. The JSON report keeps every finding (including LOW) for review.
       - name: Run Bandit SAST
         run: |
-          bandit -c .bandit.yml -r . -f json -o bandit-report.json
-          bandit -c .bandit.yml -r . -f txt
+          bandit -c .bandit.yml -r . -f json -o bandit-report.json --exit-zero
+          bandit -c .bandit.yml -r . -f txt --severity-level medium --confidence-level medium
 
       - name: Run Semgrep SAST
         run: semgrep --config=auto --error --json --output=semgrep-report.json .
@@ -75,6 +77,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Encrypted key files were previously tracked in git. They are now
       # gitignored; this keeps them from coming back.
@@ -87,3 +91,9 @@ jobs:
             exit 1
           fi
           echo "No key material tracked."
+
+      # APGI-API-003: content scan (private keys, provider tokens, long values
+      # assigned to secret-named variables) across the tree and full history.
+      - name: Scan file contents and git history for secrets
+        run: |
+          python3 scripts/scan_secrets.py --history

@@ -467,16 +467,17 @@ def main():
     args = parser.parse_args()
 
     try:
+        from utils.runtime_profile import auth_enforced
         from utils.security_gateway import Role, SecurityGateway
 
         gateway = SecurityGateway()
 
         if args.token:
             gateway.require_roles(args.token, [Role.RESEARCHER, Role.ADMIN])
-        elif os.environ.get("APGI_ENFORCE_AUTH", "0") == "1":
+        elif auth_enforced():
             raise SystemExit(
                 "Authentication required: pass --token to start the GUI. "
-                "For local development only, set APGI_ENFORCE_AUTH=0 to enable an auto-generated dev token."
+                "For local development only, set APGI_ENFORCE_AUTH=0 explicitly (refused when APGI_ENV=production)."
             )
         else:
             try:

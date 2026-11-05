@@ -5,6 +5,56 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased] — APGI v1.2 validation-specification remediation
+
+Implements the code-actionable items of the v1.2 software-validation registers.
+Full item-by-item status: `docs/validation/traceability.md`. Items needing data,
+approvals or other components remain **blocked** and are not reported as done.
+
+### Breaking (scientific)
+- `CoreIgnitionSystem.accumulated_signal` now computes the specified
+  Sₜ = Πᵉ|zᵉ| + Πⁱ_eff|zⁱ| (APGI-SCI-001); the old quadratic form is
+  `quadratic_surprise_signal` (non-canonical). Ignition is strictly `S > θ`.
+- `HierarchicalProcessor` uses the canonical L0–L4 hierarchy (APGI-SCI-003);
+  level names are now `L0`…`L4`; `num_levels` default 5.
+- Power/sample-size helpers raise `UnsupportedMethodError` /
+  `MissingScientificDependencyError` instead of returning 0.8 / 50 (APGI-REP-003).
+- Hurst estimation raises `ScientificComputationError` instead of returning 0.5 (APGI-INT-003).
+- `ProtocolResult` cannot report `success` when incomplete (APGI-API-004) and
+  carries schema/protocol/producer versions and dataset provenance (APGI-INT-001, DAT-004).
+
+### Breaking (security/operations)
+- Authentication is enforced unless `APGI_ENFORCE_AUTH=0` is set explicitly;
+  `--headless` uses the same gate; dev opt-outs and ephemeral master keys are
+  refused when `APGI_ENV=production` (APGI-IMP-002). No implicit admin override (API-002).
+- Protocol definitions load only after the registered lock verifies
+  (`config/protocol_lock.json` trust anchor, per-file SHA-256); any failure aborts
+  the whole load (APGI-REP-001, PRO-002).
+- `data_repository/empirical_data/` renamed `synthetic_data/`; labels are `synthetic` (S4-VAL-13.5).
+
+### Added
+- Record provenance labels, research-store guard (`utils/data_provenance.py`).
+- K1–K8 catalog and interval/band/sufficiency classifier (`utils/kgate.py`);
+  registered estimators (`utils/psychometrics.py`); signed validation reports
+  (`utils/validation_report.py`, `config/schemas/validation_report.schema.json`).
+- Consent gate and lineage-wide withdrawal (`utils/consent_gate.py`);
+  quarantine/reconciliation (`utils/data_quarantine.py`).
+- Release certificate and certificate-before-deposit gate (`utils/release_certificate.py`).
+- `release/` reproducibility package (12 artifacts) with builder/verifier.
+- `CITATION.cff`, terminology scan, content/history secret scan.
+- Validation governance documents under `docs/validation/`.
+- CI: `validation-gates.yml` (registered rules, synthetic fixtures, result classification).
+
+### Fixed
+- CI-NOLDS (nolds 0.6.3 import failure on Python 3.11): pin nolds 0.6.2 + setuptools < 81.
+- CI-BANDIT: severity/confidence policy moved to supported CLI flags.
+- CI-ISORT: import order. CI-MEMORY: per-test figure/GC release.
+- NumPy 1.26 compatibility of `metabolic_cost` (APGI-REP-005); seeded RNG streams (REP-002).
+- Docker builds from `requirements.lock` on a digest-pinned base (APGI-IMP-001).
+- Six non-canonical APGI expansions corrected (APGI-SCI-006).
+
+---
+
 ## [Unreleased] — APGI protocol specification 1.1.0
 
 Brings this repository into line with protocol specification release 1.1.0,

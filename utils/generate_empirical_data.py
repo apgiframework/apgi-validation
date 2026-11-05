@@ -24,7 +24,7 @@ def main():
     print("GENERATING REALISTIC EMPIRICAL DATA")
     print("=" * 80)
 
-    output_dir = "data_repository/empirical_data/"
+    output_dir = "data_repository/synthetic_data/"
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     # Generate VP-11 data (Cross-cultural EEG) - SMALLER FOR SPEED

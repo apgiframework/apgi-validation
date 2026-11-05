@@ -1,0 +1,308 @@
+# Generated inventory of APGISettings defaults (APGI-SCI-005). Edit labels/sources by hand;
+# tests/test_governance_registers.py fails if a default is added without an entry.
+registry_version: 0.1.0
+labels:
+- analytically_derived
+- post_hoc_calibrated
+- assumed
+policy: 'APGI-SCI-005: every default carries a provenance label and source reference.
+  A value is labelled analytically_derived or post_hoc_calibrated ONLY with a cited
+  source; everything without one is ''assumed'' until the scientific authority supplies
+  provenance.'
+parameters:
+  APGISettings.input_size:
+    default: 64
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.hidden_size:
+    default: 128
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.num_levels:
+    default: 5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.dt_ms:
+    default: 10.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.max_window_ms:
+    default: 500.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.theta0:
+    default: 0.03
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.gamma:
+    default: 0.1
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.delta:
+    default: 0.5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.lambda_urg:
+    default: 0.2
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.theta_min:
+    default: 0.01
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.theta_max:
+    default: 5.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.lr_extero:
+    default: 0.01
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.lr_intero:
+    default: 0.01
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.lr_somatic:
+    default: 0.1
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.lr_policy:
+    default: 0.001
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.lr_value:
+    default: 0.001
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.lr_precision:
+    default: 0.05
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.alpha_ignition:
+    default: 8.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.tau_S:
+    default: 0.3
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.tau_theta:
+    default: 10.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.eta_theta:
+    default: 0.01
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.theta_init:
+    default: 0.5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.theta_baseline:
+    default: 0.5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.Pi_e_init:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.Pi_i_init:
+    default: 1.5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.beta_somatic:
+    default: 1.8
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.eps:
+    default: 1.0e-08
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.max_refractory_ms:
+    default: 50.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.precision_learning_rate:
+    default: 0.05
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.precision_min:
+    default: 0.1
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.precision_max:
+    default: 10.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.precision_history_max:
+    default: 100
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.neuromod_ach_baseline:
+    default: 0.5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.neuromod_ach_scaling:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.energy_depletion_rate:
+    default: 0.1
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.energy_min:
+    default: 0.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.energy_max:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.allostatic_increase_rate:
+    default: 0.05
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.allostatic_decrease_rate:
+    default: 0.1
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.allostatic_min:
+    default: 0.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.allostatic_max:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.gradient_monitoring_enabled:
+    default: true
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.performance_tracking_enabled:
+    default: true
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.cost_benefit_gating_enabled:
+    default: true
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.use_physical_temperature:
+    default: true
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.boltzmann_constant:
+    default: 1.380649e-23
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.temperature_kelvin:
+    default: 310.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.temperature_normalized:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.energy_scale_factor:
+    default: 1.0e+21
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.entropy_scale_factor:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.use_rigorous_thermodynamic_entropy:
+    default: true
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.use_shannon_entropy:
+    default: true
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.use_rigorous_variational_fe:
+    default: false
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.cross_level_validation_enabled:
+    default: true
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.cost_benefit_clamp_min:
+    default: -10.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.cost_benefit_clamp_max:
+    default: 10.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.cost_benefit_scaling:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.tau_min:
+    default: 0.01
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.tau_max:
+    default: 100.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.tau_intero_baseline:
+    default: 0.3
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.tau_extero_baseline:
+    default: 0.2
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.refractory_cost_baseline:
+    default: 0.1
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.refractory_cost_scaling:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.alpha_broadcast:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.beta_maintenance:
+    default: 0.5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.beta_transition:
+    default: 0.8
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.hysteresis:
+    default: 0.1
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.volatility_history_max:
+    default: 100
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.entropy_calculation_interval:
+    default: 10
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.workspace_sustained_scaling:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.gradient_warn_threshold:
+    default: 1000.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.gradient_clip_value:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.reservoir_scaling:
+    default: 1.0
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'
+  APGISettings.reservoir_sparsity:
+    default: 0.5
+    label: assumed
+    source: 'UNREFERENCED: provenance to be supplied by scientific authority (AUD-SPEC-04)'

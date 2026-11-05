@@ -46,7 +46,7 @@ class APGISettings(BaseSettings):
     # Network architecture
     input_size: int = 64
     hidden_size: int = 128
-    num_levels: int = 3
+    num_levels: int = 5  # canonical L0–L4 (APGI-SCI-003)
 
     # Temporal dynamics
     dt_ms: float = 10.0

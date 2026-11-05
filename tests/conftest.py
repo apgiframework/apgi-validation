@@ -1007,3 +1007,30 @@ if __name__ == "__main__":
     print("conftest.py is a pytest configuration file and should not be run directly.")
     print("Use 'pytest' to run the test suite.")
     exit(0)
+
+
+@pytest.fixture(autouse=True)
+def release_test_memory():
+    """Free per-test memory (CI-MEMORY).
+
+    The suite opened matplotlib figures and built large model objects that
+    were never released; on the 3.12 CI runner the accumulated heap exhausted
+    memory around 44 % of the run, after which pytest itself raised
+    MemoryError while formatting the next failure. Closing figures and
+    collecting cycles after every test keeps the footprint flat.
+    """
+    yield
+    try:
+        import matplotlib.pyplot as plt
+
+        plt.close("all")
+    except Exception:  # pragma: no cover - matplotlib is a locked dependency
+        pass
+    _MEMORY_STATE["n"] += 1
+    if _MEMORY_STATE["n"] % 50 == 0:  # a full collection per test is too slow
+        import gc
+
+        gc.collect()
+
+
+_MEMORY_STATE = {"n": 0}

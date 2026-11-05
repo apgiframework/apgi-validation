@@ -371,14 +371,8 @@ class TestHierarchicalProcessor:
     def test_level_names(self):
         """Test level names are correct."""
         proc = HierarchicalProcessor()
-        expected = [
-            "sensory",
-            "feature_integration",
-            "pattern_recognition",
-            "semantic",
-            "executive",
-        ]
-        assert proc.level_names == expected
+        assert proc.level_names == ["L0", "L1", "L2", "L3", "L4"]
+        assert proc.level_labels[2] == "L2 (1–30 min)"
 
     def test_process_level(self):
         """Test processing a single level."""
@@ -415,7 +409,7 @@ class TestHierarchicalProcessor:
         proc = HierarchicalProcessor()
         summary = proc.get_summary()
         assert len(summary) == 5
-        assert "level_0_sensory" in summary
+        assert "level_0_L0" in summary
 
     def test_reset(self):
         """Test reset functionality."""
@@ -560,8 +554,8 @@ class TestAPGIModel:
         """Test hierarchical level states are in output."""
         model = APGIModel()
         output = model.step(1.0)
-        assert "level_0_sensory" in output
-        assert "level_4_executive" in output
+        assert "level_0_L0" in output
+        assert "level_4_L4" in output
 
     def test_p3b_latency_range(self):
         """Test P3b latency is in expected range."""

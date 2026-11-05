@@ -33,11 +33,23 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from utils.protocol_lock import (  # noqa: F401  (re-exported error types)
+    ProtocolLoadError,
+    ProtocolLockError,
+    ProtocolSchemaError,
+    VerifiedLock,
+    verify_protocol_lock,
+)
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
 _PROTOCOLS_DIR = Path(__file__).parent.parent / "protocols"
 _TEMPLATE_PATH = Path(__file__).parent.parent / "config" / "apgi_protocol_template.json"
+_SCHEMA_PATH = _PROTOCOLS_DIR / "schemas" / "protocol.schema.json"
+
+#: In-process audit trail of definition loads (outcome per file).
+LOAD_AUDIT_LOG: List[Dict[str, Any]] = []
 
 # Protocol specification release the files in protocols/ must carry. Kept in
 # step with apgi-framework (protocols/CHANGELOG.md, scripts/validate_protocols.py).
@@ -231,41 +243,115 @@ def _find_protocol_file(protocol_id: str) -> Optional[Path]:
     return None
 
 
+def _strict_json(path: Path) -> Dict[str, Any]:
+    """Parse JSON rejecting duplicate keys and NaN/Infinity constants."""
+
+    def _unique(pairs: List[Any]) -> Dict[str, Any]:
+        out: Dict[str, Any] = {}
+        for key, value in pairs:
+            if key in out:
+                raise ProtocolSchemaError(f"{path.name}: duplicate JSON key {key!r}")
+            out[key] = value
+        return out
+
+    def _reject(value: str) -> Any:
+        raise ProtocolSchemaError(f"{path.name}: non-finite JSON constant {value}")
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=_unique, parse_constant=_reject)
+    except ProtocolSchemaError:
+        raise
+    except (OSError, ValueError) as exc:
+        raise ProtocolSchemaError(f"{path.name}: unreadable protocol JSON: {exc}") from exc
+    if not isinstance(data, dict):
+        raise ProtocolSchemaError(f"{path.name}: protocol definition must be a JSON object")
+    return data
+
+
+_SCHEMA_CACHE: Dict[str, Any] = {}
+
+
+def _schema_validator() -> Any:
+    import jsonschema
+
+    if "validator" not in _SCHEMA_CACHE:
+        schema = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
+        cls = jsonschema.validators.validator_for(schema)
+        cls.check_schema(schema)
+        _SCHEMA_CACHE["validator"] = cls(schema, format_checker=jsonschema.FormatChecker())
+    return _SCHEMA_CACHE["validator"]
+
+
+def validate_protocol_document(data: Dict[str, Any], name: str = "<protocol>") -> None:
+    """Raise ProtocolSchemaError unless ``data`` is a schema-valid registered definition."""
+    failures = sorted(_schema_validator().iter_errors(data), key=lambda e: list(e.absolute_path))
+    if failures:
+        detail = "; ".join(
+            f"{'.'.join(str(x) for x in e.absolute_path) or '<root>'}: {e.message}" for e in failures[:10]
+        )
+        raise ProtocolSchemaError(f"{name}: schema validation failed ({len(failures)} errors): {detail}")
+    if data.get("schema_version") != SPECIFICATION_VERSION or data.get("version") != SPECIFICATION_VERSION:
+        raise ProtocolSchemaError(
+            f"{name}: version {data.get('version')!r}/{data.get('schema_version')!r} "
+            f"is not the supported specification {SPECIFICATION_VERSION}"
+        )
+
+
 def load_protocol(protocol_id: str) -> Optional[ProtocolSpec]:
-    """Load a protocol spec by ID (e.g. 'APGI-P01'). Returns None if not found."""
+    """Load a protocol spec by ID (e.g. 'APGI-P01'). Returns None if not found.
+
+    The full protocol lock is verified first; a lock failure raises
+    :class:`ProtocolLockError` rather than returning a definition.
+    """
     path = _find_protocol_file(protocol_id)
     if path is None:
         return None
     return load_protocol_file(path)
 
 
-def load_protocol_file(path: Path) -> ProtocolSpec:
-    """Load a ProtocolSpec from a specific JSON file path."""
-    with open(path, encoding="utf-8") as fh:
-        data = json.load(fh)
+def load_protocol_file(path: Path, *, lock: Optional[VerifiedLock] = None) -> ProtocolSpec:
+    """Load a ProtocolSpec from a specific JSON file path.
+
+    Order of checks (all before any object is built):
+      1. the registered protocol lock verifies (trust anchor, manifest, digests);
+      2. this file's bytes match a locked digest — copied or edited definitions
+         are refused even if they are schema-valid;
+      3. strict JSON parsing and JSON-Schema + version validation.
+
+    Raises:
+        ProtocolLockError: lock or digest failure.
+        ProtocolSchemaError: malformed, ID-only or wrong-version definition.
+    """
+    path = Path(path)
+    verified = lock if lock is not None else verify_protocol_lock()
+    if verified.release != "UNVERIFIED-DEV" and not verified.is_locked_definition(path):
+        LOAD_AUDIT_LOG.append({"file": path.name, "outcome": "rejected", "reason": "not a locked definition"})
+        raise ProtocolLockError(f"{path}: file bytes do not match any locked protocol definition")
+    data = _strict_json(path)
+    validate_protocol_document(data, path.name)
+    LOAD_AUDIT_LOG.append({"file": path.name, "outcome": "loaded", "protocol_id": data["protocol_id"]})
     return ProtocolSpec.from_dict(data)
 
 
 def load_all_protocols() -> Dict[str, ProtocolSpec]:
     """Load all canonical protocol specs (APGI-P## only), keyed by protocol_id.
 
-    Phase 4 (Hard Deprecation): Legacy protocols in protocols/legacy/ are no
-    longer accessible. Only canonical APGI-P## protocols can be loaded.
-
-    For legacy protocol references, update your code to use canonical naming
-    and review PROTOCOL-MIGRATION-USER-GUIDE.md for the mapping.
-
-    Returns:
-        Dict mapping protocol_id (e.g., "APGI-P01") to ProtocolSpec objects
+    All-or-nothing (APGI-PRO-002): the lock is verified once, every definition
+    is validated, and only then is the complete mapping returned. Any failure
+    raises :class:`ProtocolLoadError`; no partial or empty set is returned in
+    place of an error.
     """
-    specs: Dict[str, ProtocolSpec] = {}
-    for path in _iter_protocol_files():
-        try:
-            spec = load_protocol_file(path)
-            specs[spec.protocol_id] = spec
-        except Exception:  # nosec B110
-            pass
-    return specs
+    lock = verify_protocol_lock(_PROTOCOLS_DIR)
+    staged: Dict[str, ProtocolSpec] = {}
+    paths = _iter_protocol_files()
+    if not paths:
+        raise ProtocolLockError(f"no protocol definitions found in {_PROTOCOLS_DIR}")
+    for path in paths:
+        spec = load_protocol_file(path, lock=lock)
+        if spec.protocol_id in staged:
+            raise ProtocolSchemaError(f"duplicate protocol_id {spec.protocol_id} in {path.name}")
+        staged[spec.protocol_id] = spec
+    return dict(staged)
 
 
 def get_apgi_parameters(protocol_id: str) -> Dict[str, Any]:

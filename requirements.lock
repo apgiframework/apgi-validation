@@ -226,7 +226,7 @@ networkx==3.6.1
     # via torch
 nodeenv==1.10.0
     # via pre-commit
-nolds==0.6.3
+nolds==0.6.2
     # via -r requirements-protocols.txt
 numba==0.66.0
     # via
@@ -463,7 +463,7 @@ scipy==1.17.1
     #   xarray-einstats
 seaborn==0.13.2
     # via -r requirements.txt
-setuptools==83.0.0
+setuptools==80.9.0
     # via
     #   arviz
     #   dash

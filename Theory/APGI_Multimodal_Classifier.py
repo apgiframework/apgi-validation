@@ -4,7 +4,7 @@
 APGI Multimodal Classifier
 =============================================================================
 
-Advanced Implementation of the Active Posterior Global Integration (APGI) model
+Advanced Implementation of the Allostatic Precision-Gated Ignition (APGI) model
 for conscious access prediction using cross-modal precision-weighted integration.
 Includes Bayesian parameter inversion and mechanistic stratification.
 

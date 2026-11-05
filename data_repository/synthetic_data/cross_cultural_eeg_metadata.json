@@ -11,7 +11,10 @@
   "n_channels": 64,
   "sampling_rate": 500.0,
   "trial_duration_s": 2.0,
-  "data_source": "synthetic_realistic",
+  "data_source": "synthetic",
   "preprocessing": "ICA, artifact removal, bandpass 1-50Hz",
-  "empirical_simulation": true
+  "data_origin": "synthetic",
+  "processing_stage": "raw",
+  "inferential_category": "method_validation",
+  "provenance_note": "Simulated with utils/empirical_data_generators.py; not human data. Relabelled from 'synthetic_realistic' under S4-VAL-13.5."
 }

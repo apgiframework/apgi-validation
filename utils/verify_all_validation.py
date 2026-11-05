@@ -330,7 +330,7 @@ def verify_directory_structure():
         "apgi_core",
         "data_repository",
         "data_repository/dashboard_data",
-        "data_repository/empirical_data",
+        "data_repository/synthetic_data",
         "apgi_outputs",
         "apgi_outputs/performance_profiles",
     ]

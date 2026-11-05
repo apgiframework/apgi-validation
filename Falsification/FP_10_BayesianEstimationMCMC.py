@@ -2427,8 +2427,8 @@ def load_empirical_data_if_available() -> Optional[Tuple[np.ndarray, np.ndarray]
     try:
         # Check for empirical data files in the data repository
         data_paths = [
-            Path("data_repository/empirical_data/cross_cultural_eeg_data.csv"),
-            Path("data_repository/empirical_data/behavioral_data.csv"),
+            Path("data_repository/synthetic_data/cross_cultural_eeg_data.csv"),
+            Path("data_repository/synthetic_data/behavioral_data.csv"),
             Path("data/cross_cultural_behavioral.csv"),
             Path("cross_cultural_data.csv"),
         ]

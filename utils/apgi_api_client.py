@@ -34,9 +34,24 @@ _LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
 class ApgiApiError(RuntimeError):
     """Raised when the API is unreachable or returns an error status."""
 
-    def __init__(self, message: str, status_code: Optional[int] = None):
+    def __init__(self, message: str, status_code: Optional[int] = None, error_code: Optional[str] = None):
         super().__init__(message)
         self.status_code = status_code
+        #: Stable machine-readable code from the server's error body, if any (APGI-API-004).
+        self.error_code = error_code
+
+
+def _error_code(response: Any) -> Optional[str]:
+    """Extract only a short machine-readable error code; never echo the body."""
+    try:
+        body = response.json()
+    except Exception:
+        return None
+    if isinstance(body, dict):
+        code = body.get("code") or (body.get("error") if isinstance(body.get("error"), str) else None)
+        if isinstance(code, str) and code.replace("_", "").replace("-", "").isalnum() and len(code) <= 64:
+            return code
+    return None
 
 
 def resolve_base_url(url: Optional[str] = None) -> str:
@@ -94,9 +109,13 @@ class ApgiApiClient:
         except requests.RequestException as exc:
             raise ApgiApiError(f"APGI API unreachable at {self.base_url}: {exc}") from exc
         if response.status_code >= 400:
+            # The response body is not included: it may echo submitted data or
+            # credentials into logs (APGI-API-003/004). Only a validated code is kept.
+            code = _error_code(response)
             raise ApgiApiError(
-                f"{method} {path} failed with HTTP {response.status_code}: {response.text[:200]}",
+                f"{method} {path} failed with HTTP {response.status_code}" + (f" ({code})" if code else ""),
                 status_code=response.status_code,
+                error_code=code,
             )
         if not response.content:
             return None

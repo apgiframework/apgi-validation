@@ -1,0 +1,20 @@
+# APGI-SCI-006: the acronym expands only to "Allostatic Precision-Gated Ignition".
+# Author list, DOI and release date are to be confirmed by the release authority
+# (AUD-SPEC-05: Zenodo record 21632263 vs 21632264 unresolved), so no DOI is asserted here.
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+title: "APGI Validation Framework — Allostatic Precision-Gated Ignition (APGI)"
+abstract: >-
+  Validation and falsification framework for the Allostatic Precision-Gated
+  Ignition (APGI) theory: registered protocol definitions, scientific
+  conformance tests and an independent K-gate validation pipeline.
+authors:
+  - name: "APGI Framework"
+version: "1.3.0"
+repository-code: "https://github.com/apgiframework/apgi-validation"
+keywords:
+  - "Allostatic Precision-Gated Ignition"
+  - APGI
+  - consciousness
+  - validation

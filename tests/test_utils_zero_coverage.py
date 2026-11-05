@@ -111,15 +111,14 @@ class TestAuthAdapter:
         result = adapter.check_permission(token, [Role.ADMIN])
         assert result is False  # nosec B101  # nosec B101
 
-    def test_auth_adapter_check_permission_admin_override(self):
-        """Test admin override in permission check."""
+    def test_auth_adapter_check_permission_no_admin_override(self):
+        """APGI-API-002: no implicit admin bypass; ADMIN must be listed explicitly."""
         from utils.auth_adapter import AuthAdapter, Role
 
         adapter = AuthAdapter()
         token = adapter.generate_token("user123", Role.ADMIN)
-        # Admin should have access even if not in required list
-        result = adapter.check_permission(token, [Role.RESEARCHER])
-        assert result is True  # nosec B101  # nosec B101
+        assert adapter.check_permission(token, [Role.RESEARCHER]) is False  # nosec B101
+        assert adapter.check_permission(token, [Role.RESEARCHER, Role.ADMIN]) is True  # nosec B101
 
     def test_auth_manager_global(self):
         """Test global auth_manager instance."""

@@ -21,7 +21,10 @@ mne>=1.7.0,<1.8.0
 
 # --- Sensitivity analysis and nonlinear dynamics (FP_08, FP_11) -----------
 SALib>=1.5.0,<2.0.0
-nolds>=0.6.0,<1.7.0
+# nolds 0.6.3 fails at import on Python 3.11 (importlib.resources.files() on a
+# module, CI-NOLDS); 0.6.2 imports pkg_resources, which setuptools removed in 81.
+nolds>=0.6.0,<0.6.3
+setuptools>=70,<81
 numba>=0.59.0
 
 # --- Symbolic mathematics (VP_07a, FP_07) ---------------------------------
