@@ -86,7 +86,7 @@ independent reviewer accepts it (AUD-GOV-01).**
 | CI-NOLDS | Fixed | scoped import shim for nolds 0.6.3 on Python 3.11; setuptools 84.2.1 |
 | CI-ISORT | Fixed | isort applied |
 | CI-BANDIT | Fixed | policy via supported CLI flags |
-| CI-SEMGREP | Fixed | 59 findings triaged: actions SHA-pinned, `allow_pickle=False`, TAR restore rewritten, reviewed false positives annotated, 3 advisory rules excluded by flag; local run clean |
+| CI-SEMGREP | Fixed | 59 findings triaged: actions SHA-pinned, `allow_pickle=False`, TAR restore rewritten, reviewed false positives annotated, 4 advisory rules excluded by flag; local run clean |
 | CI-DOWNSTREAM | Unblocked | follows isort fix |
 | CI-MEMORY | Fixed | root cause: nested `oom_fixture` left `RLIMIT_AS` at 10 MB for the rest of the session; regression test added |
 | CI-PROTECTION | Blocked | repository admin must require the gate checks |

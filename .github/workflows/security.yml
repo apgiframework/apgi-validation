@@ -31,9 +31,9 @@ jobs:
           bandit -c .bandit.yml -r . -f json -o bandit-report.json --exit-zero
           bandit -c .bandit.yml -r . -f txt --severity-level medium --confidence-level medium
 
-      # CI-SEMGREP policy: all security rules gate the build. Three advisory
+      # CI-SEMGREP policy: all security rules gate the build. Four advisory
       # rules with no security impact are excluded explicitly (PyTorch
-      # performance hints and a Python 3.6 compatibility check; the project
+      # performance hints and Python 3.6/3.7 compatibility checks; the project
       # requires 3.11+). Reviewed false positives carry an inline
       # `# nosemgrep: <rule>` with the justification on the line above.
       - name: Run Semgrep SAST
@@ -42,6 +42,7 @@ jobs:
           --exclude-rule trailofbits.python.automatic-memory-pinning.automatic-memory-pinning
           --exclude-rule trailofbits.python.numpy-in-pytorch-modules.numpy-in-pytorch-modules
           --exclude-rule python.lang.compatibility.python36.python36-compatibility-Popen2
+          --exclude-rule python.lang.compatibility.python37.python37-compatibility-importlib2
           .
 
       - name: Upload security reports
