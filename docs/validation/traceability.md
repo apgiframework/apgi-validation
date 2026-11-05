@@ -83,7 +83,7 @@ independent reviewer accepts it (AUD-GOV-01).**
 | S4-VAL-14 | Blocked | WIF (S0-INF-06.4) |
 | S4-VAL-16, 16.1–16.12 | Implemented | `release/` (12 artifacts) + builder/`--check`; results honestly NOT_EVALUATED |
 | XC-CI-05, .1–.3 | Implemented in CI config | `validation-gates.yml` (3 named gates) |
-| CI-NOLDS | Fixed | nolds 0.6.2 + setuptools < 81 |
+| CI-NOLDS | Fixed | scoped import shim for nolds 0.6.3 on Python 3.11; setuptools 84.2.1 |
 | CI-ISORT | Fixed | isort applied |
 | CI-BANDIT | Fixed | policy via supported CLI flags |
 | CI-SEMGREP | Fixed | 59 findings triaged: actions SHA-pinned, `allow_pickle=False`, TAR restore rewritten, reviewed false positives annotated, 3 advisory rules excluded by flag; local run clean |

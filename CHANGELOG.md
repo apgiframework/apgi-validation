@@ -46,7 +46,7 @@ approvals or other components remain **blocked** and are not reported as done.
 - CI: `validation-gates.yml` (registered rules, synthetic fixtures, result classification).
 
 ### Fixed
-- CI-NOLDS (nolds 0.6.3 import failure on Python 3.11): pin nolds 0.6.2 + setuptools < 81.
+- CI-NOLDS (nolds 0.6.3 import failure on Python 3.11): scoped import shim (`apgi_core/_nolds_compat.py`); setuptools stays current (84.2.1) so pip-audit advisories remain fixable.
 - CI-BANDIT: severity/confidence policy moved to supported CLI flags.
 - CI-ISORT: import order.
 - CI-MEMORY: `oom_fixture` left `RLIMIT_AS` at 10 MB after nested use, so later

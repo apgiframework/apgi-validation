@@ -12,8 +12,9 @@ from apgi_core.errors import ScientificComputationError
 logger = logging.getLogger(__name__)
 
 try:
-    import nolds
+    from apgi_core._nolds_compat import import_nolds
 
+    nolds = import_nolds()
     HAS_NOLDS = True
 except ImportError:
     HAS_NOLDS = False

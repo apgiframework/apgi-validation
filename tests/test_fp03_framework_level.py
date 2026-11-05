@@ -157,7 +157,11 @@ class TestRunMultiProtocolFramework:
             MockRunner.return_value = mock_runner
 
             result = run_multi_protocol_framework(configs)
-            assert result.get("status") == "success"
+            # APGI-API-004: the mocked protocols return no data, so the
+            # framework result carries no predictions and must not be
+            # reported as scientific success.
+            assert result.get("status") == "partial"
+            assert "incomplete result: not reported as success" in result.get("errors", [])
 
 
 class TestValidateFrameworkConsistency:

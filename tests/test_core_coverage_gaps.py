@@ -388,10 +388,15 @@ class TestCoreModulesIntegration:
     def test_utils_core_functions_exist(self):
         """Test that core utility functions exist."""
         try:
-            import utils
+            import importlib
+
+            # Import the submodule explicitly: checking `utils.error_handler`
+            # as a package attribute only passed when another test had
+            # imported it first (order-dependent failure).
+            error_handler = importlib.import_module("utils.error_handler")
 
             # Should have error handling
-            assert hasattr(utils, "handle_error") or hasattr(utils, "error_handler")
+            assert callable(getattr(error_handler, "safe_import", None))
         except ImportError:
             pytest.skip("Utils module not available")
 
