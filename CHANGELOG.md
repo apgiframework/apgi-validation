@@ -48,7 +48,13 @@ approvals or other components remain **blocked** and are not reported as done.
 ### Fixed
 - CI-NOLDS (nolds 0.6.3 import failure on Python 3.11): pin nolds 0.6.2 + setuptools < 81.
 - CI-BANDIT: severity/confidence policy moved to supported CLI flags.
-- CI-ISORT: import order. CI-MEMORY: per-test figure/GC release.
+- CI-ISORT: import order.
+- CI-MEMORY: `oom_fixture` left `RLIMIT_AS` at 10 MB after nested use, so later
+  allocations raised MemoryError; it now restores limits re-entrantly.
+- CI-SEMGREP: GitHub Actions pinned to commit SHAs; NPZ loading uses
+  `allow_pickle=False`; TAR restore no longer extracts the whole archive per
+  member (it ignored component selection and `overwrite`); reviewed false
+  positives annotated.
 - NumPy 1.26 compatibility of `metabolic_cost` (APGI-REP-005); seeded RNG streams (REP-002).
 - Docker builds from `requirements.lock` on a digest-pinned base (APGI-IMP-001).
 - Six non-canonical APGI expansions corrected (APGI-SCI-006).

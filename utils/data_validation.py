@@ -1036,7 +1036,7 @@ def _validate_fmri_npz(
 ) -> Dict[str, Any]:
     """Validate pre-processed NPZ fMRI data."""
     try:
-        data = np.load(npz_path, allow_pickle=True)
+        data = np.load(npz_path, allow_pickle=False)
 
         # Check required fields
         required_fields = ["vmPFC_bold", "conditions", "dt", "trial_duration"]
@@ -1209,7 +1209,7 @@ def _validate_doc_npz(
 ) -> Dict[str, Any]:
     """Validate pre-processed DoC NPZ data."""
     try:
-        data = np.load(npz_path, allow_pickle=True)
+        data = np.load(npz_path, allow_pickle=False)
 
         # Check required fields
         required_fields = ["pci_scores", "hep_amplitudes", "consciousness_labels"]

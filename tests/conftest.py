@@ -694,38 +694,38 @@ def oom_fixture():
     """Fixture for testing out-of-memory conditions."""
 
     class OOMContext:
+        """Lower RLIMIT_AS for the duration of the block, re-entrantly.
+
+        CI-MEMORY root cause: the previous version stored a single saved limit,
+        so a nested ``with oom_fixture:`` overwrote it with the 10 MB test limit
+        and the outer exit "restored" 10 MB for the rest of the session. Every
+        later large allocation then raised MemoryError (seen ~44 % into the
+        run, inside pytest's own traceback formatting). A stack restores the
+        true original limit on the outermost exit.
+        """
+
         def __init__(self):
-            self.original_memory_limit = None
+            self._saved = []
 
         def __enter__(self):
-            # Try to simulate OOM by setting a very low memory limit
-            # This is a best-effort simulation since actual OOM is hard to trigger safely
+            # Best-effort OOM simulation: cap the address space at 10 MB.
             try:
                 import resource
 
-                self.original_memory_limit = resource.getrlimit(resource.RLIMIT_AS)
-                # Set memory limit to 10MB for testing
-                resource.setrlimit(
-                    resource.RLIMIT_AS,
-                    (10 * 1024 * 1024, self.original_memory_limit[1]),
-                )
-            except ImportError:
-                # resource module not available on Windows
-                pass
+                current = resource.getrlimit(resource.RLIMIT_AS)
+                resource.setrlimit(resource.RLIMIT_AS, (10 * 1024 * 1024, current[1]))
+                self._saved.append(current)
             except Exception:
-                # If we can't set limits, we'll use a mock approach
-                pass
+                # resource unavailable (Windows) or limit not settable
+                self._saved.append(None)
             return self
 
         def __exit__(self, exc_type, exc_val, exc_tb):
-            # Restore original memory limit
-            if self.original_memory_limit is not None:
-                try:
-                    import resource
+            previous = self._saved.pop() if self._saved else None
+            if previous is not None:
+                import resource
 
-                    resource.setrlimit(resource.RLIMIT_AS, self.original_memory_limit)
-                except Exception:
-                    pass
+                resource.setrlimit(resource.RLIMIT_AS, previous)
             return False  # Don't suppress exceptions
 
     return OOMContext()
@@ -1007,30 +1007,3 @@ if __name__ == "__main__":
     print("conftest.py is a pytest configuration file and should not be run directly.")
     print("Use 'pytest' to run the test suite.")
     exit(0)
-
-
-@pytest.fixture(autouse=True)
-def release_test_memory():
-    """Free per-test memory (CI-MEMORY).
-
-    The suite opened matplotlib figures and built large model objects that
-    were never released; on the 3.12 CI runner the accumulated heap exhausted
-    memory around 44 % of the run, after which pytest itself raised
-    MemoryError while formatting the next failure. Closing figures and
-    collecting cycles after every test keeps the footprint flat.
-    """
-    yield
-    try:
-        import matplotlib.pyplot as plt
-
-        plt.close("all")
-    except Exception:  # pragma: no cover - matplotlib is a locked dependency
-        pass
-    _MEMORY_STATE["n"] += 1
-    if _MEMORY_STATE["n"] % 50 == 0:  # a full collection per test is too slow
-        import gc
-
-        gc.collect()
-
-
-_MEMORY_STATE = {"n": 0}

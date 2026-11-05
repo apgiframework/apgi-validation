@@ -123,7 +123,9 @@ def one_factor_loadings(corr: np.ndarray, iterations: int = 200, tol: float = 1e
         if np.max(np.abs(new_h2 - h2)) < tol:
             break
         h2 = new_h2
-    return np.abs(lam) if np.sum(lam) < 0 else lam
+    # The factor's overall sign is arbitrary: flip the whole vector, never the
+    # individual loadings (np.abs would distort mixed-sign structures).
+    return -lam if np.sum(lam) < 0 else lam
 
 
 def omega_from_loadings(loadings: Sequence[float]) -> float:

@@ -274,7 +274,7 @@ class APGIP5SomaticProtocol:
             raise FileNotFoundError(f"Protocol 5 data path not found: {data_path}")
 
         if path.suffix == ".npz":
-            raw = np.load(path, allow_pickle=True)
+            raw = np.load(path, allow_pickle=False)
             return {key: np.asarray(raw[key], dtype=float) for key in raw.files}
 
         if path.suffix == ".json":

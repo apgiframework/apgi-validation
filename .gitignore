@@ -111,6 +111,9 @@ tmp/
 output/
 results/
 figures/
+# The release package's result artifacts are versioned (S4-VAL-16.10/16.11).
+!release/results/
+!release/results/**
 plots/
 backups/
 .DS_Store

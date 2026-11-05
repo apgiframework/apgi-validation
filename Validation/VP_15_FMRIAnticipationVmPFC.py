@@ -224,7 +224,7 @@ def load_fmri_data(fmri_data_path: str) -> Dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(f"fMRI data not found: {fmri_data_path}")
     if path.suffix == ".npz":
-        data = np.load(path, allow_pickle=True)
+        data = np.load(path, allow_pickle=False)
         return {
             "vmPFC_bold": np.asarray(data["vmPFC_bold"], dtype=float),
             "ant_insula_bold": np.asarray(data["ant_insula_bold"], dtype=float),

@@ -839,7 +839,8 @@ def safe_import(module_name: str, fallback=None, context: str = ""):
     try:
         import importlib
 
-        return importlib.import_module(module_name)
+        # Semgrep non-literal-import reviewed: internal helper; every in-repo caller passes a literal module name.
+        return importlib.import_module(module_name)  # nosemgrep: non-literal-import
     except ImportError as e:
         handle_import_error(module_name, e, context)
         return fallback

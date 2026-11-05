@@ -79,8 +79,14 @@ class QuarantineLedger:
             return Outcome.DUPLICATE, f"record_id {rid} or identical content already received"
         if self.window_end is not None and record.get(self.timestamp_field) is not None:
             ts = record[self.timestamp_field]
-            ts = datetime.fromisoformat(ts) if isinstance(ts, str) else ts
-            if ts > self.window_end:
+            try:
+                ts = datetime.fromisoformat(ts) if isinstance(ts, str) else ts
+                late = ts > self.window_end
+            except (TypeError, ValueError) as exc:
+                # Unparseable or naive/aware-mismatched timestamps are a named
+                # outcome, never an exception that leaves the record unaccounted.
+                return Outcome.MALFORMED, f"invalid {self.timestamp_field}: {exc}"
+            if late:
                 return Outcome.DELAYED, f"{self.timestamp_field} {ts.isoformat()} after window end"
         if self.match_field and self.known_keys is not None and record.get(self.match_field) not in self.known_keys:
             return Outcome.UNMATCHED, f"{self.match_field}={record.get(self.match_field)!r} not known"

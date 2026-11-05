@@ -1,0 +1,11 @@
+gate_id,title,processing_status,decision,next_action,reason
+K1,Test–retest reliability of self-report subscales,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K2,Test–retest reliability of behavioural indices,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K3,Internal consistency,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K4,Three-factor structure,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K4b,Measurement invariance,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K5,Self-report vs behavioural threshold convergence,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K6,Criterion prediction on locked holdout,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K6b,Practical prediction gain on holdout,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K7b,Practical identifiability at deployed trial counts,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)
+K8,Profile × intervention interaction,NOT_EVALUATED,,collect_evidence,no frozen empirical dataset (S4-REC-01)

@@ -122,3 +122,12 @@ def test_profile_likelihood():
 def test_credible_interval():
     est = credible_interval(np.random.default_rng(4).normal(0.5, 0.1, 20000))
     assert est.lower > 0
+
+
+def test_one_factor_loadings_preserve_mixed_signs():
+    lam = np.array([-0.8, -0.7, -0.6, 0.5])
+    r = np.outer(lam, lam)
+    np.fill_diagonal(r, 1.0)
+    out = one_factor_loadings(r)
+    # Overall sign is arbitrary; the relative signs must be preserved.
+    assert np.allclose(out, lam, atol=1e-4) or np.allclose(out, -lam, atol=1e-4)

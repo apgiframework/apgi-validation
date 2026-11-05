@@ -86,9 +86,9 @@ independent reviewer accepts it (AUD-GOV-01).**
 | CI-NOLDS | Fixed | nolds 0.6.2 + setuptools < 81 |
 | CI-ISORT | Fixed | isort applied |
 | CI-BANDIT | Fixed | policy via supported CLI flags |
-| CI-SEMGREP | Unblocked | runs once Bandit passes; findings to triage on first run |
+| CI-SEMGREP | Fixed | 59 findings triaged: actions SHA-pinned, `allow_pickle=False`, TAR restore rewritten, reviewed false positives annotated, 3 advisory rules excluded by flag; local run clean |
 | CI-DOWNSTREAM | Unblocked | follows isort fix |
-| CI-MEMORY | Diagnosed | see PR notes |
+| CI-MEMORY | Fixed | root cause: nested `oom_fixture` left `RLIMIT_AS` at 10 MB for the rest of the session; regression test added |
 | CI-PROTECTION | Blocked | repository admin must require the gate checks |
 | CI-GUI/LOCK/SECRET-PATHS/DEPENDENCIES/RUFF/BLACK | Preserved | unchanged gates still present |
 

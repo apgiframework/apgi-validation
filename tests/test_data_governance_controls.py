@@ -228,3 +228,17 @@ def test_api_error_does_not_echo_response_body():
         client.get("x")
     assert "secret-participant-data" not in str(info.value)
     assert info.value.error_code == "internal_error"
+
+
+@pytest.mark.parametrize("ts", ["invalid", "2025-12-31T00:00:00"])  # unparseable; naive vs aware window
+def test_bad_timestamp_is_malformed_and_reconciles(ts):
+    ledger = QuarantineLedger(window_end=datetime(2026, 1, 1, tzinfo=timezone.utc))
+    ledger.ingest([{"record_id": "x", "received_at": ts}, {"record_id": "y"}])
+    assert ledger.reconcile() == {
+        "received": 2,
+        "accepted": 1,
+        "malformed": 1,
+        "duplicate": 0,
+        "delayed": 0,
+        "unmatched": 0,
+    }
