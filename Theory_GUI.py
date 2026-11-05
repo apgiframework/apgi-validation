@@ -111,15 +111,16 @@ def main():
 
     if not args.headless:
         try:
+            from utils.runtime_profile import auth_enforced
             from utils.security_gateway import Role, SecurityGateway
 
             gateway = SecurityGateway()
             if args.token:
                 gateway.require_roles(args.token, [Role.RESEARCHER, Role.ADMIN])
-            elif os.environ.get("APGI_ENFORCE_AUTH", "0") == "1":
+            elif auth_enforced():
                 raise SystemExit(
                     "Authentication required: pass --token to start the GUI. "
-                    "For local development only, set APGI_ENFORCE_AUTH=0 to enable an auto-generated dev token."
+                    "For local development only, set APGI_ENFORCE_AUTH=0 explicitly (refused when APGI_ENV=production)."
                 )
             else:
                 try:
@@ -135,6 +136,16 @@ def main():
             pass
         except PermissionError as e:
             print(f"Authentication failed: {e}")
+            sys.exit(1)
+
+    if getattr(args, "headless", False):
+        # APGI-IMP-002: headless runs pass through the same auth gate as the GUI.
+        from utils.runtime_profile import require_entry_point_auth
+
+        try:
+            args.token = require_entry_point_auth(args.token, "Theory_GUI.py --headless")
+        except PermissionError as auth_exc:
+            print(f"Authentication failed: {auth_exc}")
             sys.exit(1)
 
     if args.headless:

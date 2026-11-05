@@ -1,0 +1,6 @@
+{
+  "note": "Populate only from the registered exclusion rules applied to frozen datasets.",
+  "participant_exclusions": [],
+  "record_exclusions": [],
+  "status": "no empirical data processed"
+}

@@ -1,0 +1,30 @@
+{
+  "catalog_version": "0.1.0",
+  "classifier": "utils.kgate.classify_gate",
+  "files": {
+    "apgi_core/engine.py": "3b04f4ec1c795365e9dc274bf5670679fa87ec2a462a16fa64b6d382471ffb7a",
+    "apgi_core/equations.py": "116436e3bc85d4c343d497e221e23b4bff76f4b71f62fb2b76494046f5ec1937",
+    "apgi_core/temporal_hierarchy.py": "53f5a80f6ebc52b0cd2230046740eb934e2e0fce3cf761ecd2df7de24ad8dc7d",
+    "config/schemas/validation_report.schema.json": "55168223188d4fc871a8cfe928131c5ca2f800c15886adf830997661cf32041f",
+    "utils/data_provenance.py": "6d20c44bea93942ff1d6ef7eac268ad1dd833ad01a52d1762cd3cedce51b3185",
+    "utils/kgate.py": "9a2ba0b437e54880f4203de3c1ef9c24f189badc55e887a2f1428e7d826c17ec",
+    "utils/protocol_loader.py": "a7e7e9b39bc7e8ea8aa04f3b40aef112f1ca76121e5bc0c4e906bb3fafbbb07a",
+    "utils/protocol_lock.py": "e9105d92e9f1acb61207e2cc8a4ae3d24346ca225f1bc7d4793a954944ed51f6",
+    "utils/psychometrics.py": "343f47b8aa349bdbab592adedc93b8d2f99daeb50dce71058af8b4e66c95fe05",
+    "utils/statistical_tests.py": "24817c9f296d9d5b5a1e4e05fe1b22a97c8aa09d8da63f797f1412269128a3be",
+    "utils/validation_report.py": "11f11889f40af80b66554b5cfe80040ded4eeba34c5099cc709c4eb071d3c49e"
+  },
+  "gate_estimators": {
+    "K1": "utils.psychometrics.icc_2_1",
+    "K2": "utils.psychometrics.icc_2_1",
+    "K3": "utils.psychometrics.ordinal_omega",
+    "K4": "utils.psychometrics.k4_estimates",
+    "K4b": "utils.psychometrics.invariance_level",
+    "K5": "utils.psychometrics.pearson_with_ci",
+    "K6": "utils.psychometrics.delta_r2_holdout",
+    "K6b": "utils.psychometrics.mae_relative_change + top_quintile_precision",
+    "K7b": "utils.psychometrics.profile_likelihood_bounded",
+    "K8": "utils.psychometrics.credible_interval"
+  },
+  "report_schema_version": "1.0.0"
+}

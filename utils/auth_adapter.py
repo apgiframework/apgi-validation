@@ -111,14 +111,9 @@ class AuthAdapter:
         if not session or not session.is_valid():
             return False
 
-        if session.role in required_roles:
-            return True
-
-        # Admin overrides
-        if session.role == Role.ADMIN:
-            return True
-
-        return False
+        # No implicit role override (APGI-API-002, docs/Compliance-Matrix.md):
+        # an operation that admits administrators lists Role.ADMIN explicitly.
+        return session.role in required_roles
 
 
 # Global Auth Adapter (lazy-initialized to avoid env var requirement at import time)

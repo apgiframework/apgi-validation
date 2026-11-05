@@ -5,7 +5,7 @@ APGI Psychological State Parameter Library
 =============================================================================
 
 Complete parameter mappings for 54 psychological states based on the
-Active Posterior Global Integration (APGI) framework.
+Allostatic Precision-Gated Ignition (APGI) framework.
 
 Each state is defined with:
 - Pi_e: Exteroceptive precision  [0.1, 15]

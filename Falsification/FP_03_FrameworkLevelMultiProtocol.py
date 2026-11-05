@@ -3682,7 +3682,8 @@ class MultiProtocolRunner:
         module_path = protocol_module_map.get(config.name)
         if module_path:
             try:
-                mod = importlib.import_module(module_path)
+                # Semgrep non-literal-import reviewed: module names are hard-coded constants in this repository; no external input reaches this call.
+                mod = importlib.import_module(module_path)  # nosemgrep: non-literal-import
                 run_fn = getattr(mod, "run_protocol", None) or getattr(mod, "run_validation", None)
                 if callable(run_fn):
                     raw = run_fn(**config.params) if config.params else run_fn()

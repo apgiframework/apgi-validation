@@ -35,8 +35,17 @@ def test_accumulated_signal():
     eps_e = 0.5
     Pi_i_eff = 1.0
     eps_i = 1.0
-    # 0.5 * 2.0 * (0.5)^2 + 0.5 * 1.0 * (1.0)^2 = 0.25 + 0.5 = 0.75
-    assert CoreIgnitionSystem.accumulated_signal(Pi_e, eps_e, Pi_i_eff, eps_i) == 0.75
+    # Canonical (APGI-SCI-001): 2.0 * |0.5| + 1.0 * |1.0| = 2.0
+    assert CoreIgnitionSystem.accumulated_signal(Pi_e, eps_e, Pi_i_eff, eps_i) == 2.0
+    assert CoreIgnitionSystem.accumulated_signal(Pi_e, -eps_e, Pi_i_eff, -eps_i) == 2.0
+    # Legacy quadratic form is retained under an explicit non-canonical name
+    assert CoreIgnitionSystem.quadratic_surprise_signal(Pi_e, eps_e, Pi_i_eff, eps_i) == 0.75
+
+
+def test_ignition_strict_inequality():
+    assert CoreIgnitionSystem.ignites(1.0000001, 1.0)
+    assert not CoreIgnitionSystem.ignites(1.0, 1.0)
+    assert not CoreIgnitionSystem.ignites(0.9999999, 1.0)
 
 
 def test_effective_interoceptive_precision():

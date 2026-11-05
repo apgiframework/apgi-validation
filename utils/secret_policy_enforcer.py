@@ -29,11 +29,14 @@ def enforce_secret_policy():
     # 1. Mandatory env checks
     master_key = os.environ.get("APGI_MASTER_KEY")
     if not master_key:
-        allow_ephemeral = os.environ.get("APGI_ALLOW_EPHEMERAL_MASTER_KEY", "").strip().lower() in {
-            "1",
-            "true",
-            "yes",
-        }
+        from utils.runtime_profile import InsecureConfigurationError, ephemeral_master_key_allowed
+
+        try:
+            allow_ephemeral = ephemeral_master_key_allowed()
+        except InsecureConfigurationError as exc:
+            # APGI-IMP-002: an ephemeral key is never acceptable in production.
+            logger.error(f"CRITICAL: {exc}. Aborting startup.")
+            sys.exit(1)
         if not allow_ephemeral:
             logger.error("CRITICAL: APGI_MASTER_KEY is not set in environment.")
             logger.error(

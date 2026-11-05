@@ -4675,7 +4675,7 @@ def run_protocol_main(config=None):
         # Return mock results for fast test execution
         if HAS_SCHEMA:
             return ProtocolResult(
-                protocol_id="VP_01_SyntheticEEG_MLClassification",
+                protocol_id="VP_01_SyntheticEEGMLClassification",
                 timestamp=datetime.now().isoformat(),
                 named_predictions={
                     "V1.1": PredictionResult(
@@ -4738,7 +4738,7 @@ def run_protocol_main(config=None):
         )
 
     return ProtocolResult(
-        protocol_id="VP_01_SyntheticEEG_MLClassification",
+        protocol_id="VP_01_SyntheticEEGMLClassification",
         timestamp=datetime.now().isoformat(),
         named_predictions=named_predictions,
         completion_percentage=100,

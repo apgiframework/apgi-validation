@@ -4,7 +4,7 @@ TIER DESIGNATION: Tier 2 (information-theoretic)
 Bridge to Level 1
 """
 
-from typing import Optional, Tuple, Union
+from typing import Any, Optional, Tuple, Union
 
 # Apply Python 3.14 NumPy compatibility patches first
 try:
@@ -14,6 +14,8 @@ except ImportError:
 
 import numpy as np
 from scipy import stats
+
+from apgi_core.errors import MissingScientificDependencyError, UnsupportedMethodError
 
 # =============================================================================
 # INPUT VALIDATION
@@ -507,6 +509,43 @@ def compute_eta_squared(f_statistic: float, df_between: int, df_within: int) -> 
 # =============================================================================
 
 
+SUPPORTED_POWER_TESTS = ("ttest_ind", "ttest_rel", "pearsonr")
+
+
+def _require_statsmodels_power() -> Any:
+    try:
+        from statsmodels.stats import power as sm_power
+    except ImportError as exc:  # pragma: no cover - statsmodels is a locked dependency
+        raise MissingScientificDependencyError(
+            "statsmodels is required for validated power/sample-size calculations; "
+            "no approximate constant is substituted (APGI-REP-003)"
+        ) from exc
+    return sm_power
+
+
+def _check_power_inputs(effect_size: float, alpha: float, test_type: str) -> None:
+    if test_type not in SUPPORTED_POWER_TESTS:
+        raise UnsupportedMethodError(
+            f"power analysis for test_type={test_type!r} is not implemented; "
+            f"supported: {', '.join(SUPPORTED_POWER_TESTS)}. Supply a design-specific simulation instead."
+        )
+    if not (0.0 < alpha < 1.0):
+        raise ValueError(f"alpha must be in (0, 1), got {alpha}")
+    if not np.isfinite(effect_size) or effect_size == 0:
+        raise ValueError(f"effect_size must be finite and non-zero, got {effect_size}")
+    if test_type == "pearsonr" and not (-1.0 < effect_size < 1.0):
+        raise ValueError(f"correlation effect size must be in (-1, 1), got {effect_size}")
+
+
+def _fisher_z_power(r: float, n: int, alpha: float) -> float:
+    """Two-sided power for H0: rho=0 via the Fisher z approximation (Cohen 1988, ch. 3)."""
+    if n <= 3:
+        raise ValueError("pearsonr power requires n > 3")
+    z_crit = stats.norm.ppf(1 - alpha / 2)
+    delta = abs(np.arctanh(r)) * np.sqrt(n - 3)
+    return float(stats.norm.cdf(delta - z_crit) + stats.norm.cdf(-delta - z_crit))
+
+
 def compute_power_analysis(
     effect_size: float,
     n_per_group: int,
@@ -514,53 +553,30 @@ def compute_power_analysis(
     test_type: str = "ttest_ind",
 ) -> float:
     """
-    Compute statistical power for a given effect size and sample size.
+    Compute two-sided statistical power for a given effect size and sample size.
 
-    Args:
-        effect_size: Cohen's d or other effect size measure
-        n_per_group: Sample size per group
-        alpha: Significance level
-        test_type: Type of test ("ttest_ind", "ttest_rel", "pearsonr", etc.)
+    Supported designs (APGI-REP-003): ``ttest_ind`` (Cohen's d, equal groups,
+    statsmodels ``TTestIndPower``), ``ttest_rel`` (Cohen's d_z, statsmodels
+    ``TTestPower``) and ``pearsonr`` (r, Fisher-z approximation).
 
-    Returns:
-        Statistical power (0 to 1)
+    Raises:
+        UnsupportedMethodError: for any other ``test_type``. No placeholder
+            power is returned.
+        MissingScientificDependencyError: if statsmodels is unavailable.
     """
-    try:
-        from statsmodels.stats.power import TTestIndPower, TTestPower
-
-        if test_type == "ttest_ind":
-            power_analysis = TTestIndPower()
-            power = power_analysis.power(
-                effect_size=effect_size,
-                nobs1=n_per_group,
-                alpha=alpha,
-                ratio=1.0,
-                alternative="two-sided",
-            )
-        elif test_type == "ttest_rel":
-            power_analysis = TTestPower()
-            power = power_analysis.power(
-                effect_size=effect_size,
-                nobs=n_per_group,
-                alpha=alpha,
-                alternative="two-sided",
-            )
-        else:
-            # Approximation for other tests
-            power = 0.8  # Default placeholder
-
-        return power
-    except ImportError:
-        # If statsmodels not available, use approximation
-        # This is a rough approximation based on Cohen's power tables
-        if effect_size >= 0.8 and n_per_group >= 26:
-            return 0.80
-        elif effect_size >= 0.5 and n_per_group >= 64:
-            return 0.80
-        elif effect_size >= 0.2 and n_per_group >= 394:
-            return 0.80
-        else:
-            return 0.5
+    _check_power_inputs(effect_size, alpha, test_type)
+    if test_type == "pearsonr":
+        return _fisher_z_power(effect_size, int(n_per_group), alpha)
+    sm_power = _require_statsmodels_power()
+    if test_type == "ttest_ind":
+        power = sm_power.TTestIndPower().power(
+            effect_size=effect_size, nobs1=n_per_group, alpha=alpha, ratio=1.0, alternative="two-sided"
+        )
+    else:
+        power = sm_power.TTestPower().power(
+            effect_size=effect_size, nobs=n_per_group, alpha=alpha, alternative="two-sided"
+        )
+    return float(power)
 
 
 def compute_required_n(
@@ -570,52 +586,37 @@ def compute_required_n(
     test_type: str = "ttest_ind",
 ) -> int:
     """
-    Compute required sample size for desired power.
+    Smallest integer sample size (per group) reaching ``desired_power``.
 
-    Args:
-        effect_size: Cohen's d or other effect size measure
-        desired_power: Desired statistical power (0 to 1)
-        alpha: Significance level
-        test_type: Type of test ("ttest_ind", "ttest_rel", etc.)
+    The returned N is the ceiling of the continuous solution and is verified
+    so that ``compute_power_analysis(N) >= desired_power`` while N-1 falls short.
 
-    Returns:
-        Required sample size per group
+    Raises:
+        UnsupportedMethodError, MissingScientificDependencyError: see
+            :func:`compute_power_analysis`.
     """
-    try:
-        from statsmodels.stats.power import TTestIndPower, TTestPower
-
+    _check_power_inputs(effect_size, alpha, test_type)
+    if not (0.0 < desired_power < 1.0):
+        raise ValueError(f"desired_power must be in (0, 1), got {desired_power}")
+    if test_type == "pearsonr":
+        z_a = stats.norm.ppf(1 - alpha / 2)
+        z_b = stats.norm.ppf(desired_power)
+        n_cont = ((z_a + z_b) / abs(np.arctanh(effect_size))) ** 2 + 3
+    else:
+        sm_power = _require_statsmodels_power()
         if test_type == "ttest_ind":
-            power_analysis = TTestIndPower()
-            n = power_analysis.solve_power(
-                effect_size=effect_size,
-                power=desired_power,
-                alpha=alpha,
-                ratio=1.0,
-                alternative="two-sided",
-            )
-        elif test_type == "ttest_rel":
-            power_analysis = TTestPower()
-            n = power_analysis.solve_power(
-                effect_size=effect_size,
-                power=desired_power,
-                alpha=alpha,
-                alternative="two-sided",
+            n_cont = sm_power.TTestIndPower().solve_power(
+                effect_size=effect_size, power=desired_power, alpha=alpha, ratio=1.0, alternative="two-sided"
             )
         else:
-            # Approximation for other tests
-            n = 50  # Default placeholder
-
-        return int(np.ceil(n))
-    except ImportError:
-        # If statsmodels not available, use Cohen's conventions
-        if effect_size >= 0.8:
-            return 26
-        elif effect_size >= 0.5:
-            return 64
-        elif effect_size >= 0.2:
-            return 394
-        else:
-            return 100
+            n_cont = sm_power.TTestPower().solve_power(
+                effect_size=effect_size, power=desired_power, alpha=alpha, alternative="two-sided"
+            )
+    n = int(np.ceil(float(np.asarray(n_cont).item()) - 1e-9))
+    # Guard the ceiling against approximation drift in the continuous solver.
+    while compute_power_analysis(effect_size, n, alpha, test_type) < desired_power:
+        n += 1
+    return n
 
 
 # =============================================================================

@@ -1,0 +1,221 @@
+catalog_version: 0.1.0
+approval_status: PENDING_SCIENTIFIC_REVIEWER
+decision_rule: interval rule; ambiguous band → INDETERMINATE + further_sample; NOT_EVALUATED
+  before sufficient empirical evidence
+gates:
+- gate_id: K1
+  title: Test–retest reliability of self-report subscales
+  register_tasks:
+  - S4-PSY-01
+  criteria:
+  - criterion_id: K1.icc
+    metric: icc_2_1
+    direction: higher_is_better
+    pass_threshold: 0.7
+    fail_threshold: null
+    ambiguous_band: null
+    description: ICC(2,1) ≥ 0.70 per subscale, with interval
+  combine: all
+  min_n: null
+  sample: independent retest sample, 2–3 week interval
+  notes: ''
+- gate_id: K2
+  title: Test–retest reliability of behavioural indices
+  register_tasks:
+  - S4-PSY-05
+  criteria:
+  - criterion_id: K2.icc
+    metric: icc_2_1
+    direction: higher_is_better
+    pass_threshold: 0.5
+    fail_threshold: null
+    ambiguous_band: null
+    description: ICC(2,1) ≥ 0.50
+  combine: all
+  min_n: null
+  sample: independent retest sample, 2–3 week interval
+  notes: ''
+- gate_id: K3
+  title: Internal consistency
+  register_tasks:
+  - S4-PSY-09
+  criteria:
+  - criterion_id: K3.omega
+    metric: ordinal_omega
+    direction: higher_is_better
+    pass_threshold: 0.8
+    fail_threshold: null
+    ambiguous_band: null
+    description: ordinal ω ≥ 0.80 per subscale
+  combine: all
+  min_n: null
+  sample: ''
+  notes: ''
+- gate_id: K4
+  title: Three-factor structure
+  register_tasks:
+  - S4-PSY-13
+  - S4-PSY-14
+  - S4-PSY-15
+  - S4-PSY-16
+  - S4-PSY-17
+  - S4-PSY-18
+  criteria:
+  - criterion_id: K4.dbic
+    metric: delta_bic_min
+    direction: higher_is_better
+    pass_threshold: 10.0
+    fail_threshold: null
+    ambiguous_band: null
+    description: ΔBIC ≥ 10 favouring 3 factors vs both alternatives
+  - criterion_id: K4.loading
+    metric: min_primary_loading
+    direction: higher_is_better
+    pass_threshold: 0.4
+    fail_threshold: null
+    ambiguous_band: null
+    description: all retained primary loadings ≥ 0.40
+  - criterion_id: K4.cross
+    metric: max_cross_loading
+    direction: lower_is_better
+    pass_threshold: 0.3
+    fail_threshold: null
+    ambiguous_band: null
+    description: no retained cross-loading > 0.30
+  - criterion_id: K4.cfi
+    metric: cfi
+    direction: higher_is_better
+    pass_threshold: 0.9
+    fail_threshold: null
+    ambiguous_band: null
+    description: CFI ≥ 0.90
+  - criterion_id: K4.rmsea
+    metric: rmsea
+    direction: lower_is_better
+    pass_threshold: 0.08
+    fail_threshold: null
+    ambiguous_band: null
+    description: RMSEA ≤ 0.08
+  - criterion_id: K4.srmr
+    metric: srmr
+    direction: lower_is_better
+    pass_threshold: 0.08
+    fail_threshold: null
+    ambiguous_band: null
+    description: SRMR ≤ 0.08
+  - criterion_id: K4.items
+    metric: min_items_per_factor
+    direction: higher_is_better
+    pass_threshold: 4.0
+    fail_threshold: null
+    ambiguous_band: null
+    description: each factor retains ≥ 4 items
+  combine: all
+  min_n: null
+  sample: independent CFA sample; one estimator family for 1/2/3-factor models
+  notes: ''
+- gate_id: K4b
+  title: Measurement invariance
+  register_tasks:
+  - S4-PSY-22
+  criteria:
+  - criterion_id: K4b.dcfi
+    metric: delta_cfi_min
+    direction: higher_is_better
+    pass_threshold: -0.01
+    fail_threshold: null
+    ambiguous_band: null
+    description: ΔCFI ≥ −0.01 per step configural→metric→scalar
+  combine: all
+  min_n: null
+  sample: ''
+  notes: Level reached is reported per grouping.
+- gate_id: K5
+  title: Self-report vs behavioural threshold convergence
+  register_tasks:
+  - S4-PSY-26
+  criteria:
+  - criterion_id: K5.r
+    metric: pearson_r
+    direction: higher_is_better
+    pass_threshold: 0.15
+    fail_threshold: 0.1
+    ambiguous_band:
+    - 0.1
+    - 0.15
+    description: r ≥ 0.15; 0.10–0.15 further sample; ≤ 0.10 falsifier
+  combine: all
+  min_n: null
+  sample: ''
+  notes: ''
+- gate_id: K6
+  title: Criterion prediction on locked holdout
+  register_tasks:
+  - S7-KC-01
+  criteria:
+  - criterion_id: K6.dr2
+    metric: delta_r2
+    direction: higher_is_better
+    pass_threshold: 0.03
+    fail_threshold: null
+    ambiguous_band: null
+    description: ΔR² ≥ 0.03 on holdout
+  combine: all
+  min_n: null
+  sample: locked holdout
+  notes: ''
+- gate_id: K6b
+  title: Practical prediction gain on holdout
+  register_tasks:
+  - S7-KC-05
+  criteria:
+  - criterion_id: K6b.mae
+    metric: mae_relative_change
+    direction: lower_is_better
+    pass_threshold: -0.15
+    fail_threshold: null
+    ambiguous_band: null
+    description: MAE ≤ −15% vs baseline
+  - criterion_id: K6b.precision
+    metric: top_quintile_precision
+    direction: higher_is_better
+    pass_threshold: 0.6
+    fail_threshold: null
+    ambiguous_band: null
+    description: quintile identification precision ≥ 60%
+  combine: all
+  min_n: null
+  sample: locked holdout
+  notes: ''
+- gate_id: K7b
+  title: Practical identifiability at deployed trial counts
+  register_tasks:
+  - S7-KC-13
+  criteria:
+  - criterion_id: K7b.bounded
+    metric: profile_likelihood_bounded_both_sides
+    direction: boolean
+    pass_threshold: null
+    fail_threshold: null
+    ambiguous_band: null
+    description: profile likelihood bounded on both sides within plausible range
+  combine: all
+  min_n: null
+  sample: ''
+  notes: ''
+- gate_id: K8
+  title: Profile × intervention interaction
+  register_tasks:
+  - S7-KC-09
+  criteria:
+  - criterion_id: K8.interaction
+    metric: interaction_effect
+    direction: excludes_zero
+    pass_threshold: null
+    fail_threshold: null
+    ambiguous_band: null
+    description: credible interval of the interaction excludes zero
+  combine: all
+  min_n: null
+  sample: first 500 experiments
+  notes: ''

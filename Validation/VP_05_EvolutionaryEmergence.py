@@ -3900,8 +3900,9 @@ def check_falsification(
                 alpha=alpha,
                 test_type="ttest_ind",
             )
-        except ImportError:
-            power = 0.80  # Fallback
+        except ImportError as exc:
+            # No placeholder power is substituted (APGI-REP-003).
+            raise RuntimeError("power analysis unavailable: statistical_tests could not be imported") from exc
 
         is_underpowered = power < 0.80
 

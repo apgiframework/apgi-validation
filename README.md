@@ -8,9 +8,9 @@ This repository contains all code needed to reproduce the validation protocols, 
 
 ## Data Availability
 
-All empirical data used for validation (synthetic EEG, fMRI vmPFC recordings, cross-cultural datasets) is organized in the `data_repository/` directory:
+No empirical (human) dataset is shipped in this repository. The bundled EEG, fMRI vmPFC and cross-cultural files are **synthetic** and support method validation only; they cannot confirm or falsify any registered prediction (S4-VAL-11.5). Data are organized in `data_repository/`:
 
-- `empirical_data/` - Raw and processed experimental data
+- `synthetic_data/` - Simulated (synthetic) datasets used for method validation only; not empirical evidence
 - `metadata/` - Dataset documentation and codebooks
 - `dashboard_data/` - Pre-computed results for dashboard visualization
 - `codebooks/` - Variable dictionaries and data specifications
@@ -352,7 +352,7 @@ apgi-validation/
 ├── scripts/                   # validate_protocols.py
 ├── config/                    # Configuration files
 ├── data_repository/           # Data storage
-│   ├── empirical_data/
+│   ├── synthetic_data/
 │   ├── metadata/
 │   └── codebooks/
 ├── tests/                     # Comprehensive test suite

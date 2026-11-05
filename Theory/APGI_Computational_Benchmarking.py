@@ -374,7 +374,7 @@ class APGIFramework(ComputationalFramework):
     """APGI Framework reference implementation"""
 
     def __init__(self):
-        self.name = "Active Predictive Generative Inference"
+        self.name = "Allostatic Precision-Gated Ignition"
         # APGI parameters: surprise decay, ignition threshold, precision weights
         self.default_params = {
             "surprise_decay_tau": 0.2,
@@ -617,7 +617,7 @@ class ComputationalBenchmarker:
         if "ignition_events" in simulation:
             predicted = simulation["ignition_events"].astype(int)
             # APGI-specific: use ignition probability for richer evaluation
-            if framework_name == "Active Predictive Generative Inference":
+            if framework_name == "Allostatic Precision-Gated Ignition":
                 ignition_prob = simulation.get("ignition_probability", np.zeros(len(target_outputs)))
                 # Weight by probability strength
                 predicted = (ignition_prob > 0.3).astype(int)  # Lower threshold for APGI

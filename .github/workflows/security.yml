@@ -10,10 +10,10 @@ jobs:
     name: Static analysis (Bandit + Semgrep)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.11"
 
@@ -22,19 +22,32 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install bandit semgrep
 
-      # Fails the build on MEDIUM+ severity at MEDIUM+ confidence.
-      # Thresholds, skips and excluded dirs live in .bandit.yml.
+      # Fails the build on MEDIUM+ severity at MEDIUM+ confidence (CI-BANDIT).
+      # Skips and excluded dirs live in .bandit.yml; the severity/confidence
+      # policy must be passed as CLI flags because Bandit's config file does not
+      # support it. The JSON report keeps every finding (including LOW) for review.
       - name: Run Bandit SAST
         run: |
-          bandit -c .bandit.yml -r . -f json -o bandit-report.json
-          bandit -c .bandit.yml -r . -f txt
+          bandit -c .bandit.yml -r . -f json -o bandit-report.json --exit-zero
+          bandit -c .bandit.yml -r . -f txt --severity-level medium --confidence-level medium
 
+      # CI-SEMGREP policy: all security rules gate the build. Four advisory
+      # rules with no security impact are excluded explicitly (PyTorch
+      # performance hints and Python 3.6/3.7 compatibility checks; the project
+      # requires 3.11+). Reviewed false positives carry an inline
+      # `# nosemgrep: <rule>` with the justification on the line above.
       - name: Run Semgrep SAST
-        run: semgrep --config=auto --error --json --output=semgrep-report.json .
+        run: >-
+          semgrep --config=auto --error --json --output=semgrep-report.json
+          --exclude-rule trailofbits.python.automatic-memory-pinning.automatic-memory-pinning
+          --exclude-rule trailofbits.python.numpy-in-pytorch-modules.numpy-in-pytorch-modules
+          --exclude-rule python.lang.compatibility.python36.python36-compatibility-Popen2
+          --exclude-rule python.lang.compatibility.python37.python37-compatibility-importlib2
+          .
 
       - name: Upload security reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: security-reports
           path: |
@@ -45,10 +58,10 @@ jobs:
     name: Dependency vulnerabilities
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.11"
 
@@ -65,7 +78,7 @@ jobs:
 
       - name: Upload dependency report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: dependency-reports
           path: pip-audit-report.json
@@ -74,7 +87,9 @@ jobs:
     name: Committed secret material
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
 
       # Encrypted key files were previously tracked in git. They are now
       # gitignored; this keeps them from coming back.
@@ -87,3 +102,9 @@ jobs:
             exit 1
           fi
           echo "No key material tracked."
+
+      # APGI-API-003: content scan (private keys, provider tokens, long values
+      # assigned to secret-named variables) across the tree and full history.
+      - name: Scan file contents and git history for secrets
+        run: |
+          python3 scripts/scan_secrets.py --history

@@ -783,54 +783,29 @@ class BackupManager:
                     # Get tar info
                     tarinfo = tarf.getmember(file_path)
 
-                    # Check for symlinks and validate target
+                    # Links are never restored: a link target can point outside
+                    # target_dir, and backups contain regular files only.
                     if tarinfo.issym() or tarinfo.islnk():
-                        # Validate symlink target using proper Path resolution
-                        link_target = tarinfo.linkname
-                        try:
-                            # Create Path objects for proper resolution
-                            target_path = Path(link_target)
-                            resolved_target = (target_dir / target_path).resolve()
-                            resolved_target_dir = target_dir.resolve()
-
-                            # Check if resolved target is within target directory
-                            resolved_target_dir in resolved_target.parents or resolved_target == resolved_target_dir
-                        except (ValueError, OSError) as e:
-                            raise ValueError(f"Symlink bypass detected: {file_path} -> {link_target} (error: {e})")
-                        # Skip symlinks for safety
-                        apgi_logger.logger.warning(f"Skipping symlink: {file_path}")
+                        apgi_logger.logger.warning(f"Skipping link in backup: {file_path}")
+                        continue
+                    if not tarinfo.isfile():
                         continue
 
-                    # Validate path to prevent path traversal attacks
-                    # Use tarfile.data_filter for Python 3.12+ or manual validation
-                    if hasattr(tarfile, "data_filter"):
-                        tarf.extractall(
-                            path=str(target_dir),
-                            filter="data",
-                        )
-                    else:
-                        resolved = (target_dir / file_path).resolve()
-                        # Use proper path comparison to prevent bypass
-                        try:
-                            resolved.relative_to(target_dir.resolve())
-                        except ValueError:
-                            raise ValueError(f"Path traversal detected in TAR: {file_path}")
-                        target_path = resolved
-
-                        # Check overwrite condition
-                        if target_path.exists() and not overwrite:
-                            apgi_logger.logger.warning(f"Skipping existing file: {target_path}")
-                            continue
-
-                        # Create parent directories
-                        target_path.parent.mkdir(parents=True, exist_ok=True)
-
-                        # Extract file manually with path validation
-                        source = tarf.extractfile(file_path)
-                        if source is not None:
-                            with source:
-                                with open(target_path, "wb") as target:
-                                    shutil.copyfileobj(source, target)
+                    # Validate every member individually: only the selected
+                    # components are restored and `overwrite` is honoured.
+                    resolved = (target_dir / file_path).resolve()
+                    try:
+                        resolved.relative_to(target_dir.resolve())
+                    except ValueError:
+                        raise ValueError(f"Path traversal detected in TAR: {file_path}")
+                    if resolved.exists() and not overwrite:
+                        apgi_logger.logger.warning(f"Skipping existing file: {resolved}")
+                        continue
+                    resolved.parent.mkdir(parents=True, exist_ok=True)
+                    source = tarf.extractfile(tarinfo)
+                    if source is not None:
+                        with source, open(resolved, "wb") as target:
+                            shutil.copyfileobj(source, target)
 
                 except (OSError, PermissionError) as e:
                     apgi_logger.logger.error(f"Error extracting {file_path}: {e}")

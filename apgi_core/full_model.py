@@ -7,11 +7,14 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple, Union
 
+from apgi_core.errors import ScientificComputationError
+
 logger = logging.getLogger(__name__)
 
 try:
-    import nolds
+    from apgi_core._nolds_compat import import_nolds
 
+    nolds = import_nolds()
     HAS_NOLDS = True
 except ImportError:
     HAS_NOLDS = False
@@ -219,13 +222,23 @@ class APGIFullDynamicModel:
     - Signal standardization
     """
 
-    def __init__(self, params: Optional[APGIParameters] = None):
+    def __init__(
+        self,
+        params: Optional[APGIParameters] = None,
+        seed: Optional[int] = None,
+        rng: Optional[np.random.Generator] = None,
+    ):
         """
         Initialize APGI model.
 
         Args:
             params: Model parameters. If None, uses default parameters.
+            seed: Recorded seed for the model's single random stream (APGI-REP-002).
+            rng: Pre-built generator; overrides ``seed``.
         """
+        self.seed = seed
+        self.rng: np.random.Generator = rng if rng is not None else np.random.default_rng(seed)
+        self.last_hurst_method: Optional[str] = None
         self.params = params or APGIParameters()
         self.state = APGIState(theta_t=self.params.theta_t0)
         self.timestep: int = 0
@@ -362,36 +375,38 @@ class APGIFullDynamicModel:
         if len(time_series) < 100:
             raise ValueError("Time series must have at least 100 points for reliable DFA")
 
+        if not HAS_NOLDS:
+            raise ScientificComputationError(
+                "Hurst exponent unavailable: the 'nolds' dependency is not installed. "
+                "No default (e.g. H=0.5) is substituted (APGI-INT-003)."
+            )
         try:
-            # Use nolds.dfa for robust Hurst exponent estimation
-            if not HAS_NOLDS:
-                raise ImportError("nolds package not available")
-            H = nolds.dfa(time_series)
-            # Allow H > 1.0 for super-persistent correlations
-            # H > 1.0 indicates strong deterministic trends (structured stimuli)
-            return float(H)
-        except Exception as e:
-            logger.debug(f"DFA failed, falling back to R/S analysis: {e}")
-            return self._hurst_rs_fallback(time_series)
+            H = float(nolds.dfa(time_series))
+        except Exception as dfa_exc:
+            logger.warning("DFA failed (%s); trying R/S analysis", dfa_exc)
+            H = self._hurst_rs_fallback(time_series)
+            self.last_hurst_method = "rs"
+        else:
+            self.last_hurst_method = "dfa"
+        if not np.isfinite(H):
+            raise ScientificComputationError(f"Hurst estimation returned a non-finite value: {H}")
+        # Allow H > 1.0 for super-persistent correlations (strong deterministic trends)
+        return H
 
     def _hurst_rs_fallback(self, time_series: np.ndarray) -> float:
-        """
-        Fallback R/S analysis for Hurst exponent estimation.
+        """Rescaled-range (R/S) Hurst estimate, used only when DFA itself fails.
 
-        Args:
-            time_series: Input time series
-
-        Returns:
-            Hurst exponent estimate using R/S method
+        Raises:
+            ScientificComputationError: if R/S also fails. A random-walk value
+            is never substituted, because a fabricated H would flow into
+            biomarker interpretation as if it had been measured.
         """
         try:
-            if not HAS_NOLDS:
-                raise ImportError("nolds package not available")
-            H = nolds.hurst_rs(time_series)
-            return float(np.clip(H, 0.0, 1.0))
-        except Exception as e:
-            logger.debug(f"R/S analysis failed, returning random walk default: {e}")
-            return 0.5
+            return float(np.clip(nolds.hurst_rs(time_series), 0.0, 1.0))
+        except Exception as exc:
+            raise ScientificComputationError(
+                f"Hurst exponent could not be computed (DFA and R/S failed): {exc}"
+            ) from exc
 
     def compute_fractional_dimension_biomarker(
         self,
@@ -591,7 +606,7 @@ class APGIFullDynamicModel:
         if deterministic_ignition:
             I_next = 1 if prob_ignition > 0.5 else 0
         else:
-            I_next = 1 if np.random.random() < prob_ignition else 0
+            I_next = 1 if self.rng.random() < prob_ignition else 0
 
         # Update state with all tracked quantities
         self.state = APGIState(

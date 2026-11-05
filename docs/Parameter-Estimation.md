@@ -1,6 +1,6 @@
 # APGI Parameter Estimation Protocol
 
-This script implements a hierarchical Bayesian framework for estimating parameters of the Active Predictive Global Ignition (APGI) model, which integrates interoceptive and exteroceptive processing. The protocol synthesizes realistic neural and behavioral data, fits a hierarchical Bayesian model, and validates parameter recovery across multiple modalities.
+This script implements a hierarchical Bayesian framework for estimating parameters of the Allostatic Precision-Gated Ignition (APGI) model, which integrates interoceptive and exteroceptive processing. The protocol synthesizes realistic neural and behavioral data, fits a hierarchical Bayesian model, and validates parameter recovery across multiple modalities.
 
 ## Core Components
 

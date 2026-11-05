@@ -98,6 +98,10 @@ matplotlib.use("Agg")  # Use non-interactive backend
 import matplotlib.pyplot as plt
 import numpy as np
 
+# NumPy 2 renamed ``trapz`` to ``trapezoid``; the lock pins NumPy 1.26 where
+# only ``trapz`` exists (APGI-REP-005). Resolve once, use everywhere.
+_trapezoid = getattr(np, "trapezoid", None) or getattr(np, "trapz")
+
 try:
     import plotly.io as pio
 
@@ -190,22 +194,50 @@ class CoreIgnitionSystem:
         eps_i: float,
     ) -> float:
         """
-        Compute accumulated signal (dimensionally correct):
+        Canonical accumulated signal (APGI-SCI-001, formulation ``SCI-F1``):
 
-        S(t) = ½Π^e(t)(ε^e(t))² + ½Π^i_eff(t)(ε^i(t))²
+        Sₜ = Πᵉ·|zᵉ| + Πⁱ_eff·|zⁱ|
+
+        ``eps_e``/``eps_i`` must be the precision-normalised prediction errors
+        (z-scores) zᵉ and zⁱ. This is the form the governing software
+        specification requires for any implementation of ignition; it agrees
+        with :func:`apgi_core.engine.APGICoreSignal.accumulated_signal`.
+
+        The previous quadratic energy form ``½Π(ε)²`` is kept, explicitly
+        labelled non-canonical, as :meth:`quadratic_surprise_signal`. See
+        ``docs/validation/formulation-register.md`` for the adjudication record.
 
         Args:
-            Pi_e: Exteroceptive precision
-            eps_e: Exteroceptive prediction error
-            Pi_i_eff: Effective interoceptive precision
-            eps_i: Interoceptive prediction error
+            Pi_e: Exteroceptive precision Πᵉ
+            eps_e: Exteroceptive z-scored prediction error zᵉ
+            Pi_i_eff: Effective interoceptive precision Πⁱ_eff
+            eps_i: Interoceptive z-scored prediction error zⁱ
 
         Returns:
-            Accumulated surprise S(t) in [nats]
+            Accumulated signal Sₜ (dimensionless, precision-weighted |z|)
         """
-        exteroceptive_surprise = 0.5 * Pi_e * (eps_e**2)
-        interoceptive_surprise = 0.5 * Pi_i_eff * (eps_i**2)
-        return exteroceptive_surprise + interoceptive_surprise
+        return Pi_e * abs(eps_e) + Pi_i_eff * abs(eps_i)
+
+    @staticmethod
+    def quadratic_surprise_signal(
+        Pi_e: float,
+        eps_e: float,
+        Pi_i_eff: float,
+        eps_i: float,
+    ) -> float:
+        """NON-CANONICAL quadratic energy form S = ½Πᵉ(εᵉ)² + ½Πⁱ_eff(εⁱ)².
+
+        Retained only for legacy simulations that declare formulation
+        ``SCI-F1-QUADRATIC-LEGACY``. It must not be used to decide ignition
+        under the governing specification; results produced with it are
+        exploratory.
+        """
+        return 0.5 * Pi_e * (eps_e**2) + 0.5 * Pi_i_eff * (eps_i**2)
+
+    @staticmethod
+    def ignites(S: float, theta: float) -> bool:
+        """Deterministic ignition rule: ignition iff Sₜ is strictly greater than θₜ."""
+        return bool(S > theta)
 
     @staticmethod
     def effective_interoceptive_precision(
@@ -712,7 +744,7 @@ class DerivedQuantities:
             n_steps = int(T_ignition / dt)
             S_history = S_history[:n_steps]
 
-        return np.trapezoid(S_history, dx=dt)
+        return float(_trapezoid(S_history, dx=dt))
 
     @staticmethod
     def hierarchical_level_dynamics(
@@ -2498,6 +2530,8 @@ class EnhancedSurpriseIgnitionSystem:
         self,
         params: Optional[APGIParameters] = None,
         neuromodulator_system: Optional[NeuromodulatorSystem] = None,
+        seed: Optional[int] = None,
+        rng: Optional[np.random.Generator] = None,
     ):
         """
         Initialize enhanced dynamical system with all equations.
@@ -2505,8 +2539,13 @@ class EnhancedSurpriseIgnitionSystem:
         Args:
             params: APGI parameters with CORRECTED ranges
             neuromodulator_system: Optional neuromodulator system
+            seed: Seed for the single random stream used by every stochastic
+                update (APGI-REP-002). Recorded as ``self.seed``.
+            rng: Pre-built generator; overrides ``seed`` when given.
         """
         self.params = params or APGIParameters()
+        self.seed = seed
+        self.rng: np.random.Generator = rng if rng is not None else np.random.default_rng(seed)
 
         # ========== VALIDATE CORRECTED PARAMETERS ==========
         violations = self.params.validate()
@@ -2669,6 +2708,7 @@ class EnhancedSurpriseIgnitionSystem:
             tau_S=self.params.tau_S,
             sigma_S=self.params.sigma_S,
             dt=dt,
+            rng=self.rng,
         )
 
         # Threshold dynamics with metabolic coupling
@@ -2689,6 +2729,7 @@ class EnhancedSurpriseIgnitionSystem:
             tau_theta=self.params.tau_theta,
             sigma_theta=self.params.sigma_theta,
             dt=dt,
+            rng=self.rng,
         )
 
         # Somatic marker dynamics
@@ -2706,6 +2747,7 @@ class EnhancedSurpriseIgnitionSystem:
             tau_M=tau_M,
             sigma_M=sigma_M,
             dt=dt,
+            rng=self.rng,
         )
 
         # Arousal dynamics
@@ -2726,6 +2768,7 @@ class EnhancedSurpriseIgnitionSystem:
             tau_A=tau_A,
             sigma_A=sigma_A,
             dt=dt,
+            rng=self.rng,
         )
 
         # Precision dynamics
@@ -2743,6 +2786,7 @@ class EnhancedSurpriseIgnitionSystem:
             alpha_Pi=alpha_Pi,
             sigma_Pi=sigma_Pi,
             dt=dt,
+            rng=self.rng,
         )
 
         self.Pi_i = self.dynamics.precision_dynamics(
@@ -2751,6 +2795,7 @@ class EnhancedSurpriseIgnitionSystem:
             alpha_Pi=alpha_Pi,
             sigma_Pi=sigma_Pi,
             dt=dt,
+            rng=self.rng,
         )
 
         # ========== IGNITION PROBABILITY (Section 2.3) ==========
@@ -2762,7 +2807,7 @@ class EnhancedSurpriseIgnitionSystem:
         )
 
         # Bernoulli trial for ignition
-        B_new = 1 if np.random.random() < P_ignition else 0
+        B_new = 1 if self.rng.random() < P_ignition else 0
 
         # ========== POST-IGNITION RESET ==========
         if B_new == 1:
@@ -3487,7 +3532,7 @@ def _check_ignition_system() -> bool:
 
         # Test accumulated signal
         S = ignition.accumulated_signal(Pi_e=2.0, eps_e=1.0, Pi_i_eff=1.5, eps_i=0.5)
-        expected = 0.5 * 2.0 * 1.0 + 0.5 * 1.5 * 0.25
+        expected = 2.0 * 1.0 + 1.5 * 0.5  # canonical Πᵉ|zᵉ| + Πⁱ_eff|zⁱ|
         if abs(S - expected) >= 1e-6:
             raise ValueError(f"Accumulated signal incorrect: {S} vs {expected}")
         print("   Accumulated signal: ✓")

@@ -133,11 +133,13 @@ def verify_imports():
     for module, alias in imports:
         try:
             if alias:
-                imported_module = importlib.import_module(module)
+                # Semgrep non-literal-import reviewed: module names are hard-coded constants in this repository; no external input reaches this call.
+                imported_module = importlib.import_module(module)  # nosemgrep: non-literal-import
                 globals()[alias] = imported_module
                 logger.info(f"[PASS] {module} as {alias}")
             else:
-                importlib.import_module(module)
+                # Semgrep non-literal-import reviewed: module names are hard-coded constants in this repository; no external input reaches this call.
+                importlib.import_module(module)  # nosemgrep: non-literal-import
                 logger.info(f"[PASS] {module}")
             results.append((module, True))
         except ImportError as e:

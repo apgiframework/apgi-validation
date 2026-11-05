@@ -21,13 +21,8 @@ exclude_dirs:
   - ./.env
   - ./node_modules
 
-# Severity levels to report (exclude LOW for cleaner output)
-# Comment out to see all issues including LOW severity
-severity:
-  - MEDIUM
-  - HIGH
-
-# Confidence levels to report
-confidence:
-  - MEDIUM
-  - HIGH
+# Severity/confidence policy (MEDIUM+ at MEDIUM+ confidence) is NOT expressible
+# in this file: Bandit ignores unknown keys, so the former `severity:` and
+# `confidence:` lists here had no effect and LOW findings failed CI (CI-BANDIT).
+# The policy is applied with the supported CLI flags in
+# .github/workflows/security.yml:  --severity-level medium --confidence-level medium

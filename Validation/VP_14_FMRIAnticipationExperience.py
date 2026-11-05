@@ -199,7 +199,7 @@ def load_fmri_data(fmri_data_path: str) -> Dict[str, Any]:
         raise FileNotFoundError(f"fMRI data path not found: {fmri_data_path}")
 
     if path.suffix == ".npz":
-        data = np.load(path, allow_pickle=True)
+        data = np.load(path, allow_pickle=False)
         conditions = data["conditions"].tolist() if "conditions" in data else []
         return {
             "S_bold": np.asarray(data["S_bold"], dtype=float),
@@ -331,7 +331,9 @@ def compute_power_analysis_for_correlation(
     try:
         from utils.statistical_tests import compute_required_n
 
-        n_required = compute_required_n(effect_size=expected_r, desired_power=desired_power, alpha=alpha)
+        n_required = compute_required_n(
+            effect_size=expected_r, desired_power=desired_power, alpha=alpha, test_type="pearsonr"
+        )
     except ImportError:
         # Fallback: Use simple power calculation
         # For correlation, required N ≈ ((z_alpha + z_beta) / (0.5 * ln((1+r)/(1-r))))^2 + 3
@@ -577,7 +579,7 @@ def run_protocol_main(config=None):
                 for i in range(1, 4)
             }
             return ProtocolResult(
-                protocol_id="VP_14_fMRI_Anticipation_Experience",
+                protocol_id="VP_14_FMRIAnticipationExperience",
                 timestamp=np.datetime64("now").astype(str),
                 named_predictions=named_predictions,
                 completion_percentage=100,
@@ -605,7 +607,7 @@ def run_protocol_main(config=None):
         )
 
     return ProtocolResult(
-        protocol_id="VP_14_fMRI_Anticipation_Experience",
+        protocol_id="VP_14_FMRIAnticipationExperience",
         timestamp=np.datetime64("now").astype(str),
         named_predictions=named_predictions,
         completion_percentage=100,

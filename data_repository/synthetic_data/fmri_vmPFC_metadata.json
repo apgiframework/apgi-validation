@@ -1,0 +1,20 @@
+{
+  "n_subjects": 10,
+  "n_trials_per_subject": 20,
+  "n_timepoints": 200,
+  "tr": 2.0,
+  "trial_duration_s": 400.0,
+  "roi": "vmPFC",
+  "roi_coords_mni": [
+    3,
+    52,
+    -8
+  ],
+  "roi_radius_mm": 8,
+  "data_source": "synthetic",
+  "preprocessing": "Motion correction, normalization, smoothing",
+  "data_origin": "synthetic",
+  "processing_stage": "raw",
+  "inferential_category": "method_validation",
+  "provenance_note": "Simulated with utils/empirical_data_generators.py; not human data. Relabelled from 'synthetic_realistic' under S4-VAL-13.5."
+}

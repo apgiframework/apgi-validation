@@ -525,7 +525,8 @@ class DataCollector:
                 if table not in allowed_tables:
                     raise ValueError(f"Invalid table name: {table}. Allowed: {allowed_tables}")
 
-                cursor.execute(
+                # Semgrep sqlalchemy-execute-raw-query reviewed: table name validated against allowed_tables; values are bound parameters.
+                cursor.execute(  # nosemgrep: sqlalchemy-execute-raw-query
                     f"SELECT * FROM {table} WHERE timestamp >= ? ORDER BY timestamp DESC",  # nosec B608
                     (cutoff_time.isoformat(),),
                 )

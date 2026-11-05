@@ -1182,7 +1182,7 @@ def run_validation():
             converted_preds[k] = PredictionResult(passed=bool(v))
 
     return ProtocolResult(
-        protocol_id="VP_12_Clinical_CrossSpecies_Convergence",
+        protocol_id="VP_12_ClinicalCrossSpeciesConvergence",
         named_predictions=converted_preds,
         completion_percentage=100,
         status="success",
@@ -1260,7 +1260,7 @@ def run_protocol_main(config=None):
                 for i in range(1, 4)
             }
             return ProtocolResult(
-                protocol_id="VP_12_Clinical_CrossSpecies_Convergence",
+                protocol_id="VP_12_ClinicalCrossSpeciesConvergence",
                 timestamp=datetime.now().isoformat(),
                 named_predictions=named,
                 completion_percentage=100,
@@ -1286,7 +1286,7 @@ def run_protocol_main(config=None):
             for k, v in legacy["named_predictions"].items()
         }
         return ProtocolResult(
-            protocol_id="VP_12_Clinical_CrossSpecies_Convergence",
+            protocol_id="VP_12_ClinicalCrossSpeciesConvergence",
             timestamp=datetime.now().isoformat(),
             named_predictions=named,
             completion_percentage=100,

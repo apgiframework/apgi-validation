@@ -21,7 +21,10 @@ mne>=1.7.0,<1.8.0
 
 # --- Sensitivity analysis and nonlinear dynamics (FP_08, FP_11) -----------
 SALib>=1.5.0,<2.0.0
-nolds>=0.6.0,<1.7.0
+# nolds 0.6.3 calls importlib.resources.files() on a module, which Python 3.11
+# rejects; apgi_core/_nolds_compat.py works around it at import (CI-NOLDS).
+# Older nolds needs pkg_resources (removed in setuptools 81), so stay on 0.6.3.
+nolds>=0.6.3,<1.7.0
 numba>=0.59.0
 
 # --- Symbolic mathematics (VP_07a, FP_07) ---------------------------------

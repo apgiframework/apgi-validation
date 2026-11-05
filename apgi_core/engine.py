@@ -40,8 +40,11 @@ class APGIPreProcessor:
 class APGIPrecisionSystem:
     """Section 2: Precision System"""
 
-    def __init__(self, cfg: APGISettings):
+    def __init__(self, cfg: APGISettings, rng: Optional[np.random.Generator] = None, seed: Optional[int] = None):
         self.cfg = cfg
+        # Single recorded random stream (APGI-REP-002); no global NumPy state.
+        self.seed = seed
+        self.rng: np.random.Generator = rng if rng is not None else np.random.default_rng(seed)
         self.precision = cfg.Pi_e_init
 
     def compute_precision(self, sigma2: float) -> float:
@@ -101,8 +104,11 @@ class APGIIgnitionMechanism:
 class APGISystemDynamics:
     """Section 5 & 8: Continuous Dynamics and SDE"""
 
-    def __init__(self, cfg: APGISettings):
+    def __init__(self, cfg: APGISettings, rng: Optional[np.random.Generator] = None, seed: Optional[int] = None):
         self.cfg = cfg
+        # Single recorded random stream (APGI-REP-002); no global NumPy state.
+        self.seed = seed
+        self.rng: np.random.Generator = rng if rng is not None else np.random.default_rng(seed)
 
     def signal_dynamics(
         self,
@@ -117,7 +123,7 @@ class APGISystemDynamics:
     ) -> float:
         """Eq 5.1 & 8.1: Signal Dynamics (ODE/SDE)"""
         # dS/dt = -S/tau_s + Pi_e|ze| + beta * Pi_i|zi| + eta_s(t)
-        noise = float(np.random.normal(0, np.sqrt(dt)))
+        noise = float(self.rng.normal(0, np.sqrt(dt)))
         ds_dt = (-s_t / tau_s) + (pi_e * abs(ze)) + (beta * pi_i * abs(zi))
         return float(s_t + ds_dt * dt + noise)
 
@@ -160,11 +166,13 @@ class APGIAllostaticLayer:
 class APGILiquidNeuralNetwork:
     """Section 9: Liquid Neural Network (Reservoir)"""
 
-    def __init__(self, size: int):
+    def __init__(self, size: int, rng: Optional[np.random.Generator] = None, seed: Optional[int] = None):
         self.size = size
+        self.seed = seed
+        self.rng: np.random.Generator = rng if rng is not None else np.random.default_rng(seed)
         self.x = np.zeros(size)
-        self.W_res = np.random.randn(size, size) * (1.0 / np.sqrt(size))
-        self.W_in = np.random.randn(size, 1)
+        self.W_res = self.rng.standard_normal((size, size)) * (1.0 / np.sqrt(size))
+        self.W_in = self.rng.standard_normal((size, 1))
 
     def reservoir_dynamics(self, x: np.ndarray, u: float, tau_t: float, dt: float) -> np.ndarray:
         """Eq 9.1: Reservoir Dynamics"""

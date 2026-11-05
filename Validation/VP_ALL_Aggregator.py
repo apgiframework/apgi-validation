@@ -922,7 +922,8 @@ def run_end_to_end_validation_pipeline(
             continue
 
         try:
-            module = importlib.import_module(module_path)
+            # Semgrep non-literal-import reviewed: module names are hard-coded constants in this repository; no external input reaches this call.
+            module = importlib.import_module(module_path)  # nosemgrep: non-literal-import
             if hasattr(module, "run_protocol_main"):
                 result = module.run_protocol_main()
                 protocol_outputs.append(result)

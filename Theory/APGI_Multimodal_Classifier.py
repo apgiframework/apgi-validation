@@ -4,7 +4,7 @@
 APGI Multimodal Classifier
 =============================================================================
 
-Advanced Implementation of the Active Posterior Global Integration (APGI) model
+Advanced Implementation of the Allostatic Precision-Gated Ignition (APGI) model
 for conscious access prediction using cross-modal precision-weighted integration.
 Includes Bayesian parameter inversion and mechanistic stratification.
 
@@ -267,7 +267,8 @@ class APGIBayesianInversion:
                     posterior = trace.posterior[param].values.flatten()
                     ci_lower = np.percentile(posterior, 2.5)
                     ci_upper = np.percentile(posterior, 97.5)
-                    true_val = locals()[f"true_{param}"]
+                    # Semgrep dangerous-globals-use reviewed: key built from a fixed parameter list in this function, not external input.
+                    true_val = locals()[f"true_{param}"]  # nosemgrep: dangerous-globals-use
                     coverage[param].append(ci_lower <= true_val <= ci_upper)
             except Exception as e:
                 print(f"Simulation {sim + 1} failed: {e}")

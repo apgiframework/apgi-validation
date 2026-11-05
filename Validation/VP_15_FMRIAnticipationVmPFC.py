@@ -224,7 +224,7 @@ def load_fmri_data(fmri_data_path: str) -> Dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(f"fMRI data not found: {fmri_data_path}")
     if path.suffix == ".npz":
-        data = np.load(path, allow_pickle=True)
+        data = np.load(path, allow_pickle=False)
         return {
             "vmPFC_bold": np.asarray(data["vmPFC_bold"], dtype=float),
             "ant_insula_bold": np.asarray(data["ant_insula_bold"], dtype=float),
@@ -788,7 +788,7 @@ def run_protocol_main(config: dict = None) -> Union[dict, object]:
                 for i in range(1, 4)
             }
             return ProtocolResult(
-                protocol_id="VP_15_fMRI_Anticipation_vmPFC",
+                protocol_id="VP_15_FMRIAnticipationVmPFC",
                 timestamp=datetime.now().isoformat(),
                 named_predictions=named_predictions,
                 completion_percentage=100,
@@ -822,7 +822,7 @@ def run_protocol_main(config: dict = None) -> Union[dict, object]:
             )
 
         return ProtocolResult(
-            protocol_id="VP_15_fMRI_Anticipation_vmPFC",
+            protocol_id="VP_15_FMRIAnticipationVmPFC",
             timestamp=datetime.now().isoformat(),
             named_predictions=named_predictions,
             completion_percentage=100,

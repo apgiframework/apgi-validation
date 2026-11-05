@@ -393,12 +393,12 @@ class HierarchicalLevel:
     """
     Single hierarchical level state (100/100 APGI Standard).
 
-    Levels:
-        1: Fast sensory (50-100ms)
-        2: Feature integration (100-200ms)
-        3: Pattern recognition (200-500ms)
-        4: Semantic processing (500ms-2s)
-        5: Executive control (2-10s)
+    Canonical levels (APGI-SCI-003, see ``apgi_core.temporal_hierarchy``):
+        L0: 10–100 ms
+        L1: 100 ms–3 s
+        L2: 1–30 min
+        L3: hours–days
+        L4: months–years
     """
 
     S: float = 0.0  # Accumulated surprise
@@ -428,18 +428,26 @@ class HierarchicalProcessor:
         beta_cross_value = self.cfg.get("beta_cross", 0.2)
         self.beta_cross: float = float(str(beta_cross_value)) if beta_cross_value is not None else 0.2
 
-        # Initialize 5 hierarchical levels with timescales
-        default_taus = [0.1, 0.2, 0.4, 1.0, 5.0]
-        self.levels: List[HierarchicalLevel] = [HierarchicalLevel(tau=default_taus[i]) for i in range(5)]
+        # Canonical L0–L4 hierarchy (APGI-SCI-003). Each level's time constant
+        # is validated against its canonical range; an out-of-range override
+        # raises TimescaleOutOfRangeError instead of being silently accepted.
+        from apgi_core.temporal_hierarchy import (
+            LEVEL_CODES,
+            LEVEL_LABELS,
+            REPRESENTATIVE_TAUS,
+            validate_level_timescale,
+        )
 
-        # Level names for reference
-        self.level_names = [
-            "sensory",
-            "feature_integration",
-            "pattern_recognition",
-            "semantic",
-            "executive",
-        ]
+        taus = list(self.cfg.get("level_taus") or REPRESENTATIVE_TAUS)
+        if len(taus) != 5:
+            raise ValueError(f"level_taus must give exactly five values (L0–L4), got {len(taus)}")
+        for idx, tau in enumerate(taus):
+            validate_level_timescale(idx, float(tau))
+        self.levels: List[HierarchicalLevel] = [HierarchicalLevel(tau=float(taus[i])) for i in range(5)]
+
+        # Canonical level codes and labels for reference/display
+        self.level_names = list(LEVEL_CODES)
+        self.level_labels = list(LEVEL_LABELS)
 
     def process_level(
         self,

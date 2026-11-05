@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field, field_validator
 class NetworkConfig(BaseModel):
     input_size: int = Field(64, gt=0)
     hidden_size: int = Field(128, gt=0)
-    num_levels: int = Field(3, gt=0)
+    num_levels: int = Field(5, gt=0)  # canonical L0–L4 (APGI-SCI-003)
 
 
 class TemporalConfig(BaseModel):

@@ -1202,6 +1202,7 @@ def main():
 
     # Security check for GUI mode - GUI scripts run in dev mode by default
     try:
+        from utils.runtime_profile import auth_enforced
         from utils.security_gateway import Role, SecurityGateway
 
         gateway = SecurityGateway()
@@ -1209,10 +1210,10 @@ def main():
         if args.token:
             # Validate token and check GUI access permissions
             gateway.require_roles(args.token, [Role.RESEARCHER, Role.ADMIN])
-        elif os.environ.get("APGI_ENFORCE_AUTH", "0") == "1":
+        elif auth_enforced():
             raise SystemExit(
                 "Authentication required: pass --token to start the GUI. "
-                "For local development only, set APGI_ENFORCE_AUTH=0 to enable an auto-generated dev token."
+                "For local development only, set APGI_ENFORCE_AUTH=0 explicitly (refused when APGI_ENV=production)."
             )
         else:
             # Development mode: auto-generate a token so the GUI works without CLI args.

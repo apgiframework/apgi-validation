@@ -1,0 +1,78 @@
+{
+  "enums": {
+    "data_origin": [
+      "human_observed",
+      "synthetic",
+      "replay",
+      "imported_empirical",
+      "demonstration"
+    ],
+    "inferential_category": [
+      "confirmatory",
+      "exploratory",
+      "descriptive",
+      "method_validation"
+    ],
+    "processing_stage": [
+      "raw",
+      "derived"
+    ]
+  },
+  "local_contract_version": "1.0",
+  "protocol_result_schema_version": "2.0.0",
+  "provenance_record": {
+    "acquisition_metadata": {
+      "annotation": "typing.Dict[str, typing.Any]",
+      "required": false
+    },
+    "data_origin": {
+      "annotation": "<enum 'DataOrigin'>",
+      "required": true
+    },
+    "inferential_category": {
+      "annotation": "<enum 'InferentialCategory'>",
+      "required": true
+    },
+    "license": {
+      "annotation": "typing.Optional[str]",
+      "required": false
+    },
+    "parents": {
+      "annotation": "typing.List[str]",
+      "required": false
+    },
+    "participant_ids": {
+      "annotation": "typing.List[str]",
+      "required": false
+    },
+    "processing_stage": {
+      "annotation": "<enum 'ProcessingStage'>",
+      "required": true
+    },
+    "record_id": {
+      "annotation": "<class 'str'>",
+      "required": true
+    },
+    "sha256": {
+      "annotation": "typing.Optional[str]",
+      "required": false
+    },
+    "source": {
+      "annotation": "typing.Optional[str]",
+      "required": false
+    },
+    "source_system": {
+      "annotation": "typing.Optional[str]",
+      "required": false
+    },
+    "transform_history": {
+      "annotation": "typing.List[utils.data_provenance.TransformStep]",
+      "required": false
+    },
+    "version": {
+      "annotation": "typing.Optional[str]",
+      "required": false
+    }
+  },
+  "validation_report_schema": "config/schemas/validation_report.schema.json"
+}

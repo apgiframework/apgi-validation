@@ -70,6 +70,9 @@ def verify_protocol_file(file_path: Path, directory_key: str) -> bool:
         True unconditionally when APGI_SKIP_MANIFEST_CHECK=1 is set (dev override).
     """
     if os.environ.get("APGI_SKIP_MANIFEST_CHECK", "0") == "1":
+        if os.environ.get("APGI_ENV", "").strip().lower() in {"prod", "production"}:
+            logger.error("SECURITY: APGI_SKIP_MANIFEST_CHECK=1 is refused when APGI_ENV=production")
+            return False
         logger.debug(f"Manifest check skipped for {file_path.name} (APGI_SKIP_MANIFEST_CHECK=1)")
         return True
 

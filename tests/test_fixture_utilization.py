@@ -483,3 +483,13 @@ class TestResetRandomStateFixture:
 
 if __name__ == "__main__":
     pytest.main([__file__])
+
+
+def test_oom_fixture_restores_limit_after_nesting(oom_fixture):
+    """CI-MEMORY regression: nested use must restore the original RLIMIT_AS."""
+    resource = pytest.importorskip("resource")
+    before = resource.getrlimit(resource.RLIMIT_AS)
+    with oom_fixture:
+        with oom_fixture:
+            pass
+    assert resource.getrlimit(resource.RLIMIT_AS) == before
