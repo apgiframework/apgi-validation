@@ -3168,7 +3168,7 @@ def run_protocol_main(config=None):
         )
 
     return ProtocolResult(
-        protocol_id="VP_08_Psychophysical_ThresholdEstimation",
+        protocol_id="VP_08_PsychophysicalThresholdEstimation",
         timestamp=datetime.now().isoformat(),
         named_predictions=named_predictions,
         completion_percentage=100,

@@ -242,6 +242,12 @@ class TestValidationProtocolExecution:
 
         # Validate result structure
         if validation_result is not None:
+            # The canonical return type is ProtocolResult (utils/protocol_schema.py);
+            # legacy protocols still return plain dicts. Check both via the dict form.
+            from utils.protocol_schema import ProtocolResult
+
+            if isinstance(validation_result, ProtocolResult):
+                validation_result = validation_result.to_dict()
             assert isinstance(validation_result, dict), f"Protocol {protocol_name} should return dict"
 
         # Check for common result fields - updated for ProtocolResult schema

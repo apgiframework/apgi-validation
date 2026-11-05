@@ -579,7 +579,7 @@ def run_protocol_main(config=None):
                 for i in range(1, 4)
             }
             return ProtocolResult(
-                protocol_id="VP_14_fMRI_Anticipation_Experience",
+                protocol_id="VP_14_FMRIAnticipationExperience",
                 timestamp=np.datetime64("now").astype(str),
                 named_predictions=named_predictions,
                 completion_percentage=100,
@@ -607,7 +607,7 @@ def run_protocol_main(config=None):
         )
 
     return ProtocolResult(
-        protocol_id="VP_14_fMRI_Anticipation_Experience",
+        protocol_id="VP_14_FMRIAnticipationExperience",
         timestamp=np.datetime64("now").astype(str),
         named_predictions=named_predictions,
         completion_percentage=100,

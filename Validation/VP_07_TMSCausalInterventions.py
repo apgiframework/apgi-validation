@@ -3778,7 +3778,7 @@ def run_protocol_main(config=None):
         )
 
     return ProtocolResult(
-        protocol_id="VP_07_TMS_CausalInterventions",
+        protocol_id="VP_07_TMSCausalInterventions",
         timestamp=datetime.now().isoformat(),
         named_predictions=named_predictions,
         completion_percentage=100,

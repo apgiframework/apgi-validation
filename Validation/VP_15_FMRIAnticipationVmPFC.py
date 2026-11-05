@@ -788,7 +788,7 @@ def run_protocol_main(config: dict = None) -> Union[dict, object]:
                 for i in range(1, 4)
             }
             return ProtocolResult(
-                protocol_id="VP_15_fMRI_Anticipation_vmPFC",
+                protocol_id="VP_15_FMRIAnticipationVmPFC",
                 timestamp=datetime.now().isoformat(),
                 named_predictions=named_predictions,
                 completion_percentage=100,
@@ -822,7 +822,7 @@ def run_protocol_main(config: dict = None) -> Union[dict, object]:
             )
 
         return ProtocolResult(
-            protocol_id="VP_15_fMRI_Anticipation_vmPFC",
+            protocol_id="VP_15_FMRIAnticipationVmPFC",
             timestamp=datetime.now().isoformat(),
             named_predictions=named_predictions,
             completion_percentage=100,
