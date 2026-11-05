@@ -56,7 +56,6 @@ import logging
 import os
 import sys
 import tempfile
-import threading
 import types
 import warnings
 from dataclasses import dataclass
@@ -84,9 +83,9 @@ def _mcmc_safe_cores(n_chains: int) -> int:
     function with one that returns n_chains and adds mp_ctx="spawn" to the
     pm.sample() call.
     """
-    if threading.current_thread().daemon:
-        return 1
-    return n_chains
+    from utils.mcmc_runtime import mcmc_cores
+
+    return mcmc_cores(n_chains)
 
 
 # Ensure ArviZ uses a writable cache location (prevents import-time failures).

@@ -47,6 +47,14 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 
+try:
+    from utils.mcmc_runtime import mcmc_cores
+except ImportError:  # standalone script run without the project root on sys.path
+
+    def mcmc_cores(requested: int) -> int:
+        return requested
+
+
 # NEW: Import for Bayesian inversion
 try:
     import pymc as pm
@@ -200,7 +208,7 @@ class APGIBayesianInversion:
                 self.draws,
                 tune=self.tune,
                 chains=4,
-                cores=4,
+                cores=mcmc_cores(4),
                 target_accept=0.99,  # Increased from 0.95 for better exploration
                 max_treedepth=12,  # Allow deeper tree exploration
                 return_inferencedata=True,

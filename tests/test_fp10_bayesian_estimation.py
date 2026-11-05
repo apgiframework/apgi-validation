@@ -3,6 +3,7 @@
 import json
 
 import numpy as np
+import pytest
 
 from Falsification.FP_10_BayesianEstimationMCMC import (
     BayesianParameterRecovery,
@@ -507,6 +508,10 @@ class TestParameterRecovery:
 class TestProtocolRunner:
     """Test protocol runner functionality."""
 
+    # Runs the complete FP_10 protocol (all MCMC models). With chains run
+    # sequentially under pytest (no forked PyMC workers, see utils/mcmc_runtime.py)
+    # it exceeds the unit-job 300 s limit, so it belongs in the slow tier.
+    @pytest.mark.slow
     def test_run_protocol_main(self):
         """Test main protocol runner."""
         from Falsification.FP_10_BayesianEstimationMCMC import run_protocol_main

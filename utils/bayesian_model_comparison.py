@@ -75,6 +75,8 @@ from pathlib import Path
 _proj_root = Path(__file__).parent.parent
 if str(_proj_root) not in sys.path:
     sys.path.insert(0, str(_proj_root))
+
+from utils.mcmc_runtime import mcmc_cores  # noqa: E402  (needs the path set above)
 from utils.statistical_tests import safe_pearsonr
 
 # Set random seeds
@@ -1871,7 +1873,7 @@ class BayesianModelComparison:
                             1000,
                             tune=500,
                             chains=2,
-                            cores=2,
+                            cores=mcmc_cores(2),
                             progressbar=False,
                             return_inferencedata=True,
                         )
