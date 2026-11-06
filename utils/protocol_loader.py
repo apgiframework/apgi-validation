@@ -108,8 +108,20 @@ class SubPrediction:
 
     @property
     def is_confirmatory(self) -> bool:
-        """True for predictions whose outcome carries a registered framework vote."""
+        """True for predictions registered with a confirmatory status (incl. confirmatory_exploratory)."""
         return self.status.startswith("confirmatory")
+
+    @property
+    def framework_vote_eligible(self) -> bool:
+        """True only for a purely confirmatory registration (APGI-VAL-001).
+
+        Exploratory, secondary and estimation predictions never carry a
+        framework vote. ``confirmatory_exploratory`` (all of Protocol 6) is
+        also excluded until the scientific authority confirms whether it votes
+        (recorded in docs/validation/traceability.md); excluding is the
+        conservative reading of "exploratory criteria must not acquire votes".
+        """
+        return self.status == "confirmatory"
 
 
 @dataclass
@@ -396,6 +408,7 @@ def spec_prediction_results(
                 "verdict": verdict.value,
                 "evidence_class": "synthetic",
                 "prediction_status": sub_pred.status,
+                "framework_vote_eligible": sub_pred.framework_vote_eligible,
                 "linked_result": pred_map.get(sub_pred.id),
                 "specification_version": spec.version,
             },

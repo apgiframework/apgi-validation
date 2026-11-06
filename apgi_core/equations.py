@@ -2230,10 +2230,19 @@ IGNITION_MAX_DURATION = 1000
 
 
 class MeasurementEquations:
-    """Implementation of measurement equations from Section A.3"""
+    """Implementation of measurement equations from Section A.3
+
+    Every stochastic measurement accepts ``rng`` (APGI-REP-002). With a
+    generator, noise comes only from that recorded stream; with ``None`` the
+    legacy global NumPy stream is used so existing seeded callers are unchanged.
+    """
 
     @staticmethod
-    def compute_HEP(Pi_i_eff: float, M_ca: float, beta: float) -> float:
+    def _noise(rng: Optional[np.random.Generator], sd: float, mean: float = 0.0) -> float:
+        return float(rng.normal(mean, sd) if rng is not None else np.random.normal(mean, sd))
+
+    @staticmethod
+    def compute_HEP(Pi_i_eff: float, M_ca: float, beta: float, rng: Optional[np.random.Generator] = None) -> float:
         """
         Compute Heartbeat-Evoked Potential amplitude.
 
@@ -2251,12 +2260,14 @@ class MeasurementEquations:
         HEP = HEP_baseline * precision_mod * somatic_mod * gain_mod
 
         # Add noise (measurement error)
-        HEP += np.random.normal(0, HEP_NOISE_STD)
+        HEP += MeasurementEquations._noise(rng, HEP_NOISE_STD)
 
         return max(HEP_MINIMUM, HEP)
 
     @staticmethod
-    def compute_P3b_latency(S_t: float, theta_t: float, Pi_e: float) -> float:
+    def compute_P3b_latency(
+        S_t: float, theta_t: float, Pi_e: float, rng: Optional[np.random.Generator] = None
+    ) -> float:
         """
         Compute P3b component latency.
 
@@ -2271,7 +2282,7 @@ class MeasurementEquations:
 
         if surprise_excess <= 0:
             # No ignition → long latency (or no P3b)
-            return P3B_NO_IGNITION_LATENCY + np.random.normal(0, P3B_NO_IGNITION_NOISE_STD)
+            return P3B_NO_IGNITION_LATENCY + MeasurementEquations._noise(rng, P3B_NO_IGNITION_NOISE_STD)
 
         # Latency reduction with surprise excess and precision
         exp_term = 1.0 / (1.0 + np.exp(np.clip(-surprise_excess, -500, 500)))
@@ -2280,7 +2291,7 @@ class MeasurementEquations:
         P3b_latency = baseline_latency - latency_reduction
 
         # Add noise
-        P3b_latency += np.random.normal(0, P3B_LATENCY_NOISE_STD)
+        P3b_latency += MeasurementEquations._noise(rng, P3B_LATENCY_NOISE_STD)
 
         return np.clip(P3b_latency, P3B_MIN_LATENCY, P3B_MAX_LATENCY)
 
@@ -2289,6 +2300,7 @@ class MeasurementEquations:
         theta_t: float,
         content_domain: str = "neutral",
         neuromodulators: Optional[Dict[str, float]] = None,
+        rng: Optional[np.random.Generator] = None,
     ) -> float:
         """
         Compute detection threshold (d') from threshold parameter.
@@ -2316,12 +2328,12 @@ class MeasurementEquations:
         d_prime = d_prime_baseline * domain_multiplier * neuromod_multiplier / (theta_t + DETECTION_THRESHOLD_OFFSET)
 
         # Add measurement noise
-        d_prime += np.random.normal(0, DETECTION_NOISE_STD)
+        d_prime += MeasurementEquations._noise(rng, DETECTION_NOISE_STD)
 
         return max(DETECTION_MINIMUM, d_prime)
 
     @staticmethod
-    def compute_ignition_duration(P_ignition: float, S_t: float) -> float:
+    def compute_ignition_duration(P_ignition: float, S_t: float, rng: Optional[np.random.Generator] = None) -> float:
         """
         Compute ignition duration based on probability and surprise.
 
@@ -2332,7 +2344,7 @@ class MeasurementEquations:
         duration = baseline_duration * P_ignition * (S_t / IGNITION_SURPRISE_NORMALIZATION)
 
         # Add variability
-        duration += np.random.normal(0, IGNITION_DURATION_NOISE_STD)
+        duration += MeasurementEquations._noise(rng, IGNITION_DURATION_NOISE_STD)
 
         return np.clip(duration, IGNITION_MIN_DURATION, IGNITION_MAX_DURATION)
 
@@ -2341,21 +2353,22 @@ class MeasurementEquations:
         cls,
         state: PsychologicalState,
         neuromodulators: Optional[Dict[str, float]] = None,
+        rng: Optional[np.random.Generator] = None,
     ) -> Dict[str, float]:
-        """Compute all measurement proxies for a state"""
+        """Compute all measurement proxies for a state (noise from ``rng`` when given)"""
         measurements = {}
 
-        measurements["HEP_amplitude"] = cls.compute_HEP(state.Pi_i_eff_actual, state.M_ca, state.beta)
+        measurements["HEP_amplitude"] = cls.compute_HEP(state.Pi_i_eff_actual, state.M_ca, state.beta, rng=rng)
 
-        measurements["P3b_latency"] = cls.compute_P3b_latency(state.S_t, state.theta_t, state.Pi_e_actual)
+        measurements["P3b_latency"] = cls.compute_P3b_latency(state.S_t, state.theta_t, state.Pi_e_actual, rng=rng)
 
         measurements["detection_threshold"] = cls.compute_detection_threshold(
-            state.theta_t, state.content_domain, neuromodulators
+            state.theta_t, state.content_domain, neuromodulators, rng=rng
         )
 
         measurements["ignition_probability"] = state.compute_ignition_probability()
         measurements["ignition_duration"] = cls.compute_ignition_duration(
-            measurements["ignition_probability"], state.S_t
+            measurements["ignition_probability"], state.S_t, rng=rng
         )
 
         # Anxiety-specific measurement
@@ -2838,6 +2851,7 @@ class EnhancedSurpriseIgnitionSystem:
                 content_domain=content_domain,
             ),
             neuromodulators=self.neuromodulator_system.levels,
+            rng=self.rng,
         )
 
         # Record history
@@ -3249,6 +3263,8 @@ def run_complete_demo() -> None:
     # ========== 5. RUN SIMULATION ==========
     print("\n5. RUNNING COMPREHENSIVE SIMULATION...")
 
+    demo_rng = np.random.default_rng(42)  # recorded stream for the demo (APGI-REP-002)
+
     def simulation_inputs(t: float) -> Dict[str, Any]:
         """Generate inputs that transition between states with different domains
 
@@ -3297,9 +3313,9 @@ def run_complete_demo() -> None:
         }
 
         # Add occasional surprise events
-        if np.random.random() < 0.01:  # 1% chance per timestep
+        if demo_rng.random() < 0.01:  # 1% chance per timestep
             observed_e_val = float(complete_inputs["observed_e"])  # type: ignore[arg-type]
-            complete_inputs["observed_e"] = observed_e_val + float(np.random.normal(3.0, 0.8))
+            complete_inputs["observed_e"] = observed_e_val + float(demo_rng.normal(3.0, 0.8))
             print(f"      Surprise event at t={t:.1f}s")
 
         return complete_inputs

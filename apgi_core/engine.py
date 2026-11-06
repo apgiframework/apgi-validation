@@ -382,19 +382,21 @@ if __name__ == "__main__":
     print("Initializing APGI System...")
     system = APGISystem()
 
+    demo_rng = np.random.default_rng(42)  # recorded stream for the smoke test (APGI-REP-002)
+
     # Pre-warm statistics to prevent Z-score explosion in small samples
     print("Pre-warming statistics...")
     for _ in range(50):
-        system.prep_e.update_statistics(np.random.normal(0, 0.1))
-        system.prep_i.update_statistics(np.random.normal(0, 0.1))
+        system.prep_e.update_statistics(demo_rng.normal(0, 0.1))
+        system.prep_i.update_statistics(demo_rng.normal(0, 0.1))
 
     print("\nStarting Simulation Loop (5 steps):")
     print("-" * 50)
     for i in range(5):
         res = system.step(
-            x=np.random.normal(0.2, 0.1),
+            x=demo_rng.normal(0.2, 0.1),
             x_hat=0.0,
-            x_i=np.random.normal(0.1, 0.05),
+            x_i=demo_rng.normal(0.1, 0.05),
             x_hat_i=0.0,
             m_ca=0.1,
         )

@@ -21,39 +21,39 @@ independent reviewer accepts it (AUD-GOV-01).**
 | SCI-001 | **Implemented** | canonical Sₜ in both paths; strict `>`; quadratic form renamed non-canonical | golden vectors, audit probe, equality boundary | approved reference implementation comparison |
 | SCI-002 | Blocked | formulation declarations (`formulation-register.md`); seeded RNG | — | approved equation IDs + fixtures (AUD-SPEC-03) |
 | SCI-003 | **Implemented** | `apgi_core/temporal_hierarchy.py`; processor L0–L4 with range checks; settings 5 levels | boundary/out-of-range tests | confirm L3/L4 numeric bounds |
-| SCI-004 | Blocked | draft symbol map, collisions listed | — | Notation Appendix |
-| SCI-005 | Partial | `config/parameter_provenance.yaml` (all 74 settings defaults, honestly `assumed`), `utils/parameter_provenance.py` | registry completeness test | sources from scientific authority |
+| SCI-004 | Blocked | draft map + `scripts/scan_notation.py` inventory (494 bare α/β/θ/τ/γ bindings) | see tests | Notation Appendix, then rename and keep a zero-findings scan |
+| SCI-005 | Partial | registry of all 74 defaults; labels propagated into every validation report (`parameter_provenance`) | see tests | sources from scientific authority |
 | SCI-006 | **Implemented** | `CITATION.cff`; 6 wrong expansions fixed; `scripts/scan_terminology.py` | CI scan | archive/remote metadata review |
-| SCI-007 | Partial | draft CLM register | — | approved claim register; GUI wording |
+| SCI-007 | Partial | draft CLM register; CLI 'Validation Score' outputs qualified as simulation-based; unsupported 'empirically validated' comment corrected | see tests | approved claim register |
 | REP-001 | **Implemented** (proof pending) | trust anchor `config/protocol_lock.json`, per-file SHA-256, whole-run failure, audit log, dev bypass refused in production (both lock and Python manifest) | tamper/missing/unlisted/coordinated-edit tests | OpenTimestamps proof reference |
-| REP-002 | Partial | single seeded stream in `EnhancedSurpriseIgnitionSystem`, `APGISystemDynamics`, `APGILiquidNeuralNetwork`, `APGIFullDynamicModel`; env fingerprint (versions/BLAS/threads) in reports | same-seed bitwise test | macOS ARM64 vs Linux x86-64 tolerance run; remaining global-RNG call sites in measurement equations and VP/FP modules |
+| REP-002 | **Implemented** (code) | every stochastic call in `apgi_core` takes a recorded stream (MeasurementEquations `rng=`, seeded demos); env fingerprint in reports | see tests | macOS ARM64 vs Linux x86-64 tolerance run |
 | REP-003 | **Implemented** | placeholders removed; Fisher-z pearsonr; named errors; ceil-N guarded; VP fallbacks to 0.80 removed | statsmodels 1e-6 comparison, minimal-N test, probe | recompute protocol-reported power sets (needs approved designs) |
-| REP-004 | Partial | `inferential_category` on records; exploratory/synthetic inputs → NOT_EVALUATED | classification tests | deviation records for every registered-plan departure |
+| REP-004 | **Implemented** | `utils/deviation_register.py`: plan comparison (omitted/added steps, parameters, method, order), exploratory flags on results and predictions, K-gates NOT_EVALUATED and reports refuse PASS/FAIL with deviations | see tests | registered analysis plans per protocol |
 | REP-005 | Partial | NumPy-1.26-safe trapezoid; metabolic cost units stated (signal·s) | independent 1e-6 test | calibration tolerances only if physical measurement declared |
-| IMP-001 | Partial | Docker base digest-pinned; installs with `-c requirements.lock` | — | release-bound build record, SBOM, image digest |
+| IMP-001 | **Implemented** (tooling) | digest-pinned base, locked install, `scripts/build_record.py` (commit, lock/protocol digests, image digest, 176-component SBOM), `release-provenance.yml` retains it per main build | see tests | certificate for a real candidate |
 | IMP-002 | **Implemented** | auth enforced by default; headless gated; dev opt-outs refused in production; ephemeral key refused in production | `test_data_governance_controls.py` | — |
-| IMP-003 | Partial | monitoring signals listed in release procedure | — | induced-fault evidence |
+| IMP-003 | Partial | `utils/health_check.py`: disk, protocol lock, keys, audit-log writability with `apgi_alert` records; induced-fault tests; runtime gates no longer pass unmeasured | see tests | alert routing in the deployment |
 | DAT-001 | Blocked | — | — | approved golden dataset |
 | DAT-002 | **Implemented** | `utils/data_quarantine.py` (5 named outcomes, notify hook, reconciliation) | reconciliation tests | wiring into each concrete loader |
-| DAT-003 | Blocked | — | — | approved per-class retention policy |
+| DAT-003 | Partial | `config/data_retention.yaml` + `utils/retention_policy.py`: per-class enforcement, PENDING classes and lineage classes never age-deleted, dry-run audit | see tests | approved retention periods (data authority) |
 | DAT-004 | **Implemented** (code) | provenance records require source/licence/version/SHA-256/history; `ProtocolResult.dataset_provenance` + `assert_exchangeable()`; report binds input hashes | provenance + checksum tests | apply to real datasets |
 | API-001 | Blocked | consumer-only scope declared | — | canonical contract (AUD-SPEC-06) |
 | API-002 | Partial | admin bypass removed; role lists explicit | permission tests | approved role matrix / object-level scope |
-| API-003 | Partial | content+history secret scan in CI; client never echoes response bodies | scan + redaction tests | approved storage encryption for sensitive backups |
+| API-003 | **Implemented** (code) | AES-256-GCM at-rest encryption (`utils/payload_encryption.py`, `BackupManager.encrypt_backup`, transparent restore), content+history secret scan, redacted client errors | see tests | decide which data classes must be encrypted |
 | API-004 | **Implemented** | incomplete result cannot be `success`; stable `error_code` | ProtocolResult + client tests | canonical consumer contract |
-| INT-001 | Partial | `schema_version`, `protocol_version`, `producer_version` on `ProtocolResult` | exchange tests | canonical schemas + hashes |
+| INT-001 | Partial | versions on `ProtocolResult`; `export_for_exchange()` refuses payloads without protocol version and dataset provenance | see tests | canonical schemas + hashes |
 | INT-002 | Blocked | — | — | pinned release set of all components |
 | INT-003 | **Implemented** | no H=0.5 substitution; no power/N constants | failure-injection tests | loader/API boundary injection beyond these |
 | INT-004 | Blocked | scope proposed | — | upstream artifacts |
-| REL-001 | Partial | signed release certificate + promotion rule | certificate tests | named approvers, candidate |
+| REL-001 | Partial | signed certificate, `scripts/release_certificate.py` (draft/sign/check), build records | see tests | named approvers, candidate |
 | REL-002 | Partial | deploy/rollback/monitoring procedure | — | rollback exercise record |
-| REL-003 | Partial | change-type → suite selection table | — | per-change records |
+| REL-003 | Partial | change-type → suite table; `.github/pull_request_template.md` captures claims/requirements/risks/regression/version impact | see tests | per-change records going forward |
 | REL-004 | Partial | compatibility matrix | version equality test | approved v1.2 / canonical rows |
-| REL-005 | **Implemented** (gate) | `assert_deposit_allowed` | refusal tests | certificate for a real release |
+| REL-005 | **Implemented** (gate + CLI) | `assert_deposit_allowed`, `release_certificate.py check` | see tests | certificate for a real release |
 | CON-001 | Partial | consent gate (absent/withdrawn/expired/scope/purpose) | blocking tests, nothing persisted | scope decision |
 | CON-002 | Partial | lineage-wide withdrawal across stores + deletion record | withdrawal test | approved backup policy |
 | ACQ-001 | Scope | proposed not applicable | — | approval |
-| VAL-001 | Partial | immutable rules (lock), deterministic K classifier, signed reports with lock/input hashes | classifier + report tests | registered fixtures per outcome type |
+| VAL-001 | Partial | lock, deterministic classifier, signed reports; only `confirmatory` predictions carry framework votes (`framework_vote_eligible`; Protocol 6 `confirmatory_exploratory` excluded pending authority) | see tests | registered fixtures per outcome type |
 | CLI-001 | Scope | proposed not applicable | — | approval |
 
 ## 2. Supplied task register
@@ -76,11 +76,11 @@ independent reviewer accepts it (AUD-GOV-01).**
 | S4-VAL-09 | Implemented (code) | Ed25519 signed reports, tamper detection |
 | S4-VAL-10 | Partial | versioned catalog + classifier; per-gate deposits await evaluated results |
 | S4-VAL-11, 11.1–11.5 | Implemented (code) | report schema, interval rule, band→further_sample, NOT_EVALUATED, simulation exclusion |
-| S4-VAL-12.1–12.4 | Blocked | frozen datasets |
+| S4-VAL-12.1–12.4 | Code ready · Blocked | `acquisition_checks` (monotonic/rate/drift/dropouts/non-finite/flatline/checksum), measured data-quality scores, preprocessing input/output SHA-256; placeholder results removed (VP_15, VP_07 P7.x, VP_01, BIC, gates) — execution needs frozen datasets |
 | S4-VAL-13, 13.1–13.4 | Implemented (code) | enums, inheritance, categories, imported requirements |
 | S4-VAL-13.5 | Implemented | `empirical_data/` → `synthetic_data/`, labels `synthetic` |
 | S4-VAL-13.6 | Partial | guard bars Appendix/Explorer here; server-side store owner must enforce |
-| S4-VAL-14 | Blocked | WIF (S0-INF-06.4) |
+| S4-VAL-14 | IaC ready · Blocked | `infra/cloudrun/main.tf` (digest-pinned isolated job, least-privilege SA); deployment needs WIF (S0-INF-06.4) and a GCP project |
 | S4-VAL-16, 16.1–16.12 | Implemented | `release/` (12 artifacts) + builder/`--check`; results honestly NOT_EVALUATED |
 | XC-CI-05, .1–.3 | Implemented in CI config | `validation-gates.yml` (3 named gates) |
 | CI-NOLDS | Fixed | scoped import shim for nolds 0.6.3 on Python 3.11; setuptools 84.2.1 |

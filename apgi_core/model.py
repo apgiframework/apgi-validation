@@ -833,9 +833,9 @@ if __name__ == "__main__":
     model = APGIModel()
 
     # Generate synthetic input (sinusoid + noise)
-    np.random.seed(42)
+    demo_rng = np.random.default_rng(42)  # recorded demo stream (APGI-REP-002)
     t = np.arange(1000) * 0.01
-    inputs = np.sin(t * 2 * np.pi) + np.random.randn(len(t)) * 0.1
+    inputs = np.sin(t * 2 * np.pi) + demo_rng.standard_normal(len(t)) * 0.1
 
     # Run model
     print("Running APGI model on synthetic data...")

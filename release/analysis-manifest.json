@@ -2,17 +2,19 @@
   "catalog_version": "0.1.0",
   "classifier": "utils.kgate.classify_gate",
   "files": {
-    "apgi_core/engine.py": "3b04f4ec1c795365e9dc274bf5670679fa87ec2a462a16fa64b6d382471ffb7a",
-    "apgi_core/equations.py": "116436e3bc85d4c343d497e221e23b4bff76f4b71f62fb2b76494046f5ec1937",
+    "apgi_core/engine.py": "06d48a78ebbd1aeb851c2dc93c537aa6bb2748816fb4c3a64aa3d6170121526b",
+    "apgi_core/equations.py": "92663130335c324f28a51c486a61c1f4e08b3440dea6b9b4d844c0811a2ff0b7",
     "apgi_core/temporal_hierarchy.py": "53f5a80f6ebc52b0cd2230046740eb934e2e0fce3cf761ecd2df7de24ad8dc7d",
-    "config/schemas/validation_report.schema.json": "55168223188d4fc871a8cfe928131c5ca2f800c15886adf830997661cf32041f",
+    "config/schemas/validation_report.schema.json": "9945eca8d6ecf64da19ccd1b9c8b0da63aca9596022e1fd1e9c1c39bdfd4bd25",
+    "utils/acquisition_checks.py": "e73bc73055c9a3f8c6f516c9e59572e3ef87ac53da3fe85f8d7ae0f75600cc3e",
     "utils/data_provenance.py": "6d20c44bea93942ff1d6ef7eac268ad1dd833ad01a52d1762cd3cedce51b3185",
-    "utils/kgate.py": "9a2ba0b437e54880f4203de3c1ef9c24f189badc55e887a2f1428e7d826c17ec",
-    "utils/protocol_loader.py": "a7e7e9b39bc7e8ea8aa04f3b40aef112f1ca76121e5bc0c4e906bb3fafbbb07a",
+    "utils/deviation_register.py": "2d85b248d577659589e703eb09ff12201227adfee5cd7440368ee5c958870ab8",
+    "utils/kgate.py": "672e6fb0a73cf8e8952eb136d7d821f3597eff289e443d8949507251b16f39d0",
+    "utils/protocol_loader.py": "62c4780891add487432ed174fd9c26b5d8ce280ff192ae5d03c62813172ff219",
     "utils/protocol_lock.py": "5a132e2d534657ccff2955eee16cb10d82d299b5a343143b8c8cbf49f9f3271b",
     "utils/psychometrics.py": "343f47b8aa349bdbab592adedc93b8d2f99daeb50dce71058af8b4e66c95fe05",
     "utils/statistical_tests.py": "24817c9f296d9d5b5a1e4e05fe1b22a97c8aa09d8da63f797f1412269128a3be",
-    "utils/validation_report.py": "11f11889f40af80b66554b5cfe80040ded4eeba34c5099cc709c4eb071d3c49e"
+    "utils/validation_report.py": "27767cf14841dd2730e7458c72e9bc50f7be2a1d7071367855f80adbac056463"
   },
   "gate_estimators": {
     "K1": "utils.psychometrics.icc_2_1",
@@ -26,5 +28,5 @@
     "K7b": "utils.psychometrics.profile_likelihood_bounded",
     "K8": "utils.psychometrics.credible_interval"
   },
-  "report_schema_version": "1.0.0"
+  "report_schema_version": "2.0.0"
 }

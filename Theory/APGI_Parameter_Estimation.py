@@ -70,7 +70,7 @@ from sklearn.model_selection import KFold, cross_val_score
 class APGIConstants:
     """All constants with scientific justification"""
 
-    # Measurement relationship constants (empirically validated)
+    # Measurement relationship constants (assumed defaults; provenance pending, APGI-SCI-005)
     HEP_SCALE_FACTOR: float = 0.48  # Park et al. (2014): HEP ~ 0.5 ± 0.1 μV per unit precision
     HEP_NOISE_SD: float = 0.15  # Pollatos et al. (2007): within-subject HEP variability
 
