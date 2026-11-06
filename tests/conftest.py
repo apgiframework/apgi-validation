@@ -530,6 +530,26 @@ def isolated_key_material(monkeypatch):
     yield
 
 
+@pytest.fixture(autouse=True, scope="session")
+def sequential_mcmc_chains():
+    """Run PyMC chains sequentially under the test runner (CI-MEMORY follow-up).
+
+    pm.sample(cores>1) forks the pytest process, which already runs BLAS/torch
+    threads; the forked chain workers were never reaped (255 orphans from one
+    FP_10 test), which later aborted the session and killed CI runners.
+    Chains are individually seeded, so results do not change.
+    """
+    import os
+
+    previous = os.environ.get("APGI_MCMC_CORES")
+    os.environ["APGI_MCMC_CORES"] = "1"
+    yield
+    if previous is None:
+        os.environ.pop("APGI_MCMC_CORES", None)
+    else:
+        os.environ["APGI_MCMC_CORES"] = previous
+
+
 @pytest.fixture(autouse=True)
 def allow_ephemeral_master_key(monkeypatch):
     """Allow explicit ephemeral master keys in tests.

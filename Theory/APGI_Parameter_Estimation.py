@@ -37,6 +37,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 try:
+    from utils.mcmc_runtime import mcmc_cores
+except ImportError:  # standalone script run without the project root on sys.path
+
+    def mcmc_cores(requested: int) -> int:
+        return requested
+
+
+try:
     import arviz as az
     import pymc as pm
 
@@ -3127,7 +3135,7 @@ def _step_build_model(sessions: List) -> "pm.Model":
             chains=CONST.MCMC_CHAINS,
             target_accept=CONST.MCMC_TARGET_ACCEPT,
             max_treedepth=CONST.MCMC_MAX_TREEDEPTH,
-            cores=CONST.MCMC_CHAINS,
+            cores=mcmc_cores(CONST.MCMC_CHAINS),
             init="adapt_diag",
             return_inferencedata=True,
             progressbar=True,
@@ -3250,7 +3258,7 @@ def _step_test_retest(sessions, trace1) -> Tuple[Dict, bool]:
                 chains=CONST.MCMC_CHAINS,
                 target_accept=CONST.MCMC_TARGET_ACCEPT,
                 max_treedepth=CONST.MCMC_MAX_TREEDEPTH,
-                cores=CONST.MCMC_CHAINS,
+                cores=mcmc_cores(CONST.MCMC_CHAINS),
                 init="adapt_diag",
                 return_inferencedata=True,
                 progressbar=True,
@@ -3598,7 +3606,7 @@ def _run_test_retest_reliability(sessions, trace1):
                 chains=CONST.MCMC_CHAINS,
                 target_accept=CONST.MCMC_TARGET_ACCEPT,
                 max_treedepth=CONST.MCMC_MAX_TREEDEPTH,
-                cores=CONST.MCMC_CHAINS,
+                cores=mcmc_cores(CONST.MCMC_CHAINS),
                 init="adapt_diag",
                 return_inferencedata=True,
                 progressbar=True,

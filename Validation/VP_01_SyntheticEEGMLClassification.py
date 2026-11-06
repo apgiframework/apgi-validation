@@ -46,6 +46,9 @@ except ImportError:
     HAS_MATPLOTLIB = False
 import numpy as np
 
+# NumPy 1.26 (locked) has only trapz; NumPy 2 renamed it trapezoid (APGI-REP-005).
+_trapezoid = getattr(np, "trapezoid", None) or getattr(np, "trapz")
+
 try:
     import torch
     import torch.nn as nn
@@ -1368,17 +1371,17 @@ class APGIDatasetGenerator:
 
         # Gamma power (40-80 Hz)
         gamma_mask = (freqs >= 40) & (freqs <= 80)
-        gamma_power = np.trapezoid(psd[gamma_mask], freqs[gamma_mask])
+        gamma_power = _trapezoid(psd[gamma_mask], freqs[gamma_mask])
         features.append(gamma_power)
 
         # Alpha power (8-13 Hz)
         alpha_mask = (freqs >= 8) & (freqs <= 13)
-        alpha_power = np.trapezoid(psd[alpha_mask], freqs[alpha_mask])
+        alpha_power = _trapezoid(psd[alpha_mask], freqs[alpha_mask])
         features.append(alpha_power)
 
         # Theta power (4-8 Hz)
         theta_mask = (freqs >= 4) & (freqs <= 8)
-        theta_power = np.trapezoid(psd[theta_mask], freqs[theta_mask])
+        theta_power = _trapezoid(psd[theta_mask], freqs[theta_mask])
         features.append(theta_power)
 
         # Global Field Power (GFP) - spatial standard deviation across channels

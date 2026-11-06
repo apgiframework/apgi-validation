@@ -10,6 +10,9 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
+# NumPy 1.26 (locked) has only trapz; NumPy 2 renamed it trapezoid (APGI-REP-005).
+_trapezoid = getattr(np, "trapezoid", None) or getattr(np, "trapz")
+
 
 # Create a minimal signal module fallback for scipy compatibility issues
 class SignalFallback:
@@ -218,7 +221,7 @@ class AlphaGammaRatioPrior:
                 # If the mask captures a single FFT bin (common with short nperseg),
                 # trapezoid integration returns 0. Approximate area using Δf.
                 if band_freqs.size >= 2:
-                    band_power = np.trapezoid(band_psd, band_freqs)
+                    band_power = _trapezoid(band_psd, band_freqs)
                 else:
                     if f.size >= 2:
                         df = float(f[1] - f[0])
