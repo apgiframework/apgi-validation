@@ -3491,27 +3491,22 @@ def main():
     z_prop = p_seen_diff / (pooled_se_prop + 1e-10)
     p_pharm_computed = float(2 * (1 - stats.norm.cdf(abs(z_prop))))
 
-    # --- P7.1 / P7.2 / P7.3: use placeholder values derived from intervention definitions ---
-    # These pharmacological ERP criteria require EEG data; use effect-size-based proxies
-    # from the known intervention effect sizes as computed outputs
-    propofol_effect_size = 0.82  # ≥0.773 needed so p = 2*(1-cdf(es/0.3)) < 0.01
-    p3b_mm_ratio_pre_computed = 1.0  # normalized baseline
-    p3b_mm_ratio_post_computed = p3b_mm_ratio_pre_computed * (1 + propofol_effect_size * 0.8)
-    cohens_d_propofol_computed = propofol_effect_size
-    p_propofol_computed = float(2 * (1 - stats.norm.cdf(abs(propofol_effect_size / 0.3))))
-
-    ketamine_effect_size = abs(interventions["Ketamine"].effect_size)
-    mmn_suppression_pct_computed = ketamine_effect_size * 30.0  # scale to percentage
-    p3b_suppression_pct_computed = ketamine_effect_size * 20.0  # P3b suppressed less
-    eta_squared_ketamine_computed = ketamine_effect_size**2 / (ketamine_effect_size**2 + 1)
-    p_ketamine_computed = float(2 * (1 - stats.norm.cdf(abs(ketamine_effect_size / 0.25))))
-
-    # Psilocybin: not in main interventions list; use effect_size=0.55 (literature-based)
-    psilocybin_effect_size = 0.82  # ≥0.773 needed so p = 2*(1-cdf(es/0.3)) < 0.01
-    p3b_increase_pct_computed = psilocybin_effect_size * 20.0
-    hep_embodiment_correlation_computed = psilocybin_effect_size * 0.45
-    cohens_d_psilocybin_computed = psilocybin_effect_size
-    p_psilocybin_computed = float(2 * (1 - stats.norm.cdf(abs(psilocybin_effect_size / 0.3))))
+    # --- P7.1 / P7.2 / P7.3: pharmacological ERP criteria need EEG recordings ---
+    # These used to be filled with effect sizes chosen so that each p-value
+    # cleared 0.01 ("≥0.773 needed so p < 0.01"), i.e. the criteria passed by
+    # construction. Without EEG data they are not evaluated (APGI-INT-003).
+    p3b_mm_ratio_pre_computed = None
+    p3b_mm_ratio_post_computed = None
+    cohens_d_propofol_computed = None
+    p_propofol_computed = None
+    mmn_suppression_pct_computed = None
+    p3b_suppression_pct_computed = None
+    eta_squared_ketamine_computed = None
+    p_ketamine_computed = None
+    p3b_increase_pct_computed = None
+    hep_embodiment_correlation_computed = None
+    cohens_d_psilocybin_computed = None
+    p_psilocybin_computed = None
 
     falsification_results = check_falsification(
         threshold_reduction=threshold_reduction_computed,
@@ -3855,20 +3850,20 @@ def check_falsification(
     cohens_d_ignition: float,
     p_pharm: float,
     # P7.1 parameters (Propofol P3b:MMN Ratio)
-    p3b_mm_ratio_pre: float,
-    p3b_mm_ratio_post: float,
-    cohens_d_propofol: float,
-    p_propofol: float,
+    p3b_mm_ratio_pre: Optional[float],
+    p3b_mm_ratio_post: Optional[float],
+    cohens_d_propofol: Optional[float],
+    p_propofol: Optional[float],
     # P7.2 parameters (Ketamine MMN Suppression)
-    mmn_suppression_pct: float,
-    p3b_suppression_pct: float,
-    eta_squared_ketamine: float,
-    p_ketamine: float,
+    mmn_suppression_pct: Optional[float],
+    p3b_suppression_pct: Optional[float],
+    eta_squared_ketamine: Optional[float],
+    p_ketamine: Optional[float],
     # P7.3 parameters (Psilocybin P3b Enhancement)
-    p3b_increase_pct: float,
-    hep_embodiment_correlation: float,
-    cohens_d_psilocybin: float,
-    p_psilocybin: float,
+    p3b_increase_pct: Optional[float],
+    hep_embodiment_correlation: Optional[float],
+    cohens_d_psilocybin: Optional[float],
+    p_psilocybin: Optional[float],
 ) -> Dict[str, Any]:
     """
     Implement all statistical tests for Validation_Protocol_7.
@@ -3959,75 +3954,105 @@ def check_falsification(
         f"V7.2: {'PASS' if v7_2_pass else 'FAIL'} - Π_i: {precision_increase:.2f}%, Ignition: {ignition_reduction:.2f}%, η²: {eta_squared:.3f}"
     )
 
-    # P7.1: Propofol P3b:MMN Ratio
-    logger.info("Testing P7.1: Propofol P3b:MMN Ratio")
-    p7_1_pass = p3b_mm_ratio_post >= 1.5 and cohens_d_propofol >= 0.60 and p_propofol < 0.01
-    results["criteria"]["P7.1"] = {
-        "passed": p7_1_pass,
-        "p3b_mm_ratio_pre": p3b_mm_ratio_pre,
-        "p3b_mm_ratio_post": p3b_mm_ratio_post,
-        "cohens_d": cohens_d_propofol,
-        "p_value": p_propofol,
-        "threshold": "Ratio ≥ 1.5:1, d ≥ 0.60",
-        "actual": f"Ratio: {p3b_mm_ratio_post:.2f}:1, d: {cohens_d_propofol:.3f}",
-    }
-    if p7_1_pass:
-        results["summary"]["passed"] += 1
-    else:
-        results["summary"]["failed"] += 1
-    logger.info(
-        f"P7.1: {'PASS' if p7_1_pass else 'FAIL'} - Ratio: {p3b_mm_ratio_post:.2f}:1, d: {cohens_d_propofol:.3f}"
-    )
+    # P7.1–P7.3 need pharmacological EEG data. When any input is missing the
+    # criterion is NOT_EVALUATED: it is neither passed nor failed (APGI-INT-003).
+    def _not_evaluated(cid: str, threshold: str) -> None:
+        results["criteria"][cid] = {
+            "passed": False,
+            "status": "NOT_EVALUATED",
+            "p_value": None,
+            "threshold": threshold,
+            "actual": "not evaluated: requires pharmacological EEG recordings",
+        }
+        results["summary"]["not_evaluated"] = results["summary"].get("not_evaluated", 0) + 1
+        logger.info(f"{cid}: NOT_EVALUATED - no pharmacological EEG data")
 
-    # P7.2: Ketamine MMN Suppression
-    logger.info("Testing P7.2: Ketamine MMN Suppression")
-    p7_2_pass = (
-        mmn_suppression_pct >= 20.0
-        and p3b_suppression_pct < 50.0
-        and eta_squared_ketamine >= 0.15
-        and p_ketamine < 0.01
-    )
-    results["criteria"]["P7.2"] = {
-        "passed": p7_2_pass,
-        "mmn_suppression_pct": mmn_suppression_pct,
-        "p3b_suppression_pct": p3b_suppression_pct,
-        "eta_squared": eta_squared_ketamine,
-        "p_value": p_ketamine,
-        "threshold": "MMN ≥20% suppression, P3b <50% suppression, η² ≥ 0.15",
-        "actual": f"MMN: {mmn_suppression_pct:.1f}%, P3b: {p3b_suppression_pct:.1f}%, η²: {eta_squared_ketamine:.3f}",
+    p7_inputs = {
+        "P7.1": (p3b_mm_ratio_pre, p3b_mm_ratio_post, cohens_d_propofol, p_propofol),
+        "P7.2": (mmn_suppression_pct, p3b_suppression_pct, eta_squared_ketamine, p_ketamine),
+        "P7.3": (p3b_increase_pct, hep_embodiment_correlation, cohens_d_psilocybin, p_psilocybin),
     }
-    if p7_2_pass:
-        results["summary"]["passed"] += 1
-    else:
-        results["summary"]["failed"] += 1
-    logger.info(
-        f"P7.2: {'PASS' if p7_2_pass else 'FAIL'} - MMN: {mmn_suppression_pct:.1f}%, P3b: {p3b_suppression_pct:.1f}%, η²: {eta_squared_ketamine:.3f}"
-    )
+    p7_thresholds = {
+        "P7.1": "Ratio ≥ 1.5:1, d ≥ 0.60",
+        "P7.2": "MMN ≥20% suppression, P3b <50% suppression, η² ≥ 0.15",
+        "P7.3": "P3b ≥10% increase, HEP-embodiment r ≥ 0.20, d ≥ 0.45",
+    }
+    p7_missing = {cid for cid, vals in p7_inputs.items() if any(v is None for v in vals)}
+    for cid in sorted(p7_missing):
+        _not_evaluated(cid, p7_thresholds[cid])
 
-    # P7.3: Psilocybin P3b Enhancement
-    logger.info("Testing P7.3: Psilocybin P3b Enhancement")
-    p7_3_pass = (
-        p3b_increase_pct >= 10.0
-        and hep_embodiment_correlation >= 0.20
-        and cohens_d_psilocybin >= 0.45
-        and p_psilocybin < 0.01
-    )
-    results["criteria"]["P7.3"] = {
-        "passed": p7_3_pass,
-        "p3b_increase_pct": p3b_increase_pct,
-        "hep_embodiment_correlation": hep_embodiment_correlation,
-        "cohens_d": cohens_d_psilocybin,
-        "p_value": p_psilocybin,
-        "threshold": "P3b ≥10% increase, HEP-embodiment r ≥ 0.20, d ≥ 0.45",
-        "actual": f"P3b: {p3b_increase_pct:.1f}%, r: {hep_embodiment_correlation:.2f}, d: {cohens_d_psilocybin:.3f}",
-    }
-    if p7_3_pass:
-        results["summary"]["passed"] += 1
-    else:
-        results["summary"]["failed"] += 1
-    logger.info(
-        f"P7.3: {'PASS' if p7_3_pass else 'FAIL'} - P3b: {p3b_increase_pct:.1f}%, r: {hep_embodiment_correlation:.2f}, d: {cohens_d_psilocybin:.3f}"
-    )
+    if "P7.1" not in p7_missing:
+        # P7.1: Propofol P3b:MMN Ratio
+        logger.info("Testing P7.1: Propofol P3b:MMN Ratio")
+        p7_1_pass = p3b_mm_ratio_post >= 1.5 and cohens_d_propofol >= 0.60 and p_propofol < 0.01
+        results["criteria"]["P7.1"] = {
+            "passed": p7_1_pass,
+            "p3b_mm_ratio_pre": p3b_mm_ratio_pre,
+            "p3b_mm_ratio_post": p3b_mm_ratio_post,
+            "cohens_d": cohens_d_propofol,
+            "p_value": p_propofol,
+            "threshold": "Ratio ≥ 1.5:1, d ≥ 0.60",
+            "actual": f"Ratio: {p3b_mm_ratio_post:.2f}:1, d: {cohens_d_propofol:.3f}",
+        }
+        if p7_1_pass:
+            results["summary"]["passed"] += 1
+        else:
+            results["summary"]["failed"] += 1
+        logger.info(
+            f"P7.1: {'PASS' if p7_1_pass else 'FAIL'} - Ratio: {p3b_mm_ratio_post:.2f}:1, d: {cohens_d_propofol:.3f}"
+        )
+
+    if "P7.2" not in p7_missing:
+        # P7.2: Ketamine MMN Suppression
+        logger.info("Testing P7.2: Ketamine MMN Suppression")
+        p7_2_pass = (
+            mmn_suppression_pct >= 20.0
+            and p3b_suppression_pct < 50.0
+            and eta_squared_ketamine >= 0.15
+            and p_ketamine < 0.01
+        )
+        results["criteria"]["P7.2"] = {
+            "passed": p7_2_pass,
+            "mmn_suppression_pct": mmn_suppression_pct,
+            "p3b_suppression_pct": p3b_suppression_pct,
+            "eta_squared": eta_squared_ketamine,
+            "p_value": p_ketamine,
+            "threshold": "MMN ≥20% suppression, P3b <50% suppression, η² ≥ 0.15",
+            "actual": f"MMN: {mmn_suppression_pct:.1f}%, P3b: {p3b_suppression_pct:.1f}%, η²: {eta_squared_ketamine:.3f}",
+        }
+        if p7_2_pass:
+            results["summary"]["passed"] += 1
+        else:
+            results["summary"]["failed"] += 1
+        logger.info(
+            f"P7.2: {'PASS' if p7_2_pass else 'FAIL'} - MMN: {mmn_suppression_pct:.1f}%, P3b: {p3b_suppression_pct:.1f}%, η²: {eta_squared_ketamine:.3f}"
+        )
+
+    if "P7.3" not in p7_missing:
+        # P7.3: Psilocybin P3b Enhancement
+        logger.info("Testing P7.3: Psilocybin P3b Enhancement")
+        p7_3_pass = (
+            p3b_increase_pct >= 10.0
+            and hep_embodiment_correlation >= 0.20
+            and cohens_d_psilocybin >= 0.45
+            and p_psilocybin < 0.01
+        )
+        results["criteria"]["P7.3"] = {
+            "passed": p7_3_pass,
+            "p3b_increase_pct": p3b_increase_pct,
+            "hep_embodiment_correlation": hep_embodiment_correlation,
+            "cohens_d": cohens_d_psilocybin,
+            "p_value": p_psilocybin,
+            "threshold": "P3b ≥10% increase, HEP-embodiment r ≥ 0.20, d ≥ 0.45",
+            "actual": f"P3b: {p3b_increase_pct:.1f}%, r: {hep_embodiment_correlation:.2f}, d: {cohens_d_psilocybin:.3f}",
+        }
+        if p7_3_pass:
+            results["summary"]["passed"] += 1
+        else:
+            results["summary"]["failed"] += 1
+        logger.info(
+            f"P7.3: {'PASS' if p7_3_pass else 'FAIL'} - P3b: {p3b_increase_pct:.1f}%, r: {hep_embodiment_correlation:.2f}, d: {cohens_d_psilocybin:.3f}"
+        )
 
     logger.info(
         f"\nValidation_Protocol_7 Summary: {results['summary']['passed']}/{results['summary']['total']} criteria passed"
@@ -4037,9 +4062,11 @@ def check_falsification(
     criteria_p_values = []
     for criterion_id in results["criteria"]:
         criterion = results["criteria"][criterion_id]
-        # Extract p-value if available, default to 1.0
-        p_val = criterion.get("p_value", 1.0)
-        criteria_p_values.append(p_val)
+        # Only evaluated criteria belong to the correction family; a missing
+        # p-value is neither substituted nor counted (APGI-INT-003).
+        p_val = criterion.get("p_value")
+        if p_val is not None:
+            criteria_p_values.append(p_val)
 
     # Apply Bonferroni and FDR-BH correction if function available
     if apply_multiple_comparison_correction is not None and criteria_p_values:

@@ -1,0 +1,46 @@
+# Per-data-class retention, deletion, access and recovery rules (APGI-DAT-003).
+#
+# STATUS: DRAFT. Retention periods for research data classes are governed by
+# ethics approvals and data-use agreements and MUST be set by the data
+# authority (AUD-GOV-02, AUD-SPEC-07). A class whose retention_days is
+# "PENDING" is never deleted automatically: utils/retention_policy.py refuses
+# to act on it, so a missing approval cannot cause data loss or silent
+# over-retention.
+policy_version: "0.1.0"
+approved_by: PENDING
+classes:
+  synthetic:
+    description: Simulated/method-validation data (data_origin=synthetic|demonstration|replay)
+    paths: ["data_repository/synthetic_data"]
+    retention_days: 365
+    deletion: delete_file
+    backup_included: false
+    access: project_members
+  derived_outputs:
+    description: Protocol result files and figures produced by runs
+    paths: ["results", "apgi_outputs"]
+    retention_days: 180
+    deletion: delete_file
+    backup_included: true
+    access: project_members
+  logs:
+    description: Application and audit logs (audit logs follow security policy)
+    paths: ["logs"]
+    retention_days: 90
+    deletion: delete_file
+    backup_included: false
+    access: operators
+  imported_empirical:
+    description: Licensed public datasets (retention bound by each licence/DUA)
+    paths: ["data_repository/raw_data"]
+    retention_days: PENDING
+    deletion: lineage_withdrawal
+    backup_included: true
+    access: named_researchers
+  human_observed:
+    description: Consented participant data (retention bound by ethics approval)
+    paths: []
+    retention_days: PENDING
+    deletion: lineage_withdrawal
+    backup_included: PENDING
+    access: named_researchers

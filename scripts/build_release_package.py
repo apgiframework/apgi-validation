@@ -70,6 +70,8 @@ ANALYSIS_FILES = [
     "utils/data_provenance.py",
     "utils/protocol_lock.py",
     "utils/protocol_loader.py",
+    "utils/deviation_register.py",
+    "utils/acquisition_checks.py",
     "utils/statistical_tests.py",
     "apgi_core/equations.py",
     "apgi_core/engine.py",

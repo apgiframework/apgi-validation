@@ -595,12 +595,28 @@ class BackupManager:
             True if restore successful
         """
         with self._lock:
-            # Find backup file
+            # Find backup file (plain or encrypted at rest, APGI-API-003)
             backup_file = None
+            decrypted_tmp: Optional[Path] = None
             for ext in [".zip", ".tar"]:
                 potential_file = self.backup_dir / f"{backup_id}{ext}"
+                encrypted_file = self.backup_dir / f"{backup_id}{ext}.apgienc"
                 if potential_file.exists():
                     backup_file = potential_file
+                    break
+                if encrypted_file.exists():
+                    import tempfile
+
+                    from utils.payload_encryption import PayloadEncryptionError, decrypt_file
+
+                    tmp_dir = Path(tempfile.mkdtemp(prefix="apgi_restore_"))
+                    try:
+                        backup_file = decrypt_file(encrypted_file, out=tmp_dir / f"{backup_id}{ext}")
+                    except PayloadEncryptionError as exc:
+                        apgi_logger.logger.error(f"Encrypted backup {backup_id} failed authentication: {exc}")
+                        shutil.rmtree(tmp_dir, ignore_errors=True)
+                        return False
+                    decrypted_tmp = tmp_dir
                     break
 
             if not backup_file:
@@ -632,6 +648,26 @@ class BackupManager:
             except Exception as e:
                 apgi_logger.logger.error(f"Error restoring backup {backup_id}: {e}")
                 return False
+            finally:
+                if decrypted_tmp is not None:
+                    # Never leave decrypted backup content on disk.
+                    shutil.rmtree(decrypted_tmp, ignore_errors=True)
+
+    def encrypt_backup(self, backup_id: str) -> Path:
+        """Encrypt an existing backup archive at rest (AES-256-GCM, APGI-API-003).
+
+        The plaintext archive is replaced by ``<archive>.apgienc``;
+        :meth:`restore_backup` decrypts it transparently into a temporary
+        directory that is removed afterwards.
+        """
+        from utils.payload_encryption import encrypt_file
+
+        with self._lock:
+            for ext in (".zip", ".tar"):
+                archive = self.backup_dir / f"{backup_id}{ext}"
+                if archive.exists():
+                    return encrypt_file(archive)
+        raise FileNotFoundError(f"Backup archive not found: {backup_id}")
 
     def _restore_zip_backup(
         self,
@@ -835,8 +871,8 @@ class BackupManager:
         """Delete a backup."""
         success = True
 
-        # Delete backup file
-        for ext in [".zip", ".tar"]:
+        # Delete backup file, plain or encrypted at rest (.apgienc)
+        for ext in [".zip", ".tar", ".zip.apgienc", ".tar.apgienc"]:
             backup_file = self.backup_dir / f"{backup_id}{ext}"
             if backup_file.exists():
                 try:

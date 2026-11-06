@@ -13,7 +13,7 @@ by design.
 | Governing protocol | v1.2 | specification (draft) | **UNRESOLVED** — no approved 1.1.0→1.2 mapping (AUD-SPEC-01) |
 | Local inter-protocol contract | 1.0 | `utils/protocol_contracts.py` | `tests/test_protocol_contracts.py` |
 | ProtocolResult exchange schema | 2.0.0 | `utils/protocol_schema.py` | `tests/test_provenance_and_reports.py` |
-| Validation report schema | 1.0.0 | `config/schemas/validation_report.schema.json` | contract + signature tests |
+| Validation report schema | 2.0.0 | `config/schemas/validation_report.schema.json` | contract + signature tests |
 | K-gate catalog | 0.1.0 | `utils/kgate.py` → `release/gate-table.yaml` | `--check` equality |
 | Canonical apgi-api schemas | — | not supplied (AUD-SPEC-06) | **none** |
 

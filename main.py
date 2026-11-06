@@ -3273,7 +3273,9 @@ def neural_signatures(
             behavioral_data_path=behavioral_data,
         )
 
-        console.print(f"Overall Validation Score: {results['overall_validation_score']:.3f}")
+        console.print(
+            f"Overall Validation Score: {results['overall_validation_score']:.3f} (simulation-based; not empirical evidence)"
+        )
         console.print("\nDetailed Results:")
         for key, value in results.items():
             if key != "overall_validation_score":
@@ -3332,7 +3334,9 @@ def causal_manipulations(
         else:
             results = validator.validate_causal_predictions()
 
-        print(f"Overall Causal Validation Score: {results.get('overall_causal_validation_score', 0):.3f}")
+        print(
+            f"Overall Causal Validation Score: {results.get('overall_causal_validation_score', 0):.3f} (simulation-based; not empirical evidence)"
+        )
 
         if output_file:
             with open(output_file, "w", encoding="utf-8") as f:
@@ -3373,7 +3377,9 @@ def quantitative_fits(
         validator = quant_module.QuantitativeModelValidator()
         results = validator.validate_quantitative_fits()
 
-        console.print(f"Overall Quantitative Validation Score: {results['overall_quantitative_score']:.3f}")
+        console.print(
+            f"Overall Quantitative Validation Score: {results['overall_quantitative_score']:.3f} (simulation-based; not empirical evidence)"
+        )
 
         if output_file:
             with open(output_file, "w", encoding="utf-8") as f:
@@ -3426,7 +3432,9 @@ def clinical_convergence(
         else:
             results = validator.validate_clinical_convergence()
 
-        console.print(f"Overall Clinical Validation Score: {results['overall_clinical_score']:.3f}")
+        console.print(
+            f"Overall Clinical Validation Score: {results['overall_clinical_score']:.3f} (simulation-based; not empirical evidence)"
+        )
 
         if output_file:
             with open(output_file, "w", encoding="utf-8") as f:
@@ -3907,7 +3915,9 @@ def comprehensive_validation(
         print(f"Validation Time: {time.time() - start_time:.1f}s")
         print(f"Scientific Status: {fals_results['scientific_assessment']['scientific_status']}")
         overall_assessment = results["overall_assessment"]  # type: ignore[assignment]
-        print(f"Overall Validation Score: {overall_assessment['overall_validation_score']:.3f}")
+        print(
+            f"Overall Validation Score: {overall_assessment['overall_validation_score']:.3f} (simulation-based; not empirical evidence)"
+        )
 
         # Final assessment
         final_score = overall_assessment["overall_validation_score"]

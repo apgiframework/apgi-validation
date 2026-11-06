@@ -1,6 +1,6 @@
 {
   "apgi-validation": {
-    "generated_from_commit": "c5022e671e79f6d0247695b1e6ed6e6f5687b557"
+    "generated_from_commit": "6826c7e72077740f01d36834da3b275fb9d5d278"
   },
   "upstream_components": {
     "apgi-api": "PENDING: canonical schema revision not approved (AUD-SPEC-06)",

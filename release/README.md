@@ -1,7 +1,7 @@
 # APGI validation — reproducibility package
 
 Application version 1.3.0 · protocol bundle 1.1.0 ·
-K-gate catalog 0.1.0 · report schema 1.0.0
+K-gate catalog 0.1.0 · report schema 2.0.0
 
 **Validation status: no K-gate has been evaluated.** No frozen, consented
 empirical dataset exists yet (prerequisites S4-REC-01, S4-REC-02), so every

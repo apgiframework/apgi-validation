@@ -32,7 +32,7 @@ import jsonschema
 from utils.data_provenance import ProvenanceRecord
 from utils.kgate import CATALOG_VERSION, GateClassification
 
-REPORT_SCHEMA_VERSION = "1.0.0"
+REPORT_SCHEMA_VERSION = "2.0.0"
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "config" / "schemas" / "validation_report.schema.json"
 
 
@@ -73,6 +73,8 @@ def validate_report(report: Dict[str, Any]) -> None:
         ]
         if bad:
             raise ReportContractError(f"non-empirical inputs cannot support a PASS/FAIL decision: {bad}")
+    if report.get("deviations") and cls["decision"] in ("PASS", "FAIL"):
+        raise ReportContractError("a report with registered-plan deviations cannot carry a PASS/FAIL decision")
     if cls["decision"] == "INDETERMINATE" and cls["next_action"] != "further_sample":
         raise ReportContractError("INDETERMINATE decisions require next_action=further_sample")
 
@@ -130,6 +132,8 @@ def build_report(
     n: Optional[int] = None,
     validation_id: Optional[str] = None,
     created_at: Optional[str] = None,
+    deviations: Iterable[Any] = (),
+    parameter_names: Optional[Iterable[str]] = None,
 ) -> Dict[str, Any]:
     report = {
         "validation_id": validation_id or str(uuid.uuid4()),
@@ -143,10 +147,24 @@ def build_report(
         "software": {"name": "apgi-validation", "version": software_version, "source_commit": source_commit},
         "seed": seed,
         "environment": environment_fingerprint(),
+        "deviations": [d.to_dict() if hasattr(d, "to_dict") else dict(d) for d in deviations],
+        "parameter_provenance": _parameter_provenance(parameter_names),
         "created_at": created_at or datetime.now(timezone.utc).isoformat(),
     }
     validate_report(report)
     return report
+
+
+def _parameter_provenance(names: Optional[Iterable[str]]) -> Dict[str, Any]:
+    """Provenance labels of the parameters the analysis used (APGI-SCI-005)."""
+    from utils.parameter_provenance import provenance_for
+
+    names = list(names or [])
+    labels = provenance_for(names)
+    counts: Dict[str, int] = {}
+    for entry in labels.values():
+        counts[entry["label"]] = counts.get(entry["label"], 0) + 1
+    return {"parameters": labels, "label_counts": counts}
 
 
 # ---------------------------------------------------------------------------

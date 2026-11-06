@@ -4881,7 +4881,7 @@ def check_falsification(
             "cohens_d": cohens_d_degradation,
         },
     )
-    p_degradation = 0.0  # Placeholder
+    p_degradation = None  # set below only if the test actually runs
     # Perform actual statistical test for V1.2 (accuracy degradation)
     try:
         from utils.statistical_tests import safe_ttest_ind
@@ -4897,8 +4897,9 @@ def check_falsification(
     ):
         _, p_degradation, _ = safe_ttest_ind(degraded_accuracy_distribution, baseline_accuracy_distribution, alpha=0.05)
     else:
-        logger.warning("V1.2: Insufficient data for statistical test, using placeholder p=1.0")
-        p_degradation = 1.0  # Non-significant when data insufficient
+        # No p-value is fabricated when the test cannot run (APGI-INT-003).
+        logger.warning("V1.2: insufficient data for the statistical test; p-value not computed")
+        p_degradation = None
     results["criteria"]["V1.2"] = {
         "passed": v1_2_pass,
         "accuracy_degradation_pct": accuracy_degradation,

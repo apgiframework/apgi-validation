@@ -1,67 +1,245 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://apgiframework.com/schemas/validation_report/1.0.0",
+  "$id": "https://apgiframework.com/schemas/validation_report/2.0.0",
   "title": "APGI independent validation report",
-  "description": "S4-VAL-11.1 contract (validation_id … created_at). Field list pending Scientific Reviewer confirmation.",
+  "description": "S4-VAL-11.1 contract (validation_id \u2026 created_at). Field list pending Scientific Reviewer confirmation. v2.0.0 adds required deviations and parameter_provenance.",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "validation_id", "report_schema_version", "gate_id", "gate_catalog_version",
-    "protocol_lock_sha256", "input_datasets", "n", "classification",
-    "software", "seed", "environment", "created_at"
+    "validation_id",
+    "report_schema_version",
+    "gate_id",
+    "gate_catalog_version",
+    "protocol_lock_sha256",
+    "input_datasets",
+    "n",
+    "classification",
+    "software",
+    "seed",
+    "environment",
+    "deviations",
+    "parameter_provenance",
+    "created_at"
   ],
   "properties": {
-    "validation_id": {"type": "string", "minLength": 8},
-    "report_schema_version": {"const": "1.0.0"},
-    "gate_id": {"enum": ["K1", "K2", "K3", "K4", "K4b", "K5", "K6", "K6b", "K7b", "K8"]},
-    "gate_catalog_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
-    "protocol_lock_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "validation_id": {
+      "type": "string",
+      "minLength": 8
+    },
+    "report_schema_version": {
+      "const": "2.0.0"
+    },
+    "gate_id": {
+      "enum": [
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "K4b",
+        "K5",
+        "K6",
+        "K6b",
+        "K7b",
+        "K8"
+      ]
+    },
+    "gate_catalog_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "protocol_lock_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "input_datasets": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["record_id", "data_origin", "processing_stage", "inferential_category", "source", "version", "sha256", "license", "parents"],
+        "required": [
+          "record_id",
+          "data_origin",
+          "processing_stage",
+          "inferential_category",
+          "source",
+          "version",
+          "sha256",
+          "license",
+          "parents"
+        ],
         "properties": {
-          "record_id": {"type": "string", "minLength": 1},
-          "data_origin": {"enum": ["human_observed", "synthetic", "replay", "imported_empirical", "demonstration"]},
-          "processing_stage": {"enum": ["raw", "derived"]},
-          "inferential_category": {"enum": ["confirmatory", "exploratory", "descriptive", "method_validation"]},
-          "source": {"type": ["string", "null"]},
-          "version": {"type": ["string", "null"]},
-          "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
-          "license": {"type": ["string", "null"]},
-          "parents": {"type": "array", "items": {"type": "string"}}
+          "record_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "data_origin": {
+            "enum": [
+              "human_observed",
+              "synthetic",
+              "replay",
+              "imported_empirical",
+              "demonstration"
+            ]
+          },
+          "processing_stage": {
+            "enum": [
+              "raw",
+              "derived"
+            ]
+          },
+          "inferential_category": {
+            "enum": [
+              "confirmatory",
+              "exploratory",
+              "descriptive",
+              "method_validation"
+            ]
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "license": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         }
       }
     },
-    "n": {"type": ["integer", "null"], "minimum": 0},
+    "n": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
     "classification": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["gate_id", "processing_status", "decision", "next_action", "rationale", "criteria"],
+      "required": [
+        "gate_id",
+        "processing_status",
+        "decision",
+        "next_action",
+        "rationale",
+        "criteria"
+      ],
       "properties": {
-        "gate_id": {"type": "string"},
-        "processing_status": {"enum": ["NOT_EVALUATED", "EVALUATED"]},
-        "decision": {"enum": ["PASS", "FAIL", "INDETERMINATE", null]},
-        "next_action": {"enum": ["none", "further_sample", "collect_evidence", "retire_items"]},
-        "rationale": {"type": "string", "minLength": 1},
-        "criteria": {"type": "array"}
+        "gate_id": {
+          "type": "string"
+        },
+        "processing_status": {
+          "enum": [
+            "NOT_EVALUATED",
+            "EVALUATED"
+          ]
+        },
+        "decision": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INDETERMINATE",
+            null
+          ]
+        },
+        "next_action": {
+          "enum": [
+            "none",
+            "further_sample",
+            "collect_evidence",
+            "retire_items"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "criteria": {
+          "type": "array"
+        }
       }
     },
     "software": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "version", "source_commit"],
+      "required": [
+        "name",
+        "version",
+        "source_commit"
+      ],
       "properties": {
-        "name": {"type": "string"},
-        "version": {"type": "string", "minLength": 1},
-        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"}
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$"
+        }
       }
     },
-    "seed": {"type": ["integer", "null"]},
-    "environment": {"type": "object"},
-    "created_at": {"type": "string", "format": "date-time"},
-    "signature": {"type": "object"}
+    "seed": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "environment": {
+      "type": "object"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature": {
+      "type": "object"
+    },
+    "deviations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "parameter_provenance": {
+      "type": "object",
+      "required": [
+        "parameters",
+        "label_counts"
+      ],
+      "properties": {
+        "parameters": {
+          "type": "object"
+        },
+        "label_counts": {
+          "type": "object"
+        }
+      }
+    }
   }
 }

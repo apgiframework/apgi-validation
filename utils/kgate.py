@@ -392,10 +392,22 @@ def classify_gate(
     estimates: Optional[Mapping[str, Any]],
     inputs: Iterable[ProvenanceRecord] = (),
     n: Optional[int] = None,
+    deviations: Sequence[Any] = (),
 ) -> GateClassification:
-    """Classify one K gate. Never forces a binary verdict."""
+    """Classify one K gate. Never forces a binary verdict.
+
+    ``deviations`` (``utils.deviation_register.Deviation``) from the registered
+    analysis plan make the evidence exploratory: the gate is NOT_EVALUATED and
+    cannot acquire a registered decision (APGI-REP-004, APGI-VAL-001).
+    """
     gate = K_GATES[gate_id]
     insufficiency = evidence_sufficiency(gate, inputs, n)
+    if insufficiency is None and deviations:
+        kinds = sorted({getattr(getattr(d, "kind", None), "value", str(d)) for d in deviations})
+        insufficiency = (
+            f"{len(deviations)} deviation(s) from the registered plan ({', '.join(kinds)}); "
+            "results are exploratory and carry no registered decision"
+        )
     if insufficiency is None and not estimates:
         insufficiency = "no estimates supplied"
     if insufficiency is None:

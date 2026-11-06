@@ -920,17 +920,17 @@ if __name__ == "__main__":
     print("\nExample Simulation (100 timesteps):")
     print("-" * 70)
 
-    np.random.seed(42)
+    demo_rng = np.random.default_rng(42)  # recorded demo stream (APGI-REP-002)
     n_steps = 100
 
     # Generate synthetic inputs
-    Pi_e_seq = np.random.uniform(0.5, 0.9, n_steps)
-    Pi_i_seq = np.random.uniform(0.5, 0.9, n_steps)
-    epsilon_e_seq = np.random.normal(0, 1, n_steps)
-    epsilon_i_seq = np.random.normal(0, 1, n_steps)
+    Pi_e_seq = demo_rng.uniform(0.5, 0.9, n_steps)
+    Pi_i_seq = demo_rng.uniform(0.5, 0.9, n_steps)
+    epsilon_e_seq = demo_rng.normal(0, 1, n_steps)
+    epsilon_i_seq = demo_rng.normal(0, 1, n_steps)
 
     # Add a strong stimulus at t=50
-    epsilon_e_seq[45:55] = np.random.normal(2.5, 0.5, 10)
+    epsilon_e_seq[45:55] = demo_rng.normal(2.5, 0.5, 10)
 
     # Run simulation
     history = model.simulate(

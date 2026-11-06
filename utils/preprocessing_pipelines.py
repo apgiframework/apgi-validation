@@ -1193,7 +1193,11 @@ class MultimodalPreprocessingPipeline:
                 "original_shape": df.shape,
                 "processed_shape": df_processed.shape,
                 "final_shape": df_processed.shape,
-                "quality_improvement": 85.0,  # Placeholder value
+                # Measured, not assumed (S4-VAL-12.3): change in the fraction of
+                # finite numeric cells between input and output, in percentage points.
+                "quality_improvement": _finite_fraction_delta(df, df_processed),
+                "input_sha256": _frame_sha256(df),
+                "output_sha256": _frame_sha256(df_processed),
                 "report_file": str(output_path / f"{input_path.stem}_report.json"),
                 "preprocessing_steps": self.pipeline_log,
             }
@@ -1277,3 +1281,23 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def _finite_fraction(frame: "pd.DataFrame") -> float:
+    numeric = frame.select_dtypes(include=[np.number])
+    if numeric.empty:
+        return 0.0
+    return float(np.isfinite(numeric.to_numpy(dtype=float)).mean())
+
+
+def _finite_fraction_delta(before: "pd.DataFrame", after: "pd.DataFrame") -> float:
+    return round(100.0 * (_finite_fraction(after) - _finite_fraction(before)), 4)
+
+
+def _frame_sha256(frame: "pd.DataFrame") -> str:
+    """Content digest of a DataFrame for the preprocessing audit trail."""
+    import hashlib
+
+    digest = hashlib.sha256(pd.util.hash_pandas_object(frame, index=True).to_numpy().tobytes())
+    digest.update(",".join(map(str, frame.columns)).encode())
+    return digest.hexdigest()

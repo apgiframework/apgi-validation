@@ -5,6 +5,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased] — register remediation, round 3
+
+### Removed fabricated results (APGI-INT-003, S4-VAL-12.4)
+- VP_15 empirical branch returned invented "EMPIRICAL_VALIDATED" passes; now NOT_EVALUATED.
+- VP_07 P7.1–P7.3 inputs were chosen so p < 0.01 by construction; now NOT_EVALUATED without EEG data.
+- Assumed data-quality scores (0.8/0.9), fixed 85 % quality improvement, fixed n_obs in BIC,
+  fabricated p = 1.0, and always-passing performance gates replaced by measurements or explicit "not computed".
+
+### Added
+- Deviation register with exploratory propagation into results, K-gates and reports (APGI-REP-004).
+- AES-256-GCM at-rest encryption for backups/datasets (APGI-API-003).
+- Per-data-class retention policy and enforcement (APGI-DAT-003; periods pending approval).
+- Acquisition-quality checks (S4-VAL-12.2); health checks with structured alerts (APGI-IMP-003).
+- Build record + SBOM per main build, release-certificate CLI, PR change-impact template (APGI-IMP-001, REL-001/003/005).
+- Notation inventory scan (APGI-SCI-004); parameter provenance in validation reports (APGI-SCI-005).
+- Cloud Run Job IaC for the isolated validation runner (S4-VAL-14; not deployed).
+- `ProtocolResult.export_for_exchange()` (APGI-INT-001); framework-vote eligibility (APGI-VAL-001).
+
+### Changed
+- Validation report schema 2.0.0: required `deviations` and `parameter_provenance`.
+- Measurement equations take an optional `rng`; the orchestrated model passes its seeded stream (APGI-REP-002).
+- CLI validation scores are labelled simulation-based (APGI-SCI-007).
+
+---
+
 ## [Unreleased] — APGI v1.2 validation-specification remediation
 
 Implements the code-actionable items of the v1.2 software-validation registers.

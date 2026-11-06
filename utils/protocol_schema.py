@@ -133,6 +133,11 @@ class ProtocolResult(BaseModel):
         if problems:
             raise ResultContractError("; ".join(problems))
 
+    def export_for_exchange(self) -> dict:
+        """Serialise for another component; refuses payloads missing the contract (APGI-INT-001)."""
+        self.assert_exchangeable()
+        return self.model_dump()
+
     def model_dump(self, **kwargs: Any) -> dict:
         """Dump to a dict containing only plain JSON types.
 
