@@ -246,3 +246,23 @@ def test_default_runtime_gates_do_not_pass_without_measurement():
     statuses = enforcer.enforce_all()
     assert statuses["protocol_runtime"] is GateStatus.FAILED
     assert enforcer.results["protocol_memory"]["value"] > 0
+
+
+def test_flatline_detected_on_any_channel():
+    from utils.acquisition_checks import check_recording
+
+    fs = 100.0
+    t = np.arange(1000) / fs
+    two = np.column_stack([np.sin(t), np.zeros_like(t)])  # channel 2 disconnected
+    rep = check_recording(t, two, fs)
+    assert "flatline" in rep.failures() and rep.checks["flatline"]["worst_channel"] == 1
+
+
+def test_delete_removes_encrypted_backup(tmp_path):
+    from utils.backup_manager import BackupManager
+
+    mgr = BackupManager(backup_dir=str(tmp_path))
+    enc = tmp_path / "b1.tar.apgienc"
+    enc.write_bytes(b"x")
+    mgr.delete_backup("b1")
+    assert not enc.exists()

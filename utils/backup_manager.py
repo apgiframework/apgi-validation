@@ -871,8 +871,8 @@ class BackupManager:
         """Delete a backup."""
         success = True
 
-        # Delete backup file
-        for ext in [".zip", ".tar"]:
+        # Delete backup file, plain or encrypted at rest (.apgienc)
+        for ext in [".zip", ".tar", ".zip.apgienc", ".tar.apgienc"]:
             backup_file = self.backup_dir / f"{backup_id}{ext}"
             if backup_file.exists():
                 try:

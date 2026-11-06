@@ -44,7 +44,8 @@ resource "google_service_account" "runner" {
 
 resource "google_storage_bucket_iam_member" "results_writer" {
   bucket = var.results_bucket
-  role   = "roles/storage.objectCreator"
+  # Cloud Storage FUSE needs create + read of the objects it writes.
+  role = "roles/storage.objectUser"
   member = "serviceAccount:${google_service_account.runner.email}"
 }
 
@@ -63,7 +64,10 @@ resource "google_cloud_run_v2_job" "validation" {
       containers {
         image   = var.image
         command = ["python", "main.py"]
-        args    = ["validate", "--all-protocols", "--output-dir", "/results"]
+        # /app/results is created in the image and owned by the non-root
+        # `apgi` user; it is backed by the results bucket (volume below), so
+        # reports persist beyond the ephemeral container.
+        args = ["validate", "--all-protocols", "--output-dir", "/app/results"]
         env {
           name  = "APGI_ENV"
           value = "production"
@@ -83,6 +87,17 @@ resource "google_cloud_run_v2_job" "validation" {
         }
         resources {
           limits = { cpu = "4", memory = "16Gi" }
+        }
+        volume_mounts {
+          name       = "results"
+          mount_path = "/app/results"
+        }
+      }
+      volumes {
+        name = "results"
+        gcs {
+          bucket    = var.results_bucket
+          read_only = false
         }
       }
       dynamic "vpc_access" {

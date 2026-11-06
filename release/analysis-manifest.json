@@ -6,7 +6,7 @@
     "apgi_core/equations.py": "92663130335c324f28a51c486a61c1f4e08b3440dea6b9b4d844c0811a2ff0b7",
     "apgi_core/temporal_hierarchy.py": "53f5a80f6ebc52b0cd2230046740eb934e2e0fce3cf761ecd2df7de24ad8dc7d",
     "config/schemas/validation_report.schema.json": "9945eca8d6ecf64da19ccd1b9c8b0da63aca9596022e1fd1e9c1c39bdfd4bd25",
-    "utils/acquisition_checks.py": "e73bc73055c9a3f8c6f516c9e59572e3ef87ac53da3fe85f8d7ae0f75600cc3e",
+    "utils/acquisition_checks.py": "0962db5ca5091ff22a85b698bf883a90342dfe3c3fa1303d2571af5848dc80b5",
     "utils/data_provenance.py": "6d20c44bea93942ff1d6ef7eac268ad1dd833ad01a52d1762cd3cedce51b3185",
     "utils/deviation_register.py": "2d85b248d577659589e703eb09ff12201227adfee5cd7440368ee5c958870ab8",
     "utils/kgate.py": "672e6fb0a73cf8e8952eb136d7d821f3597eff289e443d8949507251b16f39d0",

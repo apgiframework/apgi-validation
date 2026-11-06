@@ -95,14 +95,21 @@ def check_recording(
     n_nonfinite = int(np.sum(~np.isfinite(x)))
     checks["nonfinite"] = {"passed": n_nonfinite == 0, "count": n_nonfinite}
 
-    flat = x if x.ndim == 1 else x.reshape(len(t), -1)[:, 0]
-    longest, run = 1, 1
-    for a, b in zip(flat[:-1], flat[1:]):
-        run = run + 1 if a == b else 1
-        longest = max(longest, run)
+    # Constant runs are measured per channel; one dead channel fails the check.
+    channels = x.reshape(len(t), -1)
+    longest_by_channel = []
+    for ch in range(channels.shape[1]):
+        col = channels[:, ch]
+        longest, run = 1, 1
+        for a, b in zip(col[:-1], col[1:]):
+            run = run + 1 if a == b else 1
+            longest = max(longest, run)
+        longest_by_channel.append(longest * period)
+    worst = max(longest_by_channel)
     checks["flatline"] = {
-        "passed": longest * period <= bounds.flatline_s,
-        "longest_constant_run_s": longest * period,
+        "passed": worst <= bounds.flatline_s,
+        "longest_constant_run_s": worst,
+        "worst_channel": int(np.argmax(longest_by_channel)),
     }
 
     if expected_sha256 is not None:
