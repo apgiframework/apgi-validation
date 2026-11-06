@@ -127,7 +127,7 @@ def verify_protocol_lock(
     folder = Path(protocols_dir) if protocols_dir is not None else DEFAULT_PROTOCOLS_DIR
     anchor_path = Path(trust_anchor) if trust_anchor is not None else DEFAULT_TRUST_ANCHOR
 
-    if os.environ.get(SKIP_ENV, "0") == "1":
+    if os.environ.get("APGI_SKIP_PROTOCOL_LOCK", "0") == "1":
         if is_production():
             err = f"{SKIP_ENV}=1 is not permitted when APGI_ENV=production"
             _record(LockAuditRecord(_now(), str(folder), "rejected", None, None, [err]))
