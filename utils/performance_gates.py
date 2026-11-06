@@ -202,6 +202,30 @@ DEFAULT_SLA_THRESHOLDS = {
 }
 
 
+def _peak_rss_mb() -> float:
+    """Peak resident memory of this process in MB (measured, Linux/macOS)."""
+    import resource
+    import sys as _sys
+
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    # ru_maxrss is KiB on Linux and bytes on macOS.
+    return peak / (1024 * 1024) if _sys.platform == "darwin" else peak / 1024
+
+
+def _not_measured(metric: str) -> Callable[[], float]:
+    """A check that refuses to pass without a real measurement.
+
+    The default gates used to return 0.0, so every runtime gate passed without
+    measuring anything (APGI-IMP-003). Callers must register a gate with a real
+    measurement function; until then the gate reports a failed check.
+    """
+
+    def check() -> float:
+        raise RuntimeError(f"{metric} was not measured; register a gate with a real measurement")
+
+    return check
+
+
 def get_default_gates() -> List[PerformanceGate]:
     """Get default performance gates for APGI framework."""
     gates = []
@@ -213,7 +237,7 @@ def get_default_gates() -> List[PerformanceGate]:
             description="Maximum runtime for protocol execution",
             threshold=DEFAULT_SLA_THRESHOLDS["protocol_runtime"],
             unit="seconds",
-            check_function=lambda: 0.0,  # Placeholder
+            check_function=_not_measured("protocol_runtime"),
             comparison="<=",
             critical=True,
         )
@@ -225,7 +249,7 @@ def get_default_gates() -> List[PerformanceGate]:
             description="Maximum memory usage for protocol execution",
             threshold=DEFAULT_SLA_THRESHOLDS["protocol_memory"],
             unit="MB",
-            check_function=lambda: 0.0,  # Placeholder
+            check_function=_peak_rss_mb,
             comparison="<=",
             critical=True,
         )
@@ -238,7 +262,7 @@ def get_default_gates() -> List[PerformanceGate]:
             description="Maximum runtime for test suite",
             threshold=DEFAULT_SLA_THRESHOLDS["test_suite_runtime"],
             unit="seconds",
-            check_function=lambda: 0.0,  # Placeholder
+            check_function=_not_measured("test_suite_runtime"),
             comparison="<=",
             critical=False,
         )

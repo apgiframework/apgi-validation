@@ -341,9 +341,11 @@ class APGIPhysiologicalEstimator:
         # Model fit metrics (simplified)
         log_lik = -0.5 * beta_unc  # Higher uncertainty → lower likelihood
         n_params = 1  # Only β is free
-        n_obs = 100  # Placeholder
         aic = 2 * n_params - 2 * log_lik
-        bic = n_params * np.log(n_obs) - 2 * log_lik
+        # BIC needs the number of independent observations behind log_lik, which
+        # this simplified fit does not define. A fixed n_obs=100 used to be
+        # substituted; BIC is now NaN (not computed) instead (APGI-INT-003).
+        bic = float("nan")
 
         # Collinearity is broken by design when using physiological prior
         collinearity_broken = self.pi_i_confidence > 0.5

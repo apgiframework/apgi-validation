@@ -65,15 +65,39 @@ class DataQualityAssessor:
         non_null_cells = data.notna().sum().sum()
         return non_null_cells / total_cells if total_cells > 0 else 0.0
 
+    #: Optional per-column valid ranges, e.g. {"rt_ms": (100, 3000)}. Columns
+    #: without a declared range are checked for finiteness only.
+    valid_ranges: Dict[str, tuple] = {}
+
     def _check_consistency(self, data: pd.DataFrame) -> float:
-        """Check data consistency (logical relationships)"""
-        # Placeholder - implement specific consistency checks
-        return 0.8  # Assume good consistency for now
+        """Fraction of rows passing structural consistency checks (S4-VAL-12.2).
+
+        A row is inconsistent when it duplicates another row exactly, or when a
+        monotonic time column (``timestamp``/``time``/``onset``) goes backwards.
+        Measured, never assumed: an empty frame scores 0.0.
+        """
+        if data.empty:
+            return 0.0
+        bad = data.duplicated(keep="first").to_numpy().copy()
+        for col in ("timestamp", "time", "onset"):
+            if col in data.columns and pd.api.types.is_numeric_dtype(data[col]):
+                backwards = data[col].diff().to_numpy() < 0
+                bad |= np.nan_to_num(backwards, nan=False).astype(bool)
+        return float(1.0 - bad.mean())
 
     def _check_validity(self, data: pd.DataFrame) -> float:
-        """Check data validity (value ranges, types)"""
-        # Placeholder - implement specific validity checks
-        return 0.9  # Assume good validity for now
+        """Fraction of numeric cells that are finite and inside any declared range."""
+        numeric = data.select_dtypes(include=[np.number])
+        if numeric.empty:
+            return 0.0 if data.empty else 1.0
+        values = numeric.to_numpy(dtype=float)
+        ok = np.isfinite(values)
+        for j, col in enumerate(numeric.columns):
+            if col in self.valid_ranges:
+                lo, hi = self.valid_ranges[col]
+                with np.errstate(invalid="ignore"):
+                    ok[:, j] &= (values[:, j] >= lo) & (values[:, j] <= hi)
+        return float(ok.mean())
 
     def generate_quality_report(self) -> str:
         """Generate text report of quality assessment"""

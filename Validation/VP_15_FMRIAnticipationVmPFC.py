@@ -380,32 +380,27 @@ def run_validation(
 
             logger.info(f"Loaded empirical fMRI data: {fmri_data.shape}")
 
-            # Validate predictions on real data
+            # The empirical V15.x analyses are not implemented. Previously this
+            # branch returned hard-coded "EMPIRICAL_VALIDATED" passes with invented
+            # values (250 ms, 3.5, 0.45). No value is fabricated now: every
+            # prediction is NOT_EVALUATED until the registered analysis exists
+            # (APGI-INT-003, S4-VAL-12.4).
+            reason = "empirical V15 analysis not implemented; no result is reported"
             named_predictions = {
-                "V15.1": {
-                    "passed": True,  # Placeholder: would validate on real data
-                    "actual": 250,  # Placeholder: would extract from real data
-                    "threshold": "< 500ms",
-                    "validation_status": "EMPIRICAL_VALIDATED",
-                },
-                "V15.2": {
-                    "passed": True,  # Placeholder: would validate on real data
-                    "actual": 3.5,  # Placeholder: would extract from real data
-                    "threshold": "> 2.5",
-                    "validation_status": "EMPIRICAL_VALIDATED",
-                },
-                "V15.3": {
-                    "passed": True,  # Placeholder: would validate on real data
-                    "actual": 0.45,  # Placeholder: would extract from real data
-                    "threshold": "> 0.30",
-                    "validation_status": "EMPIRICAL_VALIDATED",
-                },
+                pid: {
+                    "passed": False,
+                    "actual": None,
+                    "threshold": threshold,
+                    "validation_status": "NOT_EVALUATED",
+                    "reason": reason,
+                }
+                for pid, threshold in (("V15.1", "< 500ms"), ("V15.2", "> 2.5"), ("V15.3", "> 0.30"))
             }
 
-            all_passed = all(p.get("passed", False) for p in named_predictions.values())
+            all_passed = False
 
             return {
-                "status": "COMPLETE",
+                "status": "NOT_EVALUATED",
                 "passed": all_passed,
                 "protocol_id": "VP-15",
                 "protocol_name": "fMRI vmPFC Anticipation Paradigm",
