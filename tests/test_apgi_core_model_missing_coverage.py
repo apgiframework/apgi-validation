@@ -431,8 +431,8 @@ class TestModelEdgeCases:
         results = model.run(inputs)
 
         assert len(results) == 3
-        # Threshold is clamped to minimum 0.1 due to biological constraints
-        assert model.theta >= 0.1
+        # Threshold is clamped to the floor θ_floor = 0 (Math Spec §4.5; PV-CLIP)
+        assert model.theta >= 0.0
 
     @pytest.mark.filterwarnings("ignore::RuntimeWarning")
     def test_infinite_values_input(self):

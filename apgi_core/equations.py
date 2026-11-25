@@ -857,6 +857,7 @@ class APGIParameters:
 
     # ========== RESET DYNAMICS ==========
     rho: float = 0.7  # Reset fraction (Range: 0.3-0.9)
+    r_max: float = 100.0  # Maximal ignition rate (1/s) of the hazard (Math Spec Eq. 35); placeholder until fitted
 
     # ========== NOISE STRENGTHS ==========
     sigma_S: float = 0.05  # Surprise noise
@@ -2819,8 +2820,11 @@ class EnhancedSurpriseIgnitionSystem:
             alpha=self.params.alpha,
         )
 
-        # Bernoulli trial for ignition
-        B_new = 1 if self.rng.random() < P_ignition else 0
+        # Ignition event through the dt-invariant hazard 1 − exp(−r_max·Bₜ·dt)
+        # (Math Spec Eq. 35; PV-HAZARD), with Bₜ = P_ignition the logistic propensity.
+        r_max = getattr(self.params, "r_max", 100.0)
+        p_event = -np.expm1(-r_max * P_ignition * dt)
+        B_new = 1 if self.rng.random() < p_event else 0
 
         # ========== POST-IGNITION RESET ==========
         if B_new == 1:
