@@ -53,11 +53,11 @@ class APGISettings(BaseSettings):
     max_window_ms: float = 500.0
 
     # Threshold parameters
-    theta0: float = 0.03
+    theta0: float = 0.35  # θ₀ (AU); Notation Appendix band [0.25, 0.85] (PV-THETA-SCALE)
     gamma: float = 0.1
     delta: float = 0.5
     lambda_urg: float = 0.2
-    theta_min: float = 0.01
+    theta_min: float = 0.0  # θ_floor = 0 (Math Spec §4.5; PV-CLIP)
     theta_max: float = 5.0
 
     # Learning rates

@@ -334,12 +334,12 @@ def enforce_stability(state: Dict[str, float]) -> Dict[str, float]:
 
     Enforces:
         - S ∈ [0, 10]
-        - θ ∈ [0.1, 5.0]
+        - θ ∈ [0, 5.0]  (floor θ_floor = 0, Math Spec §4.5; 5 AU is a numerical guard)
         - Π_e ∈ [0.01, 10]
         - Π_i ∈ [0.01, 10]
     """
     state["S"] = clip(state["S"], 0.0, 10.0)
-    state["theta"] = clip(state["theta"], 0.1, 5.0)
+    state["theta"] = clip(state["theta"], 0.0, 5.0)
     state["Pi_e"] = clip(state["Pi_e"], 0.01, 10.0)
     state["Pi_i"] = clip(state["Pi_i"], 0.01, 10.0)
     return state

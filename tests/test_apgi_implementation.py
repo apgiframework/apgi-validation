@@ -425,7 +425,7 @@ class TestAPGIModel:
     def test_init_default(self):
         """Test initialization with default config."""
         model = APGIModel()
-        assert model.theta == 0.03  # Updated to match APGISettings.theta0
+        assert model.theta == 0.35  # APGISettings.theta0, Notation Appendix band [0.25, 0.85]
         assert model.S == 0.0
         assert model.M == 0.0
 

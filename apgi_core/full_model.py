@@ -4,6 +4,7 @@ TIER DESIGNATION: Tier 1 (thermodynamic)
 """
 
 import logging
+import warnings
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple, Union
 
@@ -38,7 +39,9 @@ class APGIParameters:
     """Parameters for APGI Full Dynamic Model with constraints."""
 
     # Temporal parameters
-    delta_t: float = 0.05  # Δt: Timestep duration (seconds), typical 0.05-0.1 (50-100ms)
+    # Δt: integration step (s). dt₀ = 10 ms is the reference step at which θ₀ is
+    # calibrated; the Math Spec step rule requires dt ≤ τ_S/10 (PV-DT).
+    delta_t: float = 0.01
     tau: float = 0.2  # τ: Signal decay time constant (seconds), typical 0.1-0.3
 
     # Signal accumulation parameters
@@ -46,7 +49,9 @@ class APGIParameters:
     wi: float = 0.5  # Internal domain weight (we + wi = 1)
 
     # Threshold dynamics parameters
-    theta_t0: float = 3.0  # Baseline threshold [1.0, 10.0], typical 2.0-4.0σ
+    # Baseline threshold θ₀ (AU) on the excess-surprise scale. Notation Appendix:
+    # θ₀ ∈ [0.25, 0.85] AU, series default 0.35 (PV-THETA-SCALE; formerly 3.0 "σ").
+    theta_t0: float = 0.35
     alpha: float = 0.9  # Threshold recovery rate (0,1), typical 0.8-0.95
     phi: float = 0.4  # Post-ignition facilitation [0.0, 1.0], typical 0.3-0.5σ
     tau_theta: float = 20.0  # Threshold adaptation time constant (seconds), typical 10-100s
@@ -63,6 +68,11 @@ class APGIParameters:
     # Somatic bias
     beta: float = 1.0  # Somatic bias [0.0, 5.0], typical 0.5-2.0
 
+    # Maximal ignition rate r_max (1/s) of the dt-invariant hazard
+    # P(I=1) = 1 − exp(−r_max·Bₜ·dt) (Math Spec Eq. 35; PV-HAZARD). Fitted per study;
+    # 100 /s = 1/dt₀ is a placeholder, as in apgi-implementation.
+    r_max: float = 100.0
+
     def __post_init__(self):
         """Validate parameter constraints."""
         if not (0.01 <= self.delta_t <= 0.2):
@@ -71,8 +81,15 @@ class APGIParameters:
             raise ValueError(f"tau must be in [0.05, 1.0], got {self.tau}")
         if not np.isclose(self.we + self.wi, 1.0):
             raise ValueError(f"we + wi must equal 1.0, got {self.we + self.wi}")
-        if not (1.0 <= self.theta_t0 <= 10.0):
-            raise ValueError(f"theta_t0 must be in [1.0, 10.0], got {self.theta_t0}")
+        if not (0.25 <= self.theta_t0 <= 0.85):
+            raise ValueError(f"theta_t0 must be in [0.25, 0.85] AU, got {self.theta_t0}")
+        if not self.r_max > 0:
+            raise ValueError(f"r_max must be > 0, got {self.r_max}")
+        if self.delta_t > self.tau / 10:
+            warnings.warn(
+                f"delta_t = {self.delta_t} s breaks the step rule dt <= tau/10 = {self.tau / 10} s",
+                stacklevel=2,
+            )
         if not (0 < self.alpha < 1):
             raise ValueError(f"alpha must be in (0,1), got {self.alpha}")
         if not (0.0 <= self.phi <= 1.0):
@@ -602,11 +619,15 @@ class APGIFullDynamicModel:
         # 5. Compute ignition probability
         prob_ignition = self.ignition_probability(S_next, theta_t_next)
 
-        # 6. Determine ignition (stochastic or deterministic)
+        # 6. Determine ignition (stochastic or deterministic). prob_ignition is the
+        # propensity Bₜ; the event is drawn through the dt-invariant hazard
+        # 1 − exp(−r_max·Bₜ·dt), so two half-steps fire as often as one full step
+        # (apgi-lean: Apgi.hazard_two_steps).
         if deterministic_ignition:
             I_next = 1 if prob_ignition > 0.5 else 0
         else:
-            I_next = 1 if self.rng.random() < prob_ignition else 0
+            p_event = -np.expm1(-self.params.r_max * prob_ignition * self.params.delta_t)
+            I_next = 1 if self.rng.random() < p_event else 0
 
         # Update state with all tracked quantities
         self.state = APGIState(
