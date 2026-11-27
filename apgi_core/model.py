@@ -1,7 +1,14 @@
 """
 TIER DESIGNATION: Tier 1 (thermodynamic)
 
+MODEL FORM: energy-form variant (declared). APGIModel is NOT the APGI v1.2 minimal core
+(SSOT §9): it recomputes S from the current error and updates its statistics before
+standardizing. Analyses that test the minimal core use apgi_core.full_model or
+apgi-implementation's model_form="ssot_core"; results from APGIModel are labelled with
+MODEL_FORM and are never reported as minimal-core predictions (apgi-lean SSOT-V1).
 """
+
+MODEL_FORM = "energy_form_variant"
 
 import logging
 from dataclasses import dataclass, field

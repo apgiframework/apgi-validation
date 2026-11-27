@@ -22,6 +22,8 @@ except ImportError:
     nolds = None
 
 import numpy as np
+
+M0 = float(np.sqrt(2.0 / np.pi))  # m₀ = E|z| for z ~ N(0, 1) (apgi-lean Apgi.meanAbsStdNormal_eq)
 from scipy.special import expit
 
 # Matplotlib imports for PNG visualization
@@ -311,11 +313,16 @@ class APGIFullDynamicModel:
         """
         beta_val = beta if beta is not None else self.params.beta
 
+        # APGI v1.2 minimal core (SSOT §5.5-§5.6): the drive is the excess magnitude
+        # |ε| − m₀ (EQ-DRIVE-1, EQ-EXCESS-1; stimulus-free mean 0, so S is signed), and the
+        # accumulator is the exact leak S ← (1 − λ)S + λ·S_inst, λ = 1 − exp(−Δt/τ) (EQ-LEAK-1),
+        # whose fixed point is S_inst. Resolves apgi-lean SSOT-V2.
         decay_factor = np.exp(-self.params.delta_t / self.params.tau)
-        external_contribution = self.params.we * Pi_e * abs(epsilon_e)
-        internal_contribution = self.params.wi * beta_val * Pi_i * abs(epsilon_i)
+        lam = 1.0 - decay_factor
+        external_contribution = self.params.we * Pi_e * (abs(epsilon_e) - M0)
+        internal_contribution = self.params.wi * beta_val * Pi_i * (abs(epsilon_i) - M0)
 
-        S_next = decay_factor * self.state.S + external_contribution + internal_contribution
+        S_next = decay_factor * self.state.S + lam * (external_contribution + internal_contribution)
 
         return S_next
 
