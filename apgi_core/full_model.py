@@ -55,9 +55,19 @@ class APGIParameters:
     # θ₀ ∈ [0.25, 0.85] AU, series default 0.35 (PV-THETA-SCALE; formerly 3.0 "σ").
     theta_t0: float = 0.35
     alpha: float = 0.9  # Threshold recovery rate (0,1), typical 0.8-0.95
-    phi: float = 0.4  # Post-ignition facilitation [0.0, 1.0], typical 0.3-0.5σ
-    tau_theta: float = 20.0  # Threshold adaptation time constant (seconds), typical 10-100s
-    eta_theta: float = 0.1  # Allostatic modulation gain [0.01, 1.0], typical 0.05-0.2
+    tau_theta: float = 20.0  # τ_θ: threshold mean-reversion timescale (s); SSOT range [10, 30]
+    eta_theta: float = 0.1  # η_θ: allostatic learning rate on C − V (discrete); SSOT: fitted, ≥ 0
+
+    # APGI v1.2 minimal core (SSOT §5.7, §5.9, EQ-ALLO-1, EQ-COST-1, EQ-VAL-1, EQ-RESET-1).
+    # The SSOT lists these as fitted; the defaults are neutral placeholders (no cost/value drive,
+    # no per-event increment), equal to apgi-lean's apgi_ref.CORE_DEFAULTS.
+    theta_floor: float = 0.0  # θ_floor (AU), SSOT default 0
+    delta_reset: float = 0.0  # δ_reset (AU): per-event slow threshold increment, ≥ 0
+    rho_retain: float = 0.3  # ρ_retain: post-ignition signal retention, admissible [0, 1]
+    c1: float = 0.0  # cost weight on S(t) (AU)
+    c2: float = 0.0  # cost weight on B(t−1) (AU), ≥ 0
+    v1: float = 0.0  # information-value weight on |zᵉ| (AU), ≥ 0
+    v2: float = 0.0  # information-value weight on |zⁱ_eff| (AU), ≥ 0
 
     # Metabolic parameters
     gamma_c: float = 0.2  # Metabolic cost per ignition [0.05, 0.5], typical 0.1-0.3σ
@@ -94,12 +104,19 @@ class APGIParameters:
             )
         if not (0 < self.alpha < 1):
             raise ValueError(f"alpha must be in (0,1), got {self.alpha}")
-        if not (0.0 <= self.phi <= 1.0):
-            raise ValueError(f"phi must be in [0.0, 1.0], got {self.phi}")
         if not (5.0 <= self.tau_theta <= 200.0):
             raise ValueError(f"tau_theta must be in [5.0, 200.0], got {self.tau_theta}")
-        if not (0.01 <= self.eta_theta <= 1.0):
-            raise ValueError(f"eta_theta must be in [0.01, 1.0], got {self.eta_theta}")
+        if not self.eta_theta >= 0.0:
+            raise ValueError(f"eta_theta must be >= 0, got {self.eta_theta}")
+        if not self.theta_floor >= 0.0:
+            raise ValueError(f"theta_floor must be >= 0, got {self.theta_floor}")
+        if not self.delta_reset >= 0.0:
+            raise ValueError(f"delta_reset must be >= 0, got {self.delta_reset}")
+        if not (0.0 <= self.rho_retain <= 1.0):
+            raise ValueError(f"rho_retain must be in [0, 1], got {self.rho_retain}")
+        for name in ("c2", "v1", "v2"):
+            if not getattr(self, name) >= 0.0:
+                raise ValueError(f"{name} must be >= 0, got {getattr(self, name)}")
         if not (0.05 <= self.gamma_c <= 0.5):
             raise ValueError(f"gamma_c must be in [0.05, 0.5], got {self.gamma_c}")
         if not (0.01 <= self.gamma_r <= 0.2):
@@ -206,10 +223,10 @@ class APGIState:
     S: float = 0.0  # Accumulated signal (z-score units)
     theta_t: float = 3.0  # Current broadcast threshold (σ units)
     eta_m: float = 0.0  # Metabolic modulation (threshold elevation in σ)
-    I: int = 0  # Binary ignition indicator
-    ignition_probability: float = 0.0  # P(ignition|t)
-    C_metabolic: float = 0.0  # Anticipated metabolic cost of ignition
-    V_information: float = 0.0  # Predicted information value of ignition
+    I: int = 0  # B(t): ignition event drawn this step
+    ignition_probability: float = 0.0  # propensity Bₜ = σ(k·[S(t) − θ(t)]) at the decision
+    C_metabolic: float = 0.0  # C(t) = c₁·S(t) + c₂·B(t−1) (EQ-COST-1)
+    V_information: float = 0.0  # V(t) = v₁·|zᵉ| + v₂·|zⁱ_eff| (EQ-VAL-1)
 
     def to_dict(self) -> Dict[str, Union[int, float]]:
         """
@@ -326,56 +343,23 @@ class APGIFullDynamicModel:
 
         return S_next
 
-    def compute_metabolic_cost(self, S: float, theta_t: float) -> float:
-        """
-        Compute anticipated metabolic cost of ignition.
-
-        C_metabolic represents the expected energy cost if ignition occurs,
-        scaled by the distance above threshold and current metabolic state.
+    def compute_metabolic_cost(self, S: float, B_prev: int) -> float:
+        """EQ-COST-1 (SSOT §5.9): C(t) = c₁·S(t) + c₂·B(t−1); the action term c₃‖a‖ is not modelled.
 
         Args:
-            S: Accumulated signal
-            theta_t: Current threshold
-
-        Returns:
-            Metabolic cost estimate
+            S: Accumulated signal S(t) at the decision (before reset and leak)
+            B_prev: Ignition event of the previous step, B(t−1)
         """
-        if S <= theta_t:
-            return 0.0
+        return self.params.c1 * S + self.params.c2 * B_prev
 
-        # Cost scales with how far above threshold we are and current metabolic modulation
-        excess_signal = S - theta_t
-        base_cost = self.params.gamma_c * excess_signal
-
-        # Modulate by current metabolic state (higher eta_m means higher baseline cost)
-        metabolic_factor = 1.0 + self.state.eta_m / self.params.eta_m_max
-
-        return base_cost * metabolic_factor
-
-    def compute_information_value(self, Pi_e: float, Pi_i: float, epsilon_e: float, epsilon_i: float) -> float:
-        """
-        Compute predicted information value of ignition.
-
-        V_information represents the expected informational gain if ignition occurs,
-        based on precision-weighted prediction error magnitudes.
+    def compute_information_value(self, z_e: float, z_i_eff: float) -> float:
+        """EQ-VAL-1 (SSOT §5.9): V(t) = v₁·|zᵉ_t| + v₂·|zⁱ_eff,t|.
 
         Args:
-            Pi_e: External precision/reliability [0,1]
-            Pi_i: Internal precision/reliability [0,1]
-            epsilon_e: External prediction error magnitude (z-score)
-            epsilon_i: Internal prediction error magnitude (z-score)
-
-        Returns:
-            Information value estimate
+            z_e: Standardized exteroceptive prediction error
+            z_i_eff: Standardized interoceptive prediction error after the DA offset
         """
-        # Information value scales with precision-weighted prediction errors
-        external_value = Pi_e * abs(epsilon_e)
-        internal_value = self.params.beta * Pi_i * abs(epsilon_i)
-
-        # Total information value is the sum
-        total_value = external_value + internal_value
-
-        return total_value
+        return self.params.v1 * abs(z_e) + self.params.v2 * abs(z_i_eff)
 
     def compute_hurst_exponent_dfa(self, time_series: np.ndarray) -> float:
         """
@@ -518,38 +502,24 @@ class APGIFullDynamicModel:
 
         return results
 
-    def threshold_dynamics(self, I_prev: int) -> float:
-        """
-        Compute threshold dynamics using continuous-time differential equation.
+    def threshold_dynamics(self, B: int, C: float, V: float) -> float:
+        """EQ-ALLO-1 (SSOT §5.7), the canonical discrete update:
 
-        Implements: dθ_t/dt = (θ_0 - θ_t)/τ_θ + η_θ · (C_metabolic - V_information)
+            θ′ = θ_t + η_θ·[C(t) − V(t)] + δ_reset·B(t)
+            θ_{t+1} = max(θ_floor, θ₀ + (θ′ − θ₀)·exp(−dt/τ_θ))
 
-        NOTE: This function implements the continuous-time ODE component of threshold dynamics.
-        A discrete post-ignition facilitation term (φ·I_prev) is added after the ODE integration
-        to model short-term threshold facilitation following ignition events. This discrete component
-        breaks the strict continuous-time description but captures empirically observed post-ignition
-        threshold dynamics that are not captured by the continuous ODE alone.
+        The decay is the exact solution of dθ/dt = −(θ − θ₀)/τ_θ, so η_θ = 0 is expressible and
+        the step is bounded for every dt (apgi-lean: Apgi.thresholdStep_floor).
 
         Args:
-            I_prev: Ignition indicator from previous timestep (0 or 1)
-
-        Returns:
-            New threshold θ_t(t+Δt) including both continuous ODE and discrete facilitation
+            B: Ignition event of this step, B(t)
+            C: Cost C(t) (EQ-COST-1)
+            V: Information value V(t) (EQ-VAL-1)
         """
-        # Continuous-time dynamics: dθ_t/dt = (θ_0 - θ_t)/τ_θ + η_θ · (C_metabolic - V_information)
-        return_to_baseline = (self.params.theta_t0 - self.state.theta_t) / self.params.tau_theta
-        allostatic_modulation = self.params.eta_theta * (self.state.C_metabolic - self.state.V_information)
-
-        # Euler integration for timestep Δt
-        dtheta_dt = return_to_baseline + allostatic_modulation
-        theta_t_next = self.state.theta_t + dtheta_dt * self.params.delta_t
-
-        # Add post-ignition facilitation (discrete component)
-        # φ·I_prev models short-term threshold facilitation following ignition
-        # This term captures empirically observed post-ignition dynamics not in the continuous ODE
-        theta_t_next += self.params.phi * I_prev
-
-        return theta_t_next
+        p = self.params
+        theta_prime = self.state.theta_t + p.eta_theta * (C - V) + p.delta_reset * B
+        decayed = p.theta_t0 + (theta_prime - p.theta_t0) * float(np.exp(-(p.delta_t / p.tau_theta)))
+        return max(p.theta_floor, decayed)
 
     def metabolic_dynamics(self, I_prev: int) -> float:
         """
@@ -608,35 +578,39 @@ class APGIFullDynamicModel:
         Returns:
             New APGIState after timestep
         """
+        # SSOT §8 order (apgi-lean apgi_ref.core_step, steps 8–13; resolves SSOT-V3):
+        # the decision uses the EXISTING S(t) and θ(t); cost, value and the threshold step follow
+        # the event; the retention reset precedes the leak. θ_eff = θ here: full_model carries no
+        # NE, 5-HT, refractory or urgency term (all zero in the minimal core).
         I_prev = self.state.I
+        S_t, theta_t = self.state.S, self.state.theta_t
 
-        # 1. Compute new signal accumulation
-        S_next = self.signal_accumulation(Pi_e, Pi_i, epsilon_e, epsilon_i, beta)
+        # 8. propensity from the existing signal and threshold (EQ-IGN-2)
+        prob_ignition = self.ignition_probability(S_t, theta_t)
 
-        # 2. Compute C_metabolic and V_information for threshold dynamics
-        C_metabolic = self.compute_metabolic_cost(S_next, self.state.theta_t)
-        V_information = self.compute_information_value(Pi_e, Pi_i, epsilon_e, epsilon_i)
-
-        # 3. Compute new threshold using continuous-time dynamics
-        theta_t_next = self.threshold_dynamics(I_prev)
-
-        # 4. Compute new metabolic state
-        eta_m_next = self.metabolic_dynamics(I_prev)
-
-        # 5. Compute ignition probability
-        prob_ignition = self.ignition_probability(S_next, theta_t_next)
-
-        # 6. Determine ignition (stochastic or deterministic). prob_ignition is the
-        # propensity Bₜ; the event is drawn through the dt-invariant hazard
-        # 1 − exp(−r_max·Bₜ·dt), so two half-steps fire as often as one full step
-        # (apgi-lean: Apgi.hazard_two_steps).
+        # 9. event through the dt-invariant hazard 1 − exp(−r_max·Bₜ·dt) (EQ-HAZARD-1;
+        # apgi-lean: Apgi.hazard_two_steps). deterministic_ignition: Bₜ > 0.5.
         if deterministic_ignition:
             I_next = 1 if prob_ignition > 0.5 else 0
         else:
             p_event = -np.expm1(-self.params.r_max * prob_ignition * self.params.delta_t)
             I_next = 1 if self.rng.random() < p_event else 0
 
-        # Update state with all tracked quantities
+        # 10. cost, value and the allostatic threshold step (EQ-COST-1, EQ-VAL-1, EQ-ALLO-1)
+        C_metabolic = self.compute_metabolic_cost(S_t, I_prev)
+        V_information = self.compute_information_value(epsilon_e, epsilon_i)
+        theta_t_next = self.threshold_dynamics(I_next, C_metabolic, V_information)
+
+        # 12. retention reset, exactly once, before the leak (EQ-RESET-1)
+        if I_next:
+            self.state.S = self.params.rho_retain * S_t
+
+        # 13. exact leak towards the instantaneous drive (EQ-LEAK-1, EQ-DRIVE-1)
+        S_next = self.signal_accumulation(Pi_e, Pi_i, epsilon_e, epsilon_i, beta)
+
+        # Extension diagnostic, not part of the minimal core: it does not feed θ or S.
+        eta_m_next = self.metabolic_dynamics(I_prev)
+
         self.state = APGIState(
             S=S_next,
             theta_t=theta_t_next,
@@ -755,14 +729,15 @@ class APGIFullDynamicModel:
         """
         return {
             "signal_accumulation": r"$S(t+\Delta t) = \exp(-\Delta t/\tau) \cdot S(t) + w_e \cdot \Pi_e(t) \cdot |\varepsilon_e(t)| + w_i \cdot \beta(t) \cdot \Pi_i(t) \cdot |\varepsilon_i(t)|$",
-            "threshold_dynamics_continuous": r"$\frac{d\theta_t}{dt} = \frac{\theta_0 - \theta_t}{\tau_\theta} + \eta_\theta \cdot (C_{metabolic} - V_{information})$",
-            "threshold_dynamics_discrete": r"$\theta_t(t+\Delta t) = \theta_t(t) + \Delta t \cdot \left[\frac{\theta_0 - \theta_t(t)}{\tau_\theta} + \eta_\theta \cdot (C_{metabolic} - V_{information})\right] + \phi \cdot I(t)$",
-            "ignition_probability": r"$P(\text{ignition}|t) = \frac{1}{1 + \exp(-k \cdot (S(t) - \theta_t(t)))}$",
+            "threshold_dynamics_continuous": r"$\frac{d\theta}{dt} = -\frac{\theta - \theta_0}{\tau_\theta} + \eta_\theta [C(t) - V(t)] + \delta_{reset} \sum_k \delta_D(t - t_k)$",
+            "threshold_dynamics_discrete": r"$\theta' = \theta_t + \eta_\theta [C(t) - V(t)] + \delta_{reset} B(t),\; \theta_{t+1} = \max(\theta_{floor}, \theta_0 + (\theta' - \theta_0) e^{-\Delta t/\tau_\theta})$",
+            "retention_reset": r"$S_t \leftarrow \rho_{retain} S_t \text{ on } B(t) = 1$",
+            "ignition_probability": r"$B_t = \sigma(k [S_t - \theta_t]),\; P(B(t) = 1) = 1 - \exp(-r_{max} B_t \Delta t)$",
             "metabolic_dynamics": r"$\eta_m(t+\Delta t) = \eta_m(t) + \gamma_c \cdot I(t) - \gamma_r \cdot (1 - I(t))$",
             "signal_standardization": r"$\varepsilon_{\text{normalized}} = \frac{\varepsilon_{\text{raw}} - \mu_{\text{baseline}}}{\sigma_{\text{baseline}}}$",
             "core_criterion": r"$(\Pi_e \cdot |\varepsilon_e| + \beta \cdot \Pi_i \cdot |\varepsilon_i|) > \theta_t$",
-            "metabolic_cost": r"$C_{metabolic} = \gamma_c \cdot \max(0, S - \theta_t) \cdot \left(1 + \frac{\eta_m}{\eta_{m,max}}\right)$",
-            "information_value": r"$V_{information} = \Pi_e \cdot |\varepsilon_e| + \beta \cdot \Pi_i \cdot |\varepsilon_i|$",
+            "metabolic_cost": r"$C(t) = c_1 S(t) + c_2 B(t-1)$",
+            "information_value": r"$V(t) = v_1 |z^e_t| + v_2 |z^i_{eff,t}|$",
         }
 
     def get_parameter_summary(self) -> Dict[str, Dict[str, Any]]:
@@ -797,11 +772,17 @@ class APGIFullDynamicModel:
                 "typical": "0.8-0.95",
                 "description": "Threshold return-to-baseline rate",
             },
-            "phi": {
-                "value": self.params.phi,
-                "range": "[0.0, 1.0]",
-                "typical": "0.3-0.5σ",
-                "description": "Post-ignition facilitation",
+            "delta_reset": {
+                "value": self.params.delta_reset,
+                "range": ">= 0",
+                "typical": "fitted",
+                "description": "Per-event slow threshold increment δ_reset (EQ-ALLO-1)",
+            },
+            "rho_retain": {
+                "value": self.params.rho_retain,
+                "range": "[0, 1]",
+                "typical": "[0.1, 0.5]",
+                "description": "Post-ignition signal retention (EQ-RESET-1)",
             },
             "tau_theta": {
                 "value": self.params.tau_theta,
